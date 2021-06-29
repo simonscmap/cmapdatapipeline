@@ -157,35 +157,26 @@ def getDatasetID_Tbl_Name(tableName, server):
     )
     query_return = DB.dbRead(cur_str, server=server)
 
-    # query_return = DB.DB_query(cur_str)
     dsID = query_return.iloc[0][0]
     return dsID
 
 
 def getKeywordIDsTableNameVarName(tableName, var_short_name_list, server):
     """Get list of keyword ID's from input dataset ID"""
-    cur_str = """select [ID] from tblVariables where Table_Name = '{tableName}' AND [Short_Name] in {vsnp}""".format(
-        tableName=tableName, vsnp=tuple(var_short_name_list)
-    )
+    vsnp = tuple(var_short_name_list)
+    cur_str = f"""select [ID] from tblVariables where Table_Name = '{tableName}' AND [Short_Name] in {vsnp}"""
     if len(var_short_name_list) == 1:
         cur_str = cur_str.replace(",)", ")")
 
     query_return = DB.dbRead(cur_str, server=server)["ID"].to_list()
-
-    # query_return = DB.DB_query(cur_str)["ID"].to_list()
     return query_return
 
 
 def getKeywordsIDDataset(dataset_ID, server):
     """Get list of keyword ID's from input dataset ID"""
-    cur_str = (
-        """select [ID] from tblVariables where Dataset_ID = '{dataset_ID}'""".format(
-            dataset_ID=str(dataset_ID)
-        )
-    )
+    dataset_ID = str(dataset_ID)
+    cur_str = f"""select [ID] from tblVariables where Dataset_ID = '{dataset_ID}'"""
     query_return = DB.dbRead(cur_str, server=server)["ID"].to_list()
-
-    # query_return = DB.DB_query(cur_str)["ID"].to_list()
     return query_return
 
 
@@ -326,42 +317,33 @@ def cruise_has_trajectory(cruiseName):
         print(cruiseName, " is not a valid cruise in the CMAP database.")
         cruise_has_traj = False
     else:
-        cruise_traj_test_df = DB.DB_query(
-            """SELECT TOP (1) * FROM tblCruise_Trajectory WHERE Cruise_ID = '{cruise_id}'""".format(
-                cruise_id=cruise_id[0]
-            )
-        )
+        cruise_id = cruise_id[0]
+        cruise_traj_test_df = DB.DB_query(f"""SELECT TOP (1) * FROM tblCruise_Trajectory WHERE Cruise_ID = '{cruise_id}'""")
         if cruise_traj_test_df.empty:
             cruise_has_traj = False
         else:
             cruise_has_traj = True
-
     return cruise_has_traj
 
 
-def getLatCount(tableName):
-    query = (
-        """SELECT SUM(p.rows) FROM sys.partitions AS p
+def getLatCount(tableName,server):
+    query = (f"""SELECT SUM(p.rows) FROM sys.partitions AS p
     INNER JOIN sys.tables AS t
     ON p.[object_id] = t.[object_id]
     INNER JOIN sys.schemas AS s
     ON s.[schema_id] = t.[schema_id]
-    WHERE t.name = N'"""
-        + tableName
-        + """'
+    WHERE t.name = N'{tableName}'
     AND s.name = N'dbo'
-    AND p.index_id IN (0,1);"""
-    )
+    AND p.index_id IN (0,1);""")
 
-    api = pycmap.API()
-    df = api.query(query)
+    df = DB.dbRead(query, server)
     lat_count = df.columns[0]
     return lat_count
 
 
 def tableInDB(tableName):
     """Returns a boolean if tableName exists in DB."""
-    qry = """SELECT TOP(1) * FROM {tableName}""".format(tableName=tableName)
+    qry = f"""SELECT TOP(1) * FROM {tableName}"""
     qry_result = DB.DB_query(qry)
     if len(qry_result) > 0:
         tableBool = True
@@ -372,11 +354,7 @@ def tableInDB(tableName):
 
 def datasetINtblDatasets(dataset_name):
     """Returns a boolean if dataset name exists in tblDatasets"""
-    dataset_qry = DB.DB_query(
-        """SELECT * FROM tblDatasets WHERE Dataset_Name = '{dataset_name}'""".format(
-            dataset_name=dataset_name
-        )
-    )
+    dataset_qry = DB.DB_query(f"""SELECT * FROM tblDatasets WHERE Dataset_Name = '{dataset_name}'""")
     if len(dataset_qry) >= 1:
         ds_bool = True
     else:
@@ -386,12 +364,10 @@ def datasetINtblDatasets(dataset_name):
 
 def length_of_tbl(tableName):
     """Returns a string representation of the length of a SQL table. Alternate speedup?"""
-    qry = """  select sum (spart.rows)
+    qry = f"""  select sum (spart.rows)
     from sys.partitions spart
     where spart.object_id = object_id('{tableName}')
-    and spart.index_id < 2""".format(
-        tableName=tableName
-    )
+    and spart.index_id < 2"""
     tableCount = list(DB.DB_query(qry))[0]
     return tableCount
 
@@ -404,9 +380,7 @@ def flist_in_daterange(start_date, end_date, tableName, branch, processing_lvl):
 
 
 def get_var_list_dataset(tableName):
-    col_name_list = DB.DB_query(
-        """EXEC uspColumns '{tableName}'""".format(tableName=tableName)
-    )["Columns"].to_list()
+    col_name_list = DB.DB_query(f"""EXEC uspColumns '{tableName}'""")["Columns"].to_list()
     return col_name_list
 
 
