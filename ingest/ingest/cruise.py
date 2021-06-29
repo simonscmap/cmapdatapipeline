@@ -1,5 +1,3 @@
-##dev note: If dataset doesn't have any cruise, have user input to add cruise to DB.
-# if yes: create cruise traj from lat/lon/time pairs, cruise stats, cruise metadata from user input.
 
 import sys
 import os
