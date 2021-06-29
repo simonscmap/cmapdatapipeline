@@ -42,7 +42,7 @@ endDay = int(sys.argv[4])
 
 c1 = (
     "python motuclient.py "
-    + "--user mdehghaniashkez --pwd Jazireie08 "
+    + "--user {usr} --pwd {passwd} "
     + "--motu http://my.cmems-du.eu/motu-web/Motu "
     + "--service-id OCEANCOLOUR_GLO_CHL_L4_REP_OBSERVATIONS_009_082-TDS "
     + "--product-id dataset-oc-glo-chl-multi-l4-gsm_25km_8days-rep-v02 "

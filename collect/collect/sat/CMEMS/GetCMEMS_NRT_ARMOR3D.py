@@ -25,7 +25,7 @@ yr = int(sys.argv[1])
 startDay = int(sys.argv[2])
 endDay = int(sys.argv[3])
 
-c1 = 'python2.7 motu-client.py -u mdehghaniashkez -p Jazireie08 -m http://motu.mfcglo-obs.cls.fr/mfcglo-armor-gateway-servlet/Motu -s GLOBAL_ANALYSIS_PHYS_001_020-TDS -d dataset-armor-3d-v4-cmems-v2 -x 0.125 -X -0.125 -y -82.125 -Y 89.875 -t "'
+c1 = 'python2.7 motu-client.py -u {usr} -p {passwd} -m http://motu.mfcglo-obs.cls.fr/mfcglo-armor-gateway-servlet/Motu -s GLOBAL_ANALYSIS_PHYS_001_020-TDS -d dataset-armor-3d-v4-cmems-v2 -x 0.125 -X -0.125 -y -82.125 -Y 89.875 -t "'
 c3 = '" -T "'
 c4 = (
     '" -z 0 -Z 5500.0001 -v zvelocity -v height -v mvelocity -v salinity -v temperature -o %s -f '

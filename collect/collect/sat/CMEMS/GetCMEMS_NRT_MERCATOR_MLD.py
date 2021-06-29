@@ -18,9 +18,9 @@ from time import sleep
 def get_nrt_mercator_mld(dt):
     c1 = (
         "python motuclient.py "
-        + "--user mdehghaniashkez --pwd Jazireie08 "
+        + "--user {usr} --pwd {passwd} "
         + "--motu http://nrt.cmems-du.eu/motu-web/Motu "
-        + "--service-id GLOBAL_ANALYSIS_FORECAST_PHY_001_024-TDS "
+        + "--service-id GLOBAL_ANALYSIS_FORECAST_PHY_001_024}-TDS "
         + "--product-id global-analysis-forecast-phy-001-024 "
         + "--longitude-min -180 --longitude-max 179.9166717529297 "
         + '--latitude-min -80 --latitude-max 90 --date-min "'

@@ -24,7 +24,7 @@ yr = int(sys.argv[1])
 startDay = int(sys.argv[2])
 endDay = int(sys.argv[3])
 
-c1 = 'python motu-client.py -u mdehghaniashkez -p Jazireie08 -m http://nrtcmems.mercator-ocean.fr/motu-web/Motu -s GLOBAL_ANALYSIS_FORECAST_BIO_001_014-TDS -d dataset-global-analysis-forecast-bio-001-014 -x -180 -X 179.5 -y -89 -Y 90 -t "'
+c1 = 'python motu-client.py -u {usr} -p {passwd} -m http://nrtcmems.mercator-ocean.fr/motu-web/Motu -s GLOBAL_ANALYSIS_FORECAST_BIO_001_014-TDS -d dataset-global-analysis-forecast-bio-001-014 -x -180 -X 179.5 -y -89 -Y 90 -t "'
 c3 = '" -T "'
 c4 = '" -z 0.493 -Z 5727.918 -v Fe -v PP -v Si -v NO3 -v CHL -v PHYC -v PO4 -v O2 -o %s -f ' % cfgv.nrt_mercator_pisces_raw
 
@@ -79,7 +79,7 @@ def get_nrt_mercator_pisces_raw(dt):
 
     c1 = (
         "python motuclient.py "
-        + "--user mdehghaniashkez --pwd Jazireie08 "
+        + "--user {usr} --pwd {passwd} "
         + "--motu http://nrt.cmems-du.eu/motu-web/Motu "
         + "--service-id GLOBAL_ANALYSIS_FORECAST_BIO_001_014-TDS "
         + "--product-id dataset-global-analysis-forecast-bio-001-014 "

@@ -27,7 +27,7 @@ def get_rep_uv_sla(yr, mn, dy):
 
     c1 = (
         "python motuclient.py "
-        + "--user mdehghaniashkez --pwd Jazireie08 "
+        + "--user {usr} --pwd {passwd} "
         + "--motu http://nrt.cmems-du.eu/motu-web/Motu "
         + "--service-id SEALEVEL_GLO_PHY_L4_NRT_OBSERVATIONS_008_046-TDS "
         + "--product-id dataset-duacs-nrt-global-merged-allsat-phy-l4 "

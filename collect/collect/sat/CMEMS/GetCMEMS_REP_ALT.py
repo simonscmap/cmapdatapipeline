@@ -25,7 +25,7 @@ def daynToDate(dt):
 def get_rep_uv_sla(yr, mn, dy):
     c1 = (
         "python motuclient.py "
-        + "--user mdehghaniashkez --pwd Jazireie08 "
+        + "--user {usr} --pwd {passwd} "
         + "--motu http://my.cmems-du.eu/motu-web/Motu "
         + "--service-id SEALEVEL_GLO_PHY_L4_REP_OBSERVATIONS_008_047-TDS "
         + "--product-id dataset-duacs-rep-global-merged-allsat-phy-l4 "

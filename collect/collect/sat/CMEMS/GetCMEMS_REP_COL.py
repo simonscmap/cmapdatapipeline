@@ -39,7 +39,7 @@ startDay = int(sys.argv[2])
 endDay = int(sys.argv[3])
 
 
-c1 = 'python2.7 motu-client.py -u mdehghaniashkez -p Jazireie08 -m http://cmems.isac.cnr.it/mis-gateway-servlet/Motu -s OCEANCOLOUR_GLO_OPTICS_L4_REP_OBSERVATIONS_009_081-TDS -d dataset-oc-glo-opt-multi-l4-%s_4km_8days-rep-v01 -x -179.97917175293 -X 179.97917175293 -y -89.97917175293 -Y 89.979164123535 -t "'
+c1 = 'python2.7 motu-client.py -u {usr} -p {passwd} -m http://cmems.isac.cnr.it/mis-gateway-servlet/Motu -s OCEANCOLOUR_GLO_OPTICS_L4_REP_OBSERVATIONS_009_081-TDS -d dataset-oc-glo-opt-multi-l4-%s_4km_8days-rep-v01 -x -179.97917175293 -X 179.97917175293 -y -89.97917175293 -Y 89.979164123535 -t "'
 c4 = '" %s -o %s -f '
 
 
