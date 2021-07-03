@@ -2,51 +2,95 @@ import sys
 import os
 import pandas as pd
 import numpy as np
-from cmapingest import DB
-from cmapingest import vault_structure as vs
+import DB
+import vault_structure as vs
 import pycmap
 
+def decode_xarray_bytes(xdf):
+    """Decode any byte strings in any columns of an xarray dataset
 
-def normalize(vals, min_max=False):
-    """Takes an array and either normalize to min/max, standardize it (remove the mean and divide by standard deviation)."""
-    if min_max:
-        normalized_vals = (vals - np.nanmin(vals)) / (np.nanmax(vals) - np.nanmin(vals))
-    else:
-        normalized_vals = (vals - np.nanmean(vals)) / np.nanstd(vals)
-    return normalized_vals
+    Args:
+        xdf {xarray dataset}: Input xarray dataset
 
+    Returns:
+        {xarray dataset}: Output xarray dataset with decoded byte strings
+    """    
+    for col in list(xdf):
+        if xdf[col].dtype == 'O':
+            try:
+                xdf[col] = xdf[col].astype(str)
+            except:
+                xdf[col] = xdf[col].str.decode('cp1252').str.strip()
+    return xdf
 
 def strip_whitespace_data(df):
-    """Strips any whitespace from data"""
+    """Strips leading and trailing whitespace from dataframe
+
+    Args:
+        df {Pandas DataFrame}: Input Pandas DataFrame
+
+    Returns:
+        df {Pandas DataFrame}: Out Pandas DataFrame 
+    """    
     df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
     return df
 
 
 def strip_whitespace_headers(df):
-    """Strips any whitespace from dataframe headers"""
+    """Strips any whitespace from dataframe header
+
+    Args:
+        df {Pandas DataFrame}: Input Pandas DataFrame
+
+    Returns:
+        df {Pandas DataFrame}: Out Pandas DataFrame 
+    """       
     df.columns = df.columns.str.strip()
     return df
 
 
 def strip_leading_trailing_whitespace_column(df, col_name):
+    """Using left and right string strip, remove trailing and leading whitespace from given column
+
+    Args:
+        df {Pandas DataFrame}: Input Pandas DataFrame
+        col_name {string}: Valid column name
+
+    Returns:
+        df {Pandas DataFrame}: Out Pandas DataFrame 
+    """    
     df[col_name] = df[col_name].str.lstrip()
     df[col_name] = df[col_name].str.rstrip()
     return df
 
 
 def nanToNA(df):
-    """Replaces and numpy nans with ''"""
-    df = df.replace(np.nan, "", regex=True)
+    """Replace numpy nan with ' '
+
+    Args:
+        df {Pandas DataFrame}: Input Pandas DataFrame
+
+    Returns:
+        df {Pandas DataFrame}: Out Pandas DataFrame 
+    """    
+    df = df.replace(np.nan, " ", regex=True)
     return df
 
 
 def lowercase_List(list):
-    """Converts every string in a list to lowercase string"""
+    """Convert every string in a list to a lowercase string
+
+    Args:
+        list {list}: Python list
+
+    Returns:
+        {list}: Python list with lowercase values
+    """    
     lower_list = [x.lower() for x in list]
     return lower_list
 
 
-def getColBounds(df, col, list_multiplier="0"):
+def getColBounds(df, col, list_multiplier=0):
     """Gets the min and max bounds of a dataframe column
 
     Parameters
@@ -143,7 +187,6 @@ def getDatasetID_DS_Name(datasetName, server):
         + """'"""
     )
     query_return = DB.dbRead(cur_str, server)
-    # query_return = DB.DB_query(cur_str)
     dsID = query_return.iloc[0][0]
     return dsID
 
@@ -162,7 +205,7 @@ def getDatasetID_Tbl_Name(tableName, server):
 
 
 def getKeywordIDsTableNameVarName(tableName, var_short_name_list, server):
-    """Get list of keyword ID's from input dataset ID"""
+    """Get list of keyword ID's from input tableName"""
     vsnp = tuple(var_short_name_list)
     cur_str = f"""select [ID] from tblVariables where Table_Name = '{tableName}' AND [Short_Name] in {vsnp}"""
     if len(var_short_name_list) == 1:
@@ -187,7 +230,6 @@ def getTableName_Dtypes(tableName, server):
         + tableName
         + """'"""
     )
-    # query_return = DB.DB_query(query)
     query_return = DB.dbRead(query, server)
 
     return query_return
@@ -222,30 +264,16 @@ def findVarID(datasetID, Short_Name, server):
     return VarID
 
 
-def find_File_Path_guess_tree(name):
-    """Attempts to return vault structure path for input filename"""
-    for root, dirs, files in os.walk(vs.vault):
-        if name in files:
-            fpath = os.path.join(root, name)
-            if "cruise" in fpath:
-                struct = vs.cruise
-            elif "float" in fpath:
-                struct = vs.float_dir
-            elif "station" in fpath:
-                struct = vs.station
-            elif "satellite" in fpath:
-                struct = vs.satellite
-            elif "model" in fpath:
-                struct = vs.model
-            elif "assimilation" in fpath:
-                struct = vs.assimilation
-            else:
-                struct = "File path not found"
-            return struct
-
-
 def verify_cruise_lists(dataset_metadata_df, server):
-    """Returns matching and non matching cruises"""
+    """Take dataset_metadata_df, match cruise names with those in tblCruise, return tuple of matched and unmatched lists.
+
+    Args:
+        dataset_metadata_df {Pandas DataFrame}: dataframe constucted from dataset_meta_data sheet of the CMAP data template.
+        server {string}: Valid CMAP server name. ex Rainer
+
+    Returns:
+        tuple: Two lists, matched and unmatched cruises.
+    """
     cruise_series = strip_leading_trailing_whitespace_column(
         dataset_metadata_df, "cruise_names"
     )["cruise_names"]
@@ -260,7 +288,15 @@ def verify_cruise_lists(dataset_metadata_df, server):
 
 
 def get_cruise_IDS(cruise_name_list, server):
-    """Returns IDs of input cruise names"""
+    """Returns IDs of input cruise names
+
+    Args:
+        cruise_name_list {list}: list of cruise names
+        server {string}: Valid CMAP server name. ex Rainer
+
+    Returns:
+        {list}: list of cruise IDs
+    """    
     cruise_db_df = getListCruises(server)
     cruise_name_list = lowercase_List(cruise_name_list)
     cruise_ID_list_name = cruise_db_df["ID"][
@@ -273,9 +309,16 @@ def get_cruise_IDS(cruise_name_list, server):
     return combined_cruise_id
 
 
-def get_region_IDS(region_name_list):
-    """Returns IDs of input region names"""
-    region_db_df = DB.DB_query("""SELECT * FROM tblRegions""")
+def get_region_IDS(region_name_list,server):
+    """Returns IDs of input region names
+
+    Args:
+        region_name_list {list}: list of region names
+        server {string}: Valid CMAP server name. ex Rainer
+    Returns:
+        {list}: list of region IDs
+    """    
+    region_db_df = DB.dbRead("""SELECT * FROM tblRegions""",server)
     region_name_list = lowercase_List(region_name_list)
     region_ID_list = region_db_df["Region_ID"][
         region_db_df["Region_Name"].str.lower().isin(region_name_list)
@@ -284,22 +327,15 @@ def get_region_IDS(region_name_list):
 
 
 def exclude_val_from_col(series, exclude_list):
-    """
+    """Exclude any characters in a list from Pandas Series
 
-    Parameters
-    ----------
-    series : Pandas Series
-        Input Series
-    exclude_list : list
-        List of values to exclude from string.
+    Args:
+        series {Pandas Series}: Input pandas series
+        exclude_list {list}: list of characters to exclude
 
-    Returns
-    -------
-
-    Pandas Series
-        Returns the dataframe with exclude list values removed.
-
-    """
+    Returns:
+        {Pandas Series}: Pandas series with characters excluded
+    """    
     mod_series = pd.Series(list(series[~series.isin(exclude_list)]))
     return mod_series
 
@@ -311,22 +347,15 @@ def empty_list_2_empty_str(inlist):
     return inlist
 
 
-def cruise_has_trajectory(cruiseName):
-    cruise_id = get_cruise_IDS([cruiseName.upper()])
-    if len(cruise_id) == 0:
-        print(cruiseName, " is not a valid cruise in the CMAP database.")
-        cruise_has_traj = False
-    else:
-        cruise_id = cruise_id[0]
-        cruise_traj_test_df = DB.DB_query(f"""SELECT TOP (1) * FROM tblCruise_Trajectory WHERE Cruise_ID = '{cruise_id}'""")
-        if cruise_traj_test_df.empty:
-            cruise_has_traj = False
-        else:
-            cruise_has_traj = True
-    return cruise_has_traj
-
-
 def getLatCount(tableName,server):
+    """Get count of number of latitude rows from a give table in the database
+    Args:
+        tableName {string}: Valid CMAP tablename
+        server {string}: Valid CMAP server name. ex Rainer
+
+    Returns:
+        {int}: count of # of rows in a table
+    """    
     query = (f"""SELECT SUM(p.rows) FROM sys.partitions AS p
     INNER JOIN sys.tables AS t
     ON p.[object_id] = t.[object_id]
@@ -341,10 +370,17 @@ def getLatCount(tableName,server):
     return lat_count
 
 
-def tableInDB(tableName):
-    """Returns a boolean if tableName exists in DB."""
+def tableInDB(tableName,server):
+    """Return boolean if table exists in database
+
+    Args:
+        tableName {string}: Valid CMAP tablename
+        server {string}: Valid CMAP server name. ex Rainer
+    Returns:
+        {bool}: Boolean value if table exists
+    """    
     qry = f"""SELECT TOP(1) * FROM {tableName}"""
-    qry_result = DB.DB_query(qry)
+    qry_result = DB.dbRead(qry,server)
     if len(qry_result) > 0:
         tableBool = True
     else:
@@ -352,8 +388,15 @@ def tableInDB(tableName):
     return tableBool
 
 
-def datasetINtblDatasets(dataset_name):
-    """Returns a boolean if dataset name exists in tblDatasets"""
+def datasetINtblDatasets(dataset_name,server):
+    """Return boolean if table exists in tblDatasets
+
+    Args:
+        dataset_name {string}: Valid CMAP dataset name
+        server {string}: Valid CMAP server name. ex Rainer
+    Returns:
+        {bool}: Boolean value if table exists
+    """        
     dataset_qry = DB.DB_query(f"""SELECT * FROM tblDatasets WHERE Dataset_Name = '{dataset_name}'""")
     if len(dataset_qry) >= 1:
         ds_bool = True
@@ -363,7 +406,14 @@ def datasetINtblDatasets(dataset_name):
 
 
 def length_of_tbl(tableName):
-    """Returns a string representation of the length of a SQL table. Alternate speedup?"""
+    """Return length of CMAP database table.
+
+    Args:
+        tableName {string}: CMAP table name
+
+    Returns:
+        {int}: Length / Number of rows of CMAP table
+    """    
     qry = f"""  select sum (spart.rows)
     from sys.partitions spart
     where spart.object_id = object_id('{tableName}')
@@ -372,14 +422,15 @@ def length_of_tbl(tableName):
     return tableCount
 
 
-def flist_in_daterange(start_date, end_date, tableName, branch, processing_lvl):
-    base_path = (
-        vault_struct_retrieval(branch) + "tableName" + "/" + processing_lvl + "/"
-    )
-    pass
-
-
 def get_var_list_dataset(tableName):
+    """Returns list of column names for a given dataset
+
+    Args:
+        tableName {string}: CMAP table name
+
+    Returns:
+        {list}: List of column names
+    """    
     col_name_list = DB.DB_query(f"""EXEC uspColumns '{tableName}'""")["Columns"].to_list()
     return col_name_list
 
@@ -388,9 +439,9 @@ def double_chars_in_col(df, col, list_of_chars):
     """Replaces a single character with two of the same character. To be used in SQL Server escaping.
 
     Args:
-        df (Pandas DataFrame): Input Pandas DataFrame
-        col (str): column of DataFrame used in replace
-        list_of_chars (list): A list of strings to be doubled
+        df {Pandas DataFrame}: Input Pandas DataFrame
+        col {str}: column of DataFrame used in replace
+        list_of_chars {list}: A list of strings to be doubled
 
     Returns:
         df (Pandas DataFrame): Modified Pandas DataFrame
