@@ -1,4 +1,3 @@
-
 import sys
 import os
 import shutil
@@ -140,22 +139,6 @@ def update_tblCruises(server):
                 "(Nickname,Name,Ship_Name,Start_Time,End_Time,Lat_Min,Lat_Max,Lon_Min,Lon_Max,Chief_Name)",
                 tuple(meta_df.iloc[0].astype(str).to_list()),
             )
-            # cruise_traj_flag = cmn.cruise_has_trajectory(cruise)
-            # if cruise_traj_flag == False:
-            #     traj_df = cmn.nanToNA(
-            #         pd.read_csv(
-            #             vs.r2r_cruise
-            #             + cruise.upper()
-            #             + "/"
-            #             + cruise.upper()
-            #             + "_trajectory.csv"
-            #         )
-            #     )
-            #     Cruise_ID = cmn.get_cruise_IDS([cruise])
-            #     traj_df["Cruise_ID"] = Cruise_ID[0]
-            #     traj_df = traj_df[["Cruise_ID", "time", "lat", "lon"]]
-            #     data.data_df_to_db(traj_df, "tblCruise_Trajectory", clean_data_df=False)
-
             print(cruise, " Ingested into DB")
 
         except Exception as ex:

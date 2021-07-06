@@ -6,6 +6,7 @@ import DB
 import vault_structure as vs
 import pycmap
 
+
 def decode_xarray_bytes(xdf):
     """Decode any byte strings in any columns of an xarray dataset
 
@@ -14,14 +15,15 @@ def decode_xarray_bytes(xdf):
 
     Returns:
         {xarray dataset}: Output xarray dataset with decoded byte strings
-    """    
+    """
     for col in list(xdf):
-        if xdf[col].dtype == 'O':
+        if xdf[col].dtype == "O":
             try:
                 xdf[col] = xdf[col].astype(str)
             except:
-                xdf[col] = xdf[col].str.decode('cp1252').str.strip()
+                xdf[col] = xdf[col].str.decode("cp1252").str.strip()
     return xdf
+
 
 def strip_whitespace_data(df):
     """Strips leading and trailing whitespace from dataframe
@@ -31,7 +33,7 @@ def strip_whitespace_data(df):
 
     Returns:
         df {Pandas DataFrame}: Out Pandas DataFrame 
-    """    
+    """
     df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
     return df
 
@@ -44,7 +46,7 @@ def strip_whitespace_headers(df):
 
     Returns:
         df {Pandas DataFrame}: Out Pandas DataFrame 
-    """       
+    """
     df.columns = df.columns.str.strip()
     return df
 
@@ -58,7 +60,7 @@ def strip_leading_trailing_whitespace_column(df, col_name):
 
     Returns:
         df {Pandas DataFrame}: Out Pandas DataFrame 
-    """    
+    """
     df[col_name] = df[col_name].str.lstrip()
     df[col_name] = df[col_name].str.rstrip()
     return df
@@ -72,7 +74,7 @@ def nanToNA(df):
 
     Returns:
         df {Pandas DataFrame}: Out Pandas DataFrame 
-    """    
+    """
     df = df.replace(np.nan, " ", regex=True)
     return df
 
@@ -85,7 +87,7 @@ def lowercase_List(list):
 
     Returns:
         {list}: Python list with lowercase values
-    """    
+    """
     lower_list = [x.lower() for x in list]
     return lower_list
 
@@ -296,7 +298,7 @@ def get_cruise_IDS(cruise_name_list, server):
 
     Returns:
         {list}: list of cruise IDs
-    """    
+    """
     cruise_db_df = getListCruises(server)
     cruise_name_list = lowercase_List(cruise_name_list)
     cruise_ID_list_name = cruise_db_df["ID"][
@@ -309,7 +311,7 @@ def get_cruise_IDS(cruise_name_list, server):
     return combined_cruise_id
 
 
-def get_region_IDS(region_name_list,server):
+def get_region_IDS(region_name_list, server):
     """Returns IDs of input region names
 
     Args:
@@ -317,8 +319,8 @@ def get_region_IDS(region_name_list,server):
         server {string}: Valid CMAP server name. ex Rainer
     Returns:
         {list}: list of region IDs
-    """    
-    region_db_df = DB.dbRead("""SELECT * FROM tblRegions""",server)
+    """
+    region_db_df = DB.dbRead("""SELECT * FROM tblRegions""", server)
     region_name_list = lowercase_List(region_name_list)
     region_ID_list = region_db_df["Region_ID"][
         region_db_df["Region_Name"].str.lower().isin(region_name_list)
@@ -335,7 +337,7 @@ def exclude_val_from_col(series, exclude_list):
 
     Returns:
         {Pandas Series}: Pandas series with characters excluded
-    """    
+    """
     mod_series = pd.Series(list(series[~series.isin(exclude_list)]))
     return mod_series
 
@@ -347,7 +349,7 @@ def empty_list_2_empty_str(inlist):
     return inlist
 
 
-def getLatCount(tableName,server):
+def getLatCount(tableName, server):
     """Get count of number of latitude rows from a give table in the database
     Args:
         tableName {string}: Valid CMAP tablename
@@ -355,22 +357,22 @@ def getLatCount(tableName,server):
 
     Returns:
         {int}: count of # of rows in a table
-    """    
-    query = (f"""SELECT SUM(p.rows) FROM sys.partitions AS p
+    """
+    query = f"""SELECT SUM(p.rows) FROM sys.partitions AS p
     INNER JOIN sys.tables AS t
     ON p.[object_id] = t.[object_id]
     INNER JOIN sys.schemas AS s
     ON s.[schema_id] = t.[schema_id]
     WHERE t.name = N'{tableName}'
     AND s.name = N'dbo'
-    AND p.index_id IN (0,1);""")
+    AND p.index_id IN (0,1);"""
 
     df = DB.dbRead(query, server)
     lat_count = df.columns[0]
     return lat_count
 
 
-def tableInDB(tableName,server):
+def tableInDB(tableName, server):
     """Return boolean if table exists in database
 
     Args:
@@ -378,9 +380,9 @@ def tableInDB(tableName,server):
         server {string}: Valid CMAP server name. ex Rainer
     Returns:
         {bool}: Boolean value if table exists
-    """    
+    """
     qry = f"""SELECT TOP(1) * FROM {tableName}"""
-    qry_result = DB.dbRead(qry,server)
+    qry_result = DB.dbRead(qry, server)
     if len(qry_result) > 0:
         tableBool = True
     else:
@@ -388,7 +390,7 @@ def tableInDB(tableName,server):
     return tableBool
 
 
-def datasetINtblDatasets(dataset_name,server):
+def datasetINtblDatasets(dataset_name, server):
     """Return boolean if table exists in tblDatasets
 
     Args:
@@ -396,8 +398,10 @@ def datasetINtblDatasets(dataset_name,server):
         server {string}: Valid CMAP server name. ex Rainer
     Returns:
         {bool}: Boolean value if table exists
-    """        
-    dataset_qry = DB.DB_query(f"""SELECT * FROM tblDatasets WHERE Dataset_Name = '{dataset_name}'""")
+    """
+    dataset_qry = DB.DB_query(
+        f"""SELECT * FROM tblDatasets WHERE Dataset_Name = '{dataset_name}'"""
+    )
     if len(dataset_qry) >= 1:
         ds_bool = True
     else:
@@ -413,7 +417,7 @@ def length_of_tbl(tableName):
 
     Returns:
         {int}: Length / Number of rows of CMAP table
-    """    
+    """
     qry = f"""  select sum (spart.rows)
     from sys.partitions spart
     where spart.object_id = object_id('{tableName}')
@@ -430,8 +434,10 @@ def get_var_list_dataset(tableName):
 
     Returns:
         {list}: List of column names
-    """    
-    col_name_list = DB.DB_query(f"""EXEC uspColumns '{tableName}'""")["Columns"].to_list()
+    """
+    col_name_list = DB.DB_query(f"""EXEC uspColumns '{tableName}'""")[
+        "Columns"
+    ].to_list()
     return col_name_list
 
 
