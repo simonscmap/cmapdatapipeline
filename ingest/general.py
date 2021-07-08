@@ -150,9 +150,22 @@ def full_ingestion(args):
         push_icon()
 
 
-def partial_ingestion(args):
-    print("Partial Ingestion")
-    pass
+def dataset_metadata_without_data(args):
+    """This wrapper function should be used to add metadata into the database for large datasets that already exist in the database. ex. satellite, model, argo etc.
+
+
+    Args:
+        args (): Arguments from input argparse
+    
+    idea:
+    input args, use dataset_meta_data, vars_meta_data to build metadata
+    -challenges: data_df missing, have to build stats some other way, no cruise matching, input for region classification
+    
+
+    """    
+
+
+
 
 
 def main():
