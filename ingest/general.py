@@ -4,7 +4,7 @@ import glob
 import pandas as pd
 import numpy as np
 
-sys.path.append("../login/")
+# sys.path.append("../login/")
 import credentials as cr
 
 import pycmap
@@ -156,16 +156,13 @@ def dataset_metadata_without_data(args):
 
     Args:
         args (): Arguments from input argparse
-    
+
     idea:
     input args, use dataset_meta_data, vars_meta_data to build metadata
     -challenges: data_df missing, have to build stats some other way, no cruise matching, input for region classification
-    
-
-    """    
 
 
-
+    """
 
 
 def main():
@@ -186,7 +183,9 @@ def main():
     )
     parser.add_argument("-p", "--process_level", nargs="?", default="rep")
     parser.add_argument(
-        "-m", "--metadata_filename", nargs="?",
+        "-m",
+        "--metadata_filename",
+        nargs="?",
     )
     parser.add_argument(
         "-d",

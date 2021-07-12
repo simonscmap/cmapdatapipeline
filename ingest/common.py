@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import DB
 import vault_structure as vs
-import pycmap
 
 
 def decode_xarray_bytes(xdf):
@@ -32,7 +31,7 @@ def strip_whitespace_data(df):
         df {Pandas DataFrame}: Input Pandas DataFrame
 
     Returns:
-        df {Pandas DataFrame}: Out Pandas DataFrame 
+        df {Pandas DataFrame}: Out Pandas DataFrame
     """
     df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
     return df
@@ -45,7 +44,7 @@ def strip_whitespace_headers(df):
         df {Pandas DataFrame}: Input Pandas DataFrame
 
     Returns:
-        df {Pandas DataFrame}: Out Pandas DataFrame 
+        df {Pandas DataFrame}: Out Pandas DataFrame
     """
     df.columns = df.columns.str.strip()
     return df
@@ -59,7 +58,7 @@ def strip_leading_trailing_whitespace_column(df, col_name):
         col_name {string}: Valid column name
 
     Returns:
-        df {Pandas DataFrame}: Out Pandas DataFrame 
+        df {Pandas DataFrame}: Out Pandas DataFrame
     """
     df[col_name] = df[col_name].str.lstrip()
     df[col_name] = df[col_name].str.rstrip()
@@ -73,7 +72,7 @@ def nanToNA(df):
         df {Pandas DataFrame}: Input Pandas DataFrame
 
     Returns:
-        df {Pandas DataFrame}: Out Pandas DataFrame 
+        df {Pandas DataFrame}: Out Pandas DataFrame
     """
     df = df.replace(np.nan, " ", regex=True)
     return df

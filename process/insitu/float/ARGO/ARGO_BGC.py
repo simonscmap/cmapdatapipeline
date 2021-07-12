@@ -679,7 +679,7 @@ def reorder_bgc_data(df):
 
 
 def add_climatology_cols(df):
-    """      
+    """
      [year]
       ,[month]
       ,[week]
@@ -991,7 +991,7 @@ def add_cols_to_cleaned_df(df):
 
 
 def argo_size_decider(xdf, byte_lim=200000000):
-    """ Simple function that gets xarray dataset size and returns bool based on size"""
+    """Simple function that gets xarray dataset size and returns bool based on size"""
     fsize = xdf.nbytes
     if fsize > byte_lim:
         ds_large = True
@@ -1026,7 +1026,7 @@ def format_bgc_metadata(df, float_id):
 
 
 def process_chunked_df(df, float_id):
-    """ Inputs raw argo dataframe and cleans and reorders data"""
+    """Inputs raw argo dataframe and cleans and reorders data"""
     df.loc[:, df.columns != "JULD"] = df.loc[:, df.columns != "time"].apply(
         pd.to_numeric, errors="ignore", downcast="signed"
     )

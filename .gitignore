@@ -2,3 +2,5 @@
 *.pyc
 *.zip
 *.vscode/
+*.pickle
+*__pycache__
