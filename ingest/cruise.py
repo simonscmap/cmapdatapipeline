@@ -7,7 +7,6 @@ import numpy as np
 from bs4 import BeautifulSoup
 import time
 
-import data
 import vault_structure as vs
 import common as cmn
 import DB
@@ -145,7 +144,6 @@ def update_tblCruises(server):
             print(ex, cruise, " not ingested...")
 
 
-# update_tblCruises()
 ##############################################
 ############## Cruise Data ###################
 ##############################################
@@ -345,22 +343,10 @@ def download_hot_cruises():
 
             else:
                 print(cruise_name_str, " NOT HOT")
-            # if not cmdf.empty:
-            #     try:
-            # get_cruise_metadata(cmdf, cruise_name)
-            #         print(cruise_name, " Downloaded")
-            #     except:
-            #         print(
-            #             cruise_name,
-            #             " cruise data not downloaded b/c trajectory or metadata mising...",
-            # )
         except:
             print("##########################")
             print(cruise_name, " No applicable cruise data -- cmdf empty")
             print("##########################")
-
-
-# download_hot_cruises()
 
 
 def download_all_cruises():
@@ -383,90 +369,10 @@ def download_all_cruises():
                         cruise_name,
                         " cruise data not downloaded b/c trajectory or metadata mising...",
                     )
-                # try:
-                #     get_cruise_metadata(cmdf, cruise_name)
-                # except:
-                #     print(cruise_name, " cruise metadata not downloaded")
-                # try:
-                #     get_cruise_traj(cmdf, cruise_name)
-                #     fill_ST_bounds_metadata(cruise_name)
-                # except:
-                #     print(cruise_name, " cruise trajectory not downloaded")
-
         except:
             print("##########################")
             print(cruise_name, " No applicable cruise data -- cmdf empty")
             print("##########################")
-
-
-# download_all_cruises()
-
-# download_all_cruises()
-
-
-# import pycmap
-# import numpy as np
-# import pandas as pd
-
-# api = pycmap.API()
-# db_cruises = api.cruises()
-
-
-# sfdf = api.query("""SELECT DISTINCT cruise,time FROM tblSeaFlow""")
-# sfdf = sfdf.drop_duplicates(subset="cruise",keep='first')
-# missing_from_db  = pd.merge(sfdf,db_cruises,how='left',left_on="cruise",right_on="Name")
-
-
-# cruise_add_list = [
-#     "KM1912",
-#     "KM1915",
-#     "KM1917",
-#     "KOK1807",
-#     "SR1917",
-# ]  # missing_from_db[missing_from_db["Nickname"].isnull()]["cruise"].to_list()
-# cruise_add_traj = api.query(
-#     """SELECT  cruise,time,lat,lon FROM tblSeaFlow WHERE cruise in {cruise_list}""".format(
-#         cruise_list=tuple(cruise_add_list)
-#     )
-# )
-
-# add_to_db_cruise_meta_df = pd.DataFrame(
-#     columns=[
-#         "ID",
-#         "Nickname",
-#         "Name",
-#         "Ship_Name",
-#         "Start_Time",
-#         "End_Time",
-#         "Lat_Min",
-#         "Lat_Max",
-#         "Lon_Min",
-#         "Lon_Max",
-#         "Chief_Name",
-#     ]
-# )
-# add_to_db_cruise_meta_df["Name"] = cruise_add_list
-# add_to_db_cruise_meta_df["Nickname"] = [
-#     "Investigating Diazotrophy in tropical and subtropical Pacific Ocean",
-#     "HOT304",
-#     "HOT313",
-#     "HOT314",
-#     "HOT315",
-# ]
-# add_to_db_cruise_meta_df["Ship_Name"] = [
-#     "Sally Ride",
-#     "R/V Kaimikai O Kanaloa",
-#     "R/V Kilo Moana",
-#     "R/V Kilo Moana",
-#     "R/V Kilo Moana",
-# ]
-# add_to_db_cruise_meta_df["Chief_Name"] = [
-#     "Kendra Turk-Kubo",
-#     "David Karl",
-#     "Daniel Sadler",
-#     "Tara Clemente",
-#     "David Karl",
-# ]
 
 
 def fill_ST_meta(cruise_meta_df, cruise_traj_df):
@@ -487,44 +393,3 @@ def fill_ST_meta(cruise_meta_df, cruise_traj_df):
         cruise_meta_df.at[cruise_meta_df["Name"] == cruise_name, "Lon_Min"] = lon_min
         cruise_meta_df.at[cruise_meta_df["Name"] == cruise_name, "Lon_Max"] = lon_max
     return cruise_meta_df
-
-
-# cmdf = fill_ST_meta(add_to_db_cruise_meta_df,cruise_add_traj)
-# cmdf["ID"] = ['5909','5910','5911','5912','5913']
-# for index in range(len(cmdf)):
-#     print(tuple(cmdf.iloc[index].astype(str).to_list()))
-# DB.lineInsert(
-#     "Mariana",
-#     "tblCruise",
-#     "(Nickname,Name,Ship_Name,Start_Time,End_Time,Lat_Min,Lat_Max,Lon_Min,Lon_Max,Chief_Name)",
-#     tuple(cmdf.iloc[index].astype(str).to_list()),
-# )
-
-
-# for cruise in cruise_add_traj["cruise"].unique():
-#     cruise = cruise.lower()
-#     print(cruise)
-#     Cruise_ID = cmn.get_cruise_IDS([cruise])
-#     print(cruise,Cruise_ID)
-#     traj_df = cruise_add_traj[cruise_add_traj["cruise"] == cruise.upper()]
-#     traj_df["Cruise_ID"] = Cruise_ID[0]
-#     traj_df = traj_df[["Cruise_ID", "time", "lat", "lon"]]
-#     data.data_df_to_db(traj_df, "tblCruise_Trajectory",server="Mariana")
-
-# Cruise_ID = cmn.get_cruise_IDS([cruise])
-# traj_df["Cruise_ID"] = Cruise_ID[0]
-# traj_df = traj_df[["Cruise_ID", "time", "lat", "lon"]]
-# data.data_df_to_db(traj_df, "tblCruise_Trajectory", clean_data_df=False)
-
-
-"""update cruises that are missing regions...
-step 1: SQL query from SOT(rainier) to get cruises missing region ID that also have trajectory
-    ie. join tblCruiseTraj with tblCruise_Regions to find null
-
-     2: DB in DB_list:
-            for cruise_ID in id_list:
-                retrieve df from tblCruise_Trajectory
-                classify with Region ID
-                Insert cruise_ID, RegionID(s)
-
-"""

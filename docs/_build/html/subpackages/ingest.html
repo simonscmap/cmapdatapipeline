@@ -81,7 +81,20 @@
             
               <p class="caption"><span class="caption-text">Package Overview</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">ingest</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ingest</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#common-py">common.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#credentials-py">credentials.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cruise-py">cruise.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-py">data.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#db-py">DB.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#general-py">general.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ingest-test-py">ingest_test.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mapping-py">mapping.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#metadata-py">metadata.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#region-classification-py">region_classification.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sql-py">SQL.py</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="process.html">process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="collect.html">collect</a></li>
 </ul>
@@ -161,7 +174,53 @@
             
   <div class="section" id="ingest">
 <h1>ingest<a class="headerlink" href="#ingest" title="Permalink to this headline">¶</a></h1>
-<p>test ingest text</p>
+<p>ingest/ is the submodule that contains ingestion and data processing functions, data vault strucutre logic and DB connection information.
+Ingesting a dataset using this submodule will be covered in data_ingestion/workflow.</p>
+<p>ingest/ is broken into the multiple python scripts to seperate ingestion logic. Desiciptions and uses of each are descibed below.</p>
+<div class="section" id="common-py">
+<h2>common.py<a class="headerlink" href="#common-py" title="Permalink to this headline">¶</a></h2>
+<p>This scrip holds many commonly used simple functions for data processing/cleaning. It is a good location for generalized use functions.</p>
+</div>
+<div class="section" id="credentials-py">
+<h2>credentials.py<a class="headerlink" href="#credentials-py" title="Permalink to this headline">¶</a></h2>
+<p>This is a simple file hidden with .gitignore. <strong>Make sure this is not pushed to github!</strong>
+It contains usernames, passwords, ip addresses, ports and connection strings. It is used primarilly by DB.py for database connections. Make sure this file is duplicated across machines.</p>
+</div>
+<div class="section" id="cruise-py">
+<h2>cruise.py<a class="headerlink" href="#cruise-py" title="Permalink to this headline">¶</a></h2>
+<p>This file contains some cruise metadata helper functions and database calls along with a smattering of old cruise trajectory/metadata webscrapping stuff for r2r (rolling deck to repository).</p>
+</div>
+<div class="section" id="data-py">
+<h2>data.py<a class="headerlink" href="#data-py" title="Permalink to this headline">¶</a></h2>
+<p>This file contains general cleaning and data processing functions specifically for the data sheet of the template.</p>
+</div>
+<div class="section" id="db-py">
+<h2>DB.py<a class="headerlink" href="#db-py" title="Permalink to this headline">¶</a></h2>
+<p>DB contains the SQL connection logic, table insert logic, bcp (MSSQL bulk copy program) wrapper functions etc.</p>
+</div>
+<div class="section" id="general-py">
+<h2>general.py<a class="headerlink" href="#general-py" title="Permalink to this headline">¶</a></h2>
+<p>general.py contains wrapper functions that take arguments through argparse to ingest datasets. It is the main script used in the collection script.</p>
+</div>
+<div class="section" id="ingest-test-py">
+<h2>ingest_test.py<a class="headerlink" href="#ingest-test-py" title="Permalink to this headline">¶</a></h2>
+<p>This is a fragment of a started post-ingestion test suite, with the aim of testing the success of the ingestion. Could be removed, rewritted or expanded upon.</p>
+</div>
+<div class="section" id="mapping-py">
+<h2>mapping.py<a class="headerlink" href="#mapping-py" title="Permalink to this headline">¶</a></h2>
+<p>Contains the functionallity for creating .png and .html interactive maps from input datasets. These are stored in /static and used in the web catalog to give a spatial representation of a dataset. html interactive maps were never included in the catalog, but could be.</p>
+</div>
+<div class="section" id="metadata-py">
+<h2>metadata.py<a class="headerlink" href="#metadata-py" title="Permalink to this headline">¶</a></h2>
+<p>This contains multiple functions to format the dataset_meta_data and vars_meta_data into custom SQL queries.</p>
+</div>
+<div class="section" id="region-classification-py">
+<h2>region_classification.py<a class="headerlink" href="#region-classification-py" title="Permalink to this headline">¶</a></h2>
+<p>This uses input dataset coordinates along with a geopackage of ocean regions to classify a dataset by spatial region.</p>
+</div>
+<div class="section" id="sql-py">
+<h2>SQL.py<a class="headerlink" href="#sql-py" title="Permalink to this headline">¶</a></h2>
+</div>
 </div>
 
 

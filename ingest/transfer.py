@@ -116,8 +116,7 @@ def single_file_split(filename, metadata_filename):
 
     else:
         data_df = pd.read_csv(vs.data + filename)
-    #
-    # print(vs.metadata + metadata_filename)
+
     dataset_metadata_df = pd.read_excel(
         vs.combined + metadata_filename, sheet_name="dataset_meta_data"
     )
