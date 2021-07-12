@@ -1,32 +1,40 @@
 cmapdata
 ========
 
-cmapdata is a collection of scripts organized into dataset collection (collect), dataset processing (process), dataset ingestion (ingest) and a data vault structure file (vault_structure). These docs should provide a primer on data flow into CMAP's databases along with suggested improvements. 
+cmapdata is a collection of scripts organized into dataset collection (collect), 
+dataset processing (process) and dataset ingestion (ingest). 
+These docs should provide a primer on data flow into CMAP's databases along with 
+suggested improvements. 
 
 
 .. toctree::
     :maxdepth: 2
-    :hidden:
+    :caption: Package Overview
 
-    overview
-        -each package
-        -dive into modules in cmapingest
-    dataset_ingestion_walkthrough
-        -web validator
-        -data from validator -> download, dropbox vault/combined etc.
-        -
-    future_work_improvements
-        -changes to ingestion code etc.
-    FAQ
-        -common issues and pitfalls
+    subpackages/ingest.rst
+    subpackages/process.rst
+    subpackages/collect.rst
 
+.. toctree::
+    :maxdepth: 2
+    :caption: Ingesting a Dataset
 
-    faq_and_contributing/FAQ
-    faq_and_contributing/contact
+    data_ingestion/web_validator.rst
+    data_ingestion/workflow.rst
+    data_ingestion/pitfalls.rst
 
 
-.. automodule:: ingest.common
-   :members:
+.. toctree::
+    :maxdepth: 2
+    :caption: Future Improvements
+
+    future/change_ideas.rst
+
+
+    
+
+.. .. automodule:: ingest.common
+..    :members:
 
 .. Indices and tables
 .. ==================

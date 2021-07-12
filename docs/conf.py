@@ -34,6 +34,9 @@ release = "0.0.1"
 # ones.
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.coverage", "sphinx.ext.napoleon"]
 
+source_suffix = [".rst"]
+
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
@@ -49,6 +52,13 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
+html_theme_options = {
+    "logo_only": False,
+    "display_version": False,
+    "prev_next_buttons_location": None,
+    "navigation_depth": 4,
+    "collapse_navigation": True,
+}
 
 
 # Add any paths that contain custom static files (such as style sheets) here,

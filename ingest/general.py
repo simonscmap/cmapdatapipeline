@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 import sys
 import os
 import glob
@@ -183,9 +186,7 @@ def main():
     )
     parser.add_argument("-p", "--process_level", nargs="?", default="rep")
     parser.add_argument(
-        "-m",
-        "--metadata_filename",
-        nargs="?",
+        "-m", "--metadata_filename", nargs="?",
     )
     parser.add_argument(
         "-d",
