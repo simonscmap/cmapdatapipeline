@@ -1,3 +1,4 @@
 *credentials.py
 *.pyc
 *.zip
+*.vscode/

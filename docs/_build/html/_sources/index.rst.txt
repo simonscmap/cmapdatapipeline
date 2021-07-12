@@ -1,14 +1,16 @@
-Welcome to Getting Started with Sphinx's documentation!
-=======================================================
+cmapdata
+========
 
-.. automodule:: ingest.common
-    :members:
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-Indices and tables
-==================
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. automodule:: ingest.common
+   :members:
+
+.. Indices and tables
+.. ==================
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`
