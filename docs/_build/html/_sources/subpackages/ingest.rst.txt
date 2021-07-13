@@ -63,3 +63,20 @@ This uses input dataset coordinates along with a geopackage of ocean regions to 
 SQL.py
 ------
 
+Has functionallity to suggest SQL tables and basic indicies.
+
+stats.py
+--------
+
+Functions to build summary statistics from datasets. These results are used for data size estimations in the web app.
+
+transfer.py
+-----------
+
+A few functions to move and split excel files from /staging to /vault
+
+vault_structure.py
+------------------
+
+vault_structure contains the relative paths of vault as well as some directory creation structure.
+
