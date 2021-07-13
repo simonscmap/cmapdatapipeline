@@ -165,15 +165,27 @@ def tblVariables_Insert(
         "tblSpatial_Resolutions",
         server,
     )
-    Temporal_Coverage_Begin_list, Temporal_Coverage_End_list = cmn.getColBounds(
-        data_df, "time", list_multiplier=len(variable_metadata_df)
-    )
-    Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds(
-        data_df, "lat", list_multiplier=len(variable_metadata_df)
-    )
-    Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds(
-        data_df, "lon", list_multiplier=len(variable_metadata_df)
-    )
+    if data_df == True:
+        Temporal_Coverage_Begin_list, Temporal_Coverage_End_list = cmn.getColBounds(
+            data_df, "time", list_multiplier=len(variable_metadata_df)
+        )
+        Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds(
+            data_df, "lat", list_multiplier=len(variable_metadata_df)
+        )
+        Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds(
+            data_df, "lon", list_multiplier=len(variable_metadata_df)
+        )
+    else:
+        Temporal_Coverage_Begin_list, Temporal_Coverage_End_list = cmn.getColBounds(
+            Table_Name, "time", list_multiplier=len(variable_metadata_df)
+        )
+        Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds(
+            Table_Name, "lat", list_multiplier=len(variable_metadata_df)
+        )
+        Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds(
+            Table_Name, "lon", list_multiplier=len(variable_metadata_df)
+        )
+
     Grid_Mapping_list = [CRS] * len(variable_metadata_df)
     Sensor_ID_list = ID_Var_Map(
         variable_metadata_df["var_sensor"], "Sensor", "tblSensors", server

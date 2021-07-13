@@ -32,8 +32,8 @@ def getBranch_Path(args):
     return branch_path
 
 
-def splitExcel(staging_filename, metadata_filename):
-    transfer.single_file_split(staging_filename, metadata_filename)
+def splitExcel(staging_filename, data_missing_flag):
+    transfer.single_file_split(staging_filename, data_missing_flag)
 
 
 def staging_to_vault(staging_filename, branch, tableName, remove_file_flag=False):
@@ -78,6 +78,33 @@ def insertData(data_dict, tableName, server):
     data.data_df_to_db(data_dict["data_df"], tableName, server)
 
 
+def insertMetdata_no_data(data_dict, tableName, DOI_link_append, server):
+    metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server)
+    metadata.tblDataset_References_Insert(
+        data_dict["dataset_metadata_df"], server, DOI_link_append
+    )
+
+    metadata.tblVariables_Insert(
+        False,
+        data_dict["dataset_metadata_df"],
+        data_dict["variable_metadata_df"],
+        tableName,
+        server,
+        process_level="REP",
+        CRS="CRS",
+    )
+    metadata.tblKeywords_Insert(
+        data_dict["variable_metadata_df"],
+        data_dict["dataset_metadata_df"],
+        tableName,
+        server,
+    )
+    if data_dict["dataset_metadata_df"]["cruise_names"].dropna().empty == False:
+        metadata.tblDataset_Cruises_Insert(
+            data_dict["data_df"], data_dict["dataset_metadata_df"], server
+        )
+
+
 def insertMetadata(data_dict, tableName, DOI_link_append, server):
     metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server)
     metadata.tblDataset_References_Insert(
@@ -109,13 +136,6 @@ def insertMetadata(data_dict, tableName, DOI_link_append, server):
         )
 
 
-###   TESTING SUITE   ###
-# ⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️ #
-# ⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️ #
-# ⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️⚙️ #
-#########################
-
-
 def insert_small_stats(data_dict, tableName, server):
     stats.updateStats_Small(tableName, server, data_dict["data_df"])
 
@@ -136,14 +156,16 @@ def push_icon():
 
 def full_ingestion(args):
     print("Full Ingestion")
-    splitExcel(args.staging_filename, args.metadata_filename)
+    splitExcel(args.staging_filename, data_missing_flag=False)
     staging_to_vault(
         args.staging_filename,
         getBranch_Path(args),
         args.tableName,
         remove_file_flag=True,
     )
-    data_dict = data.importDataMemory(args.branch, args.tableName, args.process_level)
+    data_dict = data.importDataMemory(
+        args.branch, args.tableName, args.process_level, import_data=True
+    )
     SQL_suggestion(data_dict, args.tableName, args.branch, args.Server)
     insertData(data_dict, args.tableName, args.Server)
     insertMetadata(data_dict, args.tableName, args.DOI_link_append, args.Server)
@@ -153,19 +175,25 @@ def full_ingestion(args):
         push_icon()
 
 
-def dataset_metadata_without_data(args):
-    """This wrapper function should be used to add metadata into the database for large datasets that already exist in the database. ex. satellite, model, argo etc.
+def dataless_ingestion(args):
+    """This wrapper function adds metadata into the database for large datasets that already exist in the database. ex. satellite, model, argo etc.
 
 
     Args:
         args (): Arguments from input argparse
 
-    idea:
-    input args, use dataset_meta_data, vars_meta_data to build metadata
-    -challenges: data_df missing, have to build stats some other way, no cruise matching, input for region classification
-
-
     """
+    splitExcel(args.staging_filename, data_missing_flag=True)
+    staging_to_vault(
+        args.staging_filename,
+        getBranch_Path(args),
+        args.tableName,
+        remove_file_flag=True,
+    )
+    data_dict = data.importDataMemory(
+        args.branch, args.tableName, args.process_level, import_data=False
+    )
+    insertMetadata(data_dict, args.tableName, args.DOI_link_append, args.Server)
 
 
 def main():
@@ -186,17 +214,13 @@ def main():
     )
     parser.add_argument("-p", "--process_level", nargs="?", default="rep")
     parser.add_argument(
-        "-m", "--metadata_filename", nargs="?",
-    )
-    parser.add_argument(
         "-d",
         "--DOI_link_append",
         help="DOI string to append to reference_list",
         nargs="?",
     )
-    parser.add_argument("-P", "--Partial_Ingestion", nargs="?", const=True)
 
-    parser.add_argument("-A", "--Append_Ingestion", nargs="?", const=True)
+    parser.add_argument("-D", "--Dataless Ingestion", nargs="?", const=True)
 
     parser.add_argument(
         "-S",
@@ -208,11 +232,9 @@ def main():
 
     args = parser.parse_args()
 
-    if args.Partial_Ingestion:
-        partial_ingestion(args)
+    if args.Dataless_Ingestion:
+        dataless_ingestion(args)
 
-    elif args.Append_Ingestion:
-        append_ingestion(args)
     else:
         full_ingestion(args)
 

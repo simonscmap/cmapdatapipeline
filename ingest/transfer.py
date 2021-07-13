@@ -27,8 +27,10 @@ def clear_directory(directory):
 
 def Zenodo_DOI_Formatter(DOI, filename):
     doi_record = DOI.split("zenodo.")[1]
-    doi_download_str = "https://zenodo.org/record/{doi_record}}/files/{filename}}?download=1".format(
-        doi_record=doi_record, filename=filename
+    doi_download_str = (
+        "https://zenodo.org/record/{doi_record}}/files/{filename}}?download=1".format(
+            doi_record=doi_record, filename=filename
+        )
     )
     return doi_download_str
 
@@ -91,11 +93,8 @@ def staging_to_vault(
         os.remove(vars_metadata_fname)
 
 
-def single_file_split(filename, metadata_filename):
+def single_file_split(filename, data_missing_flag):
     """
-    #If metadata_filename is provided, ds,vars split, data file just transfered.
-    else:
-        filename is split into all three files.
 
     Splits an excel file containing data, dataset_metadata and vars_metadata sheets
     into three seperate files in the staging file strucutre.
@@ -105,23 +104,15 @@ def single_file_split(filename, metadata_filename):
     ----------
     filename : string
         Filename and extension to be split.
-    metadata_filename : string (optional)
-        Filename of metadata specific file.
     """
 
     base_filename = os.path.splitext(os.path.basename(filename))[0]
-    if metadata_filename == None:
-        metadata_filename = filename
-        data_df = pd.read_excel(vs.combined + filename, sheet_name=0)
-
-    else:
-        data_df = pd.read_csv(vs.data + filename)
 
     dataset_metadata_df = pd.read_excel(
-        vs.combined + metadata_filename, sheet_name="dataset_meta_data"
+        vs.combined + filename, sheet_name="dataset_meta_data"
     )
     vars_metadata_df = pd.read_excel(
-        vs.combined + metadata_filename, sheet_name="vars_meta_data"
+        vs.combined + filename, sheet_name="vars_meta_data"
     )
 
     dataset_metadata_df.to_csv(
@@ -130,9 +121,9 @@ def single_file_split(filename, metadata_filename):
     vars_metadata_df.to_csv(
         vs.metadata + base_filename + "_vars_metadata.csv", sep=",", index=False
     )
-    data_df.to_csv(vs.data + base_filename + "_data.csv", sep=",", index=False)
-
-    # os.remove(vs.combined + filename)
+    if data_missing_flag == False:
+        data_df = pd.read_csv(vs.data + filename)
+        data_df.to_csv(vs.data + base_filename + "_data.csv", sep=",", index=False)
 
 
 def remove_data_metadata_fnames_staging(staging_sep_flag="combined"):
@@ -189,7 +180,8 @@ def dropbox_file_transfer(input_file_path, output_file_path):
                 )
                 pbar.update(chunk_size)
                 cursor = dropbox.files.UploadSessionCursor(
-                    session_id=upload_session_start_result.session_id, offset=f.tell(),
+                    session_id=upload_session_start_result.session_id,
+                    offset=f.tell(),
                 )
                 commit = dropbox.files.CommitInfo(path=output_file_path)
 
@@ -201,7 +193,9 @@ def dropbox_file_transfer(input_file_path, output_file_path):
 
                     else:
                         dbx.files_upload_session_append(
-                            f.read(chunk_size), cursor.session_id, cursor.offset,
+                            f.read(chunk_size),
+                            cursor.session_id,
+                            cursor.offset,
                         )
                         cursor.offset = f.tell()
                     pbar.update(chunk_size)

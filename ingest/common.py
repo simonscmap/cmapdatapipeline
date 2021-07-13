@@ -91,6 +91,17 @@ def lowercase_List(list):
     return lower_list
 
 
+def getColBounds_from_DB(tableName, col, server, list_multiplier=0):
+    qry = f"""SELECT MIN({col}),MAX({col}) FROM {tableName}"""
+    df = DB.dbRead(qry, server)
+    min_col = [df.iloc[0].astype(str).iloc[0]]
+    max_col = [df.iloc[0].astype(str).iloc[1]]
+    if list_multiplier != "0":
+        min_col = min_col * int(list_multiplier)
+        max_col = max_col * int(list_multiplier)
+    return min_col, max_col
+
+
 def getColBounds(df, col, list_multiplier=0):
     """Gets the min and max bounds of a dataframe column
 
@@ -425,7 +436,7 @@ def length_of_tbl(tableName):
     return tableCount
 
 
-def get_var_list_dataset(tableName):
+def get_var_list_dataset(tableName, server):
     """Returns list of column names for a given dataset
 
     Args:
@@ -434,7 +445,7 @@ def get_var_list_dataset(tableName):
     Returns:
         {list}: List of column names
     """
-    col_name_list = DB.DB_query(f"""EXEC uspColumns '{tableName}'""")[
+    col_name_list = DB.dbRead(f"""EXEC uspColumns '{tableName}'""", server)[
         "Columns"
     ].to_list()
     return col_name_list

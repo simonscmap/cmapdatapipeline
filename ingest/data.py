@@ -180,19 +180,26 @@ def fetch_single_datafile(branch, tableName, process_level="REP", file_ext=".csv
     return flist
 
 
-def importDataMemory(branch, tableName, process_level):
+def importDataMemory(branch, tableName, process_level, import_data=True):
     data_file_name = fetch_single_datafile(branch, tableName, process_level)
-    data_df = read_csv(data_file_name)
-    data_df = clean_data_df(data_df)
-    data_df.rename(columns={"latitude": "lat", "longitude": "lon"}, inplace=True)
+
     dataset_metadata_df, variable_metadata_df = metadata.import_metadata(
         branch, tableName
     )
-    data_dict = {
-        "data_df": data_df,
-        "dataset_metadata_df": dataset_metadata_df,
-        "variable_metadata_df": variable_metadata_df,
-    }
+    if import_data == True:
+        data_df = read_csv(data_file_name)
+        data_df = clean_data_df(data_df)
+        data_df.rename(columns={"latitude": "lat", "longitude": "lon"}, inplace=True)
+        data_dict = {
+            "data_df": data_df,
+            "dataset_metadata_df": dataset_metadata_df,
+            "variable_metadata_df": variable_metadata_df,
+        }
+    else:
+        data_dict = {
+            "dataset_metadata_df": dataset_metadata_df,
+            "variable_metadata_df": variable_metadata_df,
+        }
     return data_dict
 
 

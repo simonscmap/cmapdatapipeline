@@ -51,6 +51,12 @@ def updateStats_Small(tableName, server, data_df=None):
     print("Updated stats for " + tableName)
 
 
+def retrieve_stats_from_DB(tableName, server):
+    st_cols = data.ST_columns(df)
+
+    qry = f"""SELECT MIN(time),MAX(time),MIN(lat),MAX(lat),MIN(lon),MAX(depth),"""
+
+
 def buildLarge_Stats(df, datetime_slice, tableName, branch, transfer_flag="dropbox"):
     """Input is dataframe slice (daily, 8 day, monthly etc.) of a dataset that is split into multiple files"""
     df_stats = df.describe()
