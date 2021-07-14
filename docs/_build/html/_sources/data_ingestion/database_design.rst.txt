@@ -15,7 +15,8 @@ This key links the data tables to the rest of the metadata.
 
 Metadata tables are listed below with a brief description of each:
 
-**Variable Level Metadata**
+Variable Level Metadata
+-----------------------
 
 **tblVariables** links the data tables to the metadata through the column [Table_Name]. 
 Columns with an _ID suffix are linked to other metadata tables. For example, Dataset level information in tblDatasets in linked through [Dataset_ID].
@@ -61,9 +62,10 @@ variable level tables that contain links between the ID's in tblVariables and th
 
 
 
-**Dataset Level Metadata**
+Dataset Level Metadata
+----------------------
 
-tblDatasets contains dataset level information and has links to tblVariables as well as links to cruise and region level information.
+**tblDatasets** contains dataset level information and has links to tblVariables as well as links to cruise and region level information.
 
 
 * ID
@@ -85,11 +87,11 @@ tblDatasets contains dataset level information and has links to tblVariables as 
 
 
 
-** Cruise Metadata **
+**Cruise Metadata**
 The metadata for cruises in CMAP is seperated into multiple tables. A core **tblCruise** links together metadata tables for cruise trajectories, cruise keywords, cruise region links and cruise dataset links.
 **tblDataset_Cruises** is the linking table to connect cruise_IDs with dataset_IDs.  
 
-** Region Metadata **
+**Region Metadata**
 The region tables in CMAP share a similar schema to the cruise tables layout. **tblRegions** contains the ocean regions (this can be expanded). 
 **tblDataset_Regions** is similar to **tblDataset_Cruises** because it acts as the linking table between the region and dataset tables. 
 **tblCruise_Regions** is a linking table between cruise IDs and region IDs. 

@@ -91,7 +91,11 @@
 </ul>
 <p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Database Design and Table Structure</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Database Design and Table Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#variable-level-metadata">Variable Level Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataset-level-metadata">Dataset Level Metadata</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pitfalls.html">Pitfalls</a></li>
@@ -182,7 +186,8 @@ Rainier was the first dedicated server to host the database and currently serves
 Data tables are independent of one another. The dataset table name is stored as a column in the metadata table <em>tblVariables</em>.
 This key links the data tables to the rest of the metadata.</p>
 <p>Metadata tables are listed below with a brief description of each:</p>
-<p><strong>Variable Level Metadata</strong></p>
+<div class="section" id="variable-level-metadata">
+<h2>Variable Level Metadata<a class="headerlink" href="#variable-level-metadata" title="Permalink to this headline">¶</a></h2>
 <p><strong>tblVariables</strong> links the data tables to the metadata through the column [Table_Name].
 Columns with an _ID suffix are linked to other metadata tables. For example, Dataset level information in tblDatasets in linked through [Dataset_ID].
 Each data variable in a dataset has a row in this table, containing the following columns:</p>
@@ -219,8 +224,10 @@ tblKeywords contains an ID column, where each value which corresponds to a uniqu
 </ul>
 <p><strong>tblTemporal_Resolution</strong>, <strong>tblSpatial_Resolution</strong>, <strong>tblMake</strong>, <strong>tblSensor</strong>, <strong>tblProcess_Stages</strong> and <strong>tblStudy_Domains</strong> are all
 variable level tables that contain links between the ID’s in tblVariables and their respective tables.</p>
-<p><strong>Dataset Level Metadata</strong></p>
-<p>tblDatasets contains dataset level information and has links to tblVariables as well as links to cruise and region level information.</p>
+</div>
+<div class="section" id="dataset-level-metadata">
+<h2>Dataset Level Metadata<a class="headerlink" href="#dataset-level-metadata" title="Permalink to this headline">¶</a></h2>
+<p><strong>tblDatasets</strong> contains dataset level information and has links to tblVariables as well as links to cruise and region level information.</p>
 <ul class="simple">
 <li><p>ID</p></li>
 <li><p>DB</p></li>
@@ -239,13 +246,14 @@ variable level tables that contain links between the ID’s in tblVariables and 
 <li><p>Dataset_Release_Date</p></li>
 <li><p>Dataset_History</p></li>
 </ul>
-<p>** Cruise Metadata **
+<p><strong>Cruise Metadata</strong>
 The metadata for cruises in CMAP is seperated into multiple tables. A core <strong>tblCruise</strong> links together metadata tables for cruise trajectories, cruise keywords, cruise region links and cruise dataset links.
 <strong>tblDataset_Cruises</strong> is the linking table to connect cruise_IDs with dataset_IDs.</p>
-<p>** Region Metadata **
+<p><strong>Region Metadata</strong>
 The region tables in CMAP share a similar schema to the cruise tables layout. <strong>tblRegions</strong> contains the ocean regions (this can be expanded).
 <strong>tblDataset_Regions</strong> is similar to <strong>tblDataset_Cruises</strong> because it acts as the linking table between the region and dataset tables.
 <strong>tblCruise_Regions</strong> is a linking table between cruise IDs and region IDs.</p>
+</div>
 </div>
 
 
