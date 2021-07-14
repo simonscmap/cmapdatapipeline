@@ -100,6 +100,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../future/code_changes.html">Code Changes</a></li>
 </ul>
+<p class="caption"><span class="caption-text">API Ref</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_common.html">API Ref common.py</a></li>
+</ul>
 
             
           
@@ -235,8 +239,13 @@ variable level tables that contain links between the ID’s in tblVariables and 
 <li><p>Dataset_Release_Date</p></li>
 <li><p>Dataset_History</p></li>
 </ul>
-<p>** Cruise Metadata **</p>
-<p>** Region Metadata **</p>
+<p>** Cruise Metadata **
+The metadata for cruises in CMAP is seperated into multiple tables. A core <strong>tblCruise</strong> links together metadata tables for cruise trajectories, cruise keywords, cruise region links and cruise dataset links.
+<strong>tblDataset_Cruises</strong> is the linking table to connect cruise_IDs with dataset_IDs.</p>
+<p>** Region Metadata **
+The region tables in CMAP share a similar schema to the cruise tables layout. <strong>tblRegions</strong> contains the ocean regions (this can be expanded).
+<strong>tblDataset_Regions</strong> is similar to <strong>tblDataset_Cruises</strong> because it acts as the linking table between the region and dataset tables.
+<strong>tblCruise_Regions</strong> is a linking table between cruise IDs and region IDs.</p>
 </div>
 
 
