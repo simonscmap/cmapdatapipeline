@@ -91,7 +91,7 @@ def buildLarge_Stats(df, datetime_slice, tableName, branch, transfer_flag="dropb
     )
 
 
-def aggregate_large_stats(branch, tableName):
+def aggregate_large_stats(branch, tableName, server):
     """aggregates summary stats files and computes stats of stats. Returns stats dataframe"""
     branch_path = cmn.vault_struct_retrieval(branch)
     df = dd.read_csv(branch_path + tableName + "/stats/" + "*.csv*")
@@ -100,7 +100,7 @@ def aggregate_large_stats(branch, tableName):
     st_cols = data.ST_columns(df)
     var_list = list(set(list(df)) - set(st_cols))
     var_max_list, var_min_list, var_mean_list, var_std_list = [], [], [], []
-    max_var_count_list = [cmn.getLatCount(tableName)] * len(list(df))
+    max_var_count_list = [cmn.getLatCount(tableName, server)] * len(list(df))
     for var in list(df):  # var_list:
         var_max = max(df.loc["max", var])
         var_max_list.append(var_max)

@@ -612,19 +612,6 @@ def ocean_region_classification(data_df, dataset_name, server):
         )
 
 
-# insitu_df = DB.dbRead(
-#     """select distinct tblD.Dataset_Name, tblV.Table_Name from tblDatasets tblD
-# inner join
-# tblVariables tblV
-# on tblD.ID = tblV.Dataset_ID
-
-# where tblV.Make_ID = 1
-# and tblV.Sensor_ID <> 1
-# AND
-# tblD.Dataset_Name <>  'Argo_BGC_REP' AND tblD.Dataset_Name <>  'ESV' AND tblD.Dataset_Name <>  'Global_Drifter_Program' AND tblD.Dataset_Name <> 'WOA_Climatology'"""
-# )
-
-
 def if_exists_dataset_region(dataset_name, server):
     """Checks if dataset ID is already in tblDatasets_Regions
 
