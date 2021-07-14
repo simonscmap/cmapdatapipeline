@@ -18,7 +18,8 @@ suggested improvements.
 .. toctree::
     :maxdepth: 2
     :caption: Ingesting a Dataset
-
+    
+    data_ingestion/installation.rst
     data_ingestion/database_design.rst
     data_ingestion/web_validator.rst
     data_ingestion/workflow.rst
