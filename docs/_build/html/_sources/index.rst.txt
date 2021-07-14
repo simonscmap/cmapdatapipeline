@@ -31,14 +31,9 @@ suggested improvements.
 
     future/code_changes.rst
 
+.. toctree::
+    :maxdepth: 2
+    :caption: API Ref
 
+    API/API_common.rst
     
-
-.. automodule:: ingest.common
-    :members:
-
-.. Indices and tables
-.. ==================
-.. * :ref:`genindex`
-.. * :ref:`modindex`
-.. * :ref:`search`
