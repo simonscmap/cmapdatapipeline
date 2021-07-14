@@ -165,7 +165,8 @@ def tblVariables_Insert(
         "tblSpatial_Resolutions",
         server,
     )
-    if data_df == True:
+
+    if data_df.empty != True:
         Temporal_Coverage_Begin_list, Temporal_Coverage_End_list = cmn.getColBounds(
             data_df, "time", list_multiplier=len(variable_metadata_df)
         )
@@ -598,7 +599,7 @@ def ocean_region_classification(data_df, dataset_name, server):
     region_set = classified_gdf_to_list(classified_gdf)
 
     dataset_ID = cmn.getDatasetID_DS_Name(dataset_name, server)
-    region_ID_list = cmn.get_region_IDS(region_set)
+    region_ID_list = cmn.get_region_IDS(region_set, server)
     print("Dataset matched to the following Regions: ", region_set)
 
     for region_ID in region_ID_list:

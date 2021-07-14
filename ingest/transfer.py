@@ -122,7 +122,7 @@ def single_file_split(filename, data_missing_flag):
         vs.metadata + base_filename + "_vars_metadata.csv", sep=",", index=False
     )
     if data_missing_flag == False:
-        data_df = pd.read_csv(vs.data + filename)
+        data_df = pd.read_excel(vs.combined + filename, sheet_name="data")
         data_df.to_csv(vs.data + base_filename + "_data.csv", sep=",", index=False)
 
 

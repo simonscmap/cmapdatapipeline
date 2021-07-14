@@ -220,7 +220,7 @@ def main():
         nargs="?",
     )
 
-    parser.add_argument("-D", "--Dataless Ingestion", nargs="?", const=True)
+    parser.add_argument("-D", "--Dataless_Ingestion", nargs="?", const=True)
 
     parser.add_argument(
         "-S",
