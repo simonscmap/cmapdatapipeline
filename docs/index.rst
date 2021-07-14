@@ -34,8 +34,8 @@ suggested improvements.
 
     
 
-.. .. automodule:: ingest.common
-..    :members:
+.. automodule:: ingest.common
+    :members:
 
 .. Indices and tables
 .. ==================
