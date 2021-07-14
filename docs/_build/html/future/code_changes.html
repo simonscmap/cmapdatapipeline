@@ -7,12 +7,13 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Change Ideas &mdash; cmapdata 0.0.1 documentation</title>
+  <title>Code Changes &mdash; cmapdata 0.0.1 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
 
   
   
@@ -86,13 +87,14 @@
 </ul>
 <p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/database_design.html">Database Design and Table Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/pitfalls.html">Pitfalls</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Future Improvements</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Change Ideas</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Code Changes</a></li>
 </ul>
 
             
@@ -139,13 +141,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Change Ideas</li>
+      <li>Code Changes</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/future/change_ideas.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/future/code_changes.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -158,8 +160,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="change-ideas">
-<h1>Change Ideas<a class="headerlink" href="#change-ideas" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="code-changes">
+<h1>Code Changes<a class="headerlink" href="#code-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Improve test coverage</p></li>
+<li><p>Update all .format() to fstring formatting</p></li>
+<li><p>Rename dropbox pathing to remove any spacing</p></li>
+<li><p>Add the ability to ingest to add DB’s</p></li>
+<li><p>Metadata insert should all be captured in a SQL transaction, so that if a table insert fails, other tables and relations are rolled back.</p></li>
+<li><p>Move any r2r cruise collection remenant into collect/</p></li>
+<li><p>Build up cruise ingestion infrastructure</p></li>
+<li><p>Build gridded spatio-temporal dataset classifer</p></li>
+<li><p>Finish up cmapsync and put on cronjob with report emailed</p></li>
+</ul>
 </div>
 
 

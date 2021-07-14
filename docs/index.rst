@@ -19,6 +19,7 @@ suggested improvements.
     :maxdepth: 2
     :caption: Ingesting a Dataset
 
+    data_ingestion/database_design.rst
     data_ingestion/web_validator.rst
     data_ingestion/workflow.rst
     data_ingestion/pitfalls.rst
@@ -28,7 +29,7 @@ suggested improvements.
     :maxdepth: 2
     :caption: Future Improvements
 
-    future/change_ideas.rst
+    future/code_changes.rst
 
 
     

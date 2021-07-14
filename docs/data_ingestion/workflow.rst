@@ -14,10 +14,29 @@ User submitted datasets are submitted through the web validator. Once the QA/QC 
 Starting out with the dataset in '/CMAP Data Submission Dropbox/Simons CMAP/staging/combined/{dataset_name}.xlsx, the data ingestion pipeline should work.
 
 Using general.py, you can pass command line arguments to specify which server you wish to add the dataset to as well as including a DOI.
-An example string would be:
-**python general.py tblglobal_diazotroph_nifH cruise 'global_diazotroph_nifH.xlsx' -d "http://doi.org/10.5281/zenodo.4968554" -S "Rainier"**
+
 Where we have:
-**python general.py {table_name} {branch}[Branch where dataset should be placed in Vault. Ex's: cruise, float, station, satellite, model, assimilation.] {filename}[base file name in vault/staging/combined/] {-d}[CLI flag to include DOI] {DOI link as string} {-S} {server}[Valid server name: ex. Rainier, Mariana, Rossby]**
+
+.. code-block:: python
+
+   python general.py {table_name} {branch} {filename} {-d} {DOI link} {-S} {server}
+
+* {**branch**}: Branch where dataset should be placed in Vault. Ex's: cruise, float, station, satellite, model, assimilation]
+* {**filename**}: Base file name in vault/staging/combined/. Ex.: 'global_diazotroph_nifH.xlsx'
+* {**-d**}: Optional flag for including DOI with dataset in tblReferences. DOI link string follows flag arg. 
+* {**DOI link**}: String for full web address of CMAP specific DOI. Ex. "http://doi.org/10.5281/zenodo.4968554"
+* {**-S**}: Required flag for specifying server choice. Server name string follows flag. 
+* {**server**}: Valid server name string.  Ex. "Rainier", "Mariana" or "Rossby"
+
+
+An example string would be:
+
+.. code-block:: python
+
+   python general.py tblglobal_diazotroph_nifH cruise 'global_diazotroph_nifH.xlsx' -d "http://doi.org/10.5281/zenodo.4968554" -S "Rainier"
+
+
+
 
 general.py contains wrapper functions that will split the excel sheet into pandas dataframes, transfer the data to vault/, build a suggested SQL table, insert data, split dataset_meta_data and vars_meta_data into SQL queries and insert into SQL metadata tables, build summary statistics, match provided cruises to cruises in the database, classify the dataset into ocean regions and create maps and icons for the web catalog.
 
@@ -29,7 +48,7 @@ Outside 'Small' Datasets
 ------------------------
 
 These datasets usually need quite a bit of data munging to make them match the CMAP data format. Additionally, metadata needs to be collected and created.
-To keep a record of data transformations, any processing scripts should be placed in **/process/../process_datasetname.py**. Additionally, any relevent collection information should be placed in **/collect/../{collect_datasetname.py}**
+To keep a record of data transformations, any processing scripts should be placed in **/process/../process_datasetname.py**. Additionally, any relevent collection information should be placed in **/collect/../collect_datasetname.py**
 
 
 Outside 'Large' Datasets
@@ -42,7 +61,7 @@ Once data has been transfered, the next step is any data processing. This should
 In this data processing script, data should be read from **/collected_data/**, cleaned, sorted and inserted into the database(s). 
 
 .. note::
-   You will need to create a SQL table and add it to the databases prior to ingestion. Any SQL table creation script should be recorded in DB/ (repository is on Simons CMAP github). Adding indexes once the ingestion has completed might speed up ingeston.
+   You will need to create a SQL table and add it to the databases prior to ingestion. Any SQL table creation script should be recorded in DB/ (repository is on Simons CMAP github). Adding indexes once the ingestion has completed might speed up ingestion.
 
 After the data has been inserted and the indicies successfully created, metadata will need to be created and added to the databases. A standard excel template should be used for the dataset and vars metadata sheets.
 

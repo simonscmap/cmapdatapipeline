@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Web Validator &mdash; cmapdata 0.0.1 documentation</title>
+  <title>Database Design and Table Structure &mdash; cmapdata 0.0.1 documentation</title>
   
 
   
@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Workflow" href="workflow.html" />
-    <link rel="prev" title="Database Design and Table Structure" href="database_design.html" /> 
+    <link rel="next" title="Web Validator" href="web_validator.html" />
+    <link rel="prev" title="collect" href="../subpackages/collect.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -88,8 +88,8 @@
 </ul>
 <p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="database_design.html">Database Design and Table Structure</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Web Validator</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Database Design and Table Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pitfalls.html">Pitfalls</a></li>
 </ul>
@@ -142,13 +142,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Web Validator</li>
+      <li>Database Design and Table Structure</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/data_ingestion/web_validator.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/data_ingestion/database_design.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -161,37 +161,77 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="web-validator">
-<h1>Web Validator<a class="headerlink" href="#web-validator" title="Permalink to this headline">¶</a></h1>
-<p>Colaborator datasets are submitted through our online web validator.
-This system checks the integrity of the data, dataset metaddata and variable metadata sheets,
-looking for missing information and invalid data types.
-The status of the dataset is available to the curation team as well as the submitter on the data submission dashboard (<a class="reference external" href="https://simonscmap.com/datasubmission/admindashboard">https://simonscmap.com/datasubmission/admindashboard</a>)</p>
-<div class="figure align-default">
-<a class="reference internal image-reference" href="../_images/admin_dashboard.png"><img alt="Web Validator Admin Dashboard" src="../_images/admin_dashboard.png" style="width: 1278.1999999999998px; height: 653.8px;" /></a>
+  <div class="section" id="database-design-and-table-structure">
+<h1>Database Design and Table Structure<a class="headerlink" href="#database-design-and-table-structure" title="Permalink to this headline">¶</a></h1>
+<div class="figure align-default" id="id1">
+<img alt="CMAP DB metadata specific table database diagram" src="../_images/DB_diagram.png" />
+<p class="caption"><span class="caption-text">CMAP DB metadata specific table database diagram</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </div>
-<p>Once a colaborator has succesfully submitted a dataset through the validator,
-the process will be handed over to the data curation team for additional QA/QC checks.
-Data and metadata should be checked to make sure it conforms to the data submission guide.
-At this point it is also a good idea to do some sanity checks on the data itself.
-A common pitfall from data submitters is to mix up the sign of longitude, placing the dataset in the wrong ocean.
-When the first check is complete, the dataset should have secondary independent QA/QC check.</p>
-<div class="figure align-default">
-<a class="reference internal image-reference" href="../_images/validator_meta_data_check.png"><img alt="Web Validator Dataset Metadata Check" src="../_images/validator_meta_data_check.png" style="width: 1183.2px; height: 596.0px;" /></a>
-</div>
-<p>Any edits of suggestions should be sent back to the submitter through the web validator. Addtionally,
-any changes in the ‘phase’ should be updated through the dropdown menu in the dashboard.</p>
-<div class="figure align-default">
-<img alt="Web Validator Phase Dropdown Menu" src="../_images/phase_dropdown.png" />
-</div>
-<p>Once all the dataset changes are complete, the submitter should register a DOI for their dataset and send it over via the validator.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Datasets submitted through the web validator are currently stored in dropbox:
-‘CMAP Data Submission Dropbox/Simons CMAP/Apps/Simons CMAP Web Data Submission/{dataset_name}/{dataset_name_datestring.xlsx}
-The data ingest pipeline starts at ‘CMAP Data Submission Dropbox/Simons CMAP/staging/combined/{dataset_name}.xlsx
-This path disconnect should be remedied.</p>
-</div>
+<p>Simons CMAP currently has three servers that contain near replicates of the SQL Server database. The names of these three are: Rainier, Mariana and Rossby.
+Rainier was the first dedicated server to host the database and currently serves as the main ‘source of truth’.</p>
+<p>Data tables along with metadata tables are stored in the same schema. Common queries live on the database as stored procedures.
+Data tables are independent of one another. The dataset table name is stored as a column in the metadata table <em>tblVariables</em>.
+This key links the data tables to the rest of the metadata.</p>
+<p>Metadata tables are listed below with a brief description of each:</p>
+<p><strong>Variable Level Metadata</strong></p>
+<p><strong>tblVariables</strong> links the data tables to the metadata through the column [Table_Name].
+Columns with an _ID suffix are linked to other metadata tables. For example, Dataset level information in tblDatasets in linked through [Dataset_ID].
+Each data variable in a dataset has a row in this table, containing the following columns:</p>
+<ul class="simple">
+<li><p>ID</p></li>
+<li><p>DB</p></li>
+<li><p>Dataset_ID</p></li>
+<li><p>Table_Name</p></li>
+<li><p>Short_Name</p></li>
+<li><p>Long_Name</p></li>
+<li><p>Unit</p></li>
+<li><p>Temporal_Res_ID</p></li>
+<li><p>Spatial_Res_ID</p></li>
+<li><p>Temporal_Coverage_Begin</p></li>
+<li><p>Temporal_Coverage_End</p></li>
+<li><p>Lat_Coverage_Begin</p></li>
+<li><p>Lat_Coverage_End</p></li>
+<li><p>Lon_Coverage_Begin</p></li>
+<li><p>Lon_Coverage_End</p></li>
+<li><p>Grid_Mapping</p></li>
+<li><p>Make_ID</p></li>
+<li><p>Sensor_ID</p></li>
+<li><p>Process_ID</p></li>
+<li><p>Study_Domain_ID</p></li>
+<li><p>Comment</p></li>
+<li><p>Visualize</p></li>
+<li><p>Data_Type</p></li>
+</ul>
+<p><strong>tblKeywords</strong> contains user submitted keywords used in the searching of a variable.
+tblKeywords contains an ID column, where each value which corresponds to a unique variable entry in tblVariables.</p>
+<ul class="simple">
+<li><p>var_ID</p></li>
+<li><p>keywords</p></li>
+</ul>
+<p><strong>tblTemporal_Resolution</strong>, <strong>tblSpatial_Resolution</strong>, <strong>tblMake</strong>, <strong>tblSensor</strong>, <strong>tblProcess_Stages</strong> and <strong>tblStudy_Domains</strong> are all
+variable level tables that contain links between the ID’s in tblVariables and their respective tables.</p>
+<p><strong>Dataset Level Metadata</strong></p>
+<p>tblDatasets contains dataset level information and has links to tblVariables as well as links to cruise and region level information.</p>
+<ul class="simple">
+<li><p>ID</p></li>
+<li><p>DB</p></li>
+<li><p>Dataset_Name</p></li>
+<li><p>Dataset_Long_Name</p></li>
+<li><p>Variables</p></li>
+<li><p>Data_Source</p></li>
+<li><p>Distributor</p></li>
+<li><p>Description</p></li>
+<li><p>Climatology</p></li>
+<li><p>Acknowledgement</p></li>
+<li><p>Doc_URL</p></li>
+<li><p>Icon_URL</p></li>
+<li><p>Contact_Email</p></li>
+<li><p>Dataset_Version</p></li>
+<li><p>Dataset_Release_Date</p></li>
+<li><p>Dataset_History</p></li>
+</ul>
+<p>** Cruise Metadata **</p>
+<p>** Region Metadata **</p>
 </div>
 
 

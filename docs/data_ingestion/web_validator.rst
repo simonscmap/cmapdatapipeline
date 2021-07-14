@@ -6,7 +6,12 @@ This system checks the integrity of the data, dataset metaddata and variable met
 looking for missing information and invalid data types.
 The status of the dataset is available to the curation team as well as the submitter on the data submission dashboard (https://simonscmap.com/datasubmission/admindashboard)
 
-## insert image of validator dashboard and admin status dashboard. ##
+.. figure:: ../_static/admin_dashboard.png
+   :scale: 70 %
+   :alt: Web Validator Admin Dashboard
+
+
+
 
 Once a colaborator has succesfully submitted a dataset through the validator, 
 the process will be handed over to the data curation team for additional QA/QC checks.
@@ -15,8 +20,18 @@ At this point it is also a good idea to do some sanity checks on the data itself
 A common pitfall from data submitters is to mix up the sign of longitude, placing the dataset in the wrong ocean.
 When the first check is complete, the dataset should have secondary independent QA/QC check.
 
+.. figure:: ../_static/validator_meta_data_check.png
+   :scale: 80 %
+   :alt: Web Validator Dataset Metadata Check
+
+
 Any edits of suggestions should be sent back to the submitter through the web validator. Addtionally, 
 any changes in the 'phase' should be updated through the dropdown menu in the dashboard.
+
+.. figure:: ../_static/phase_dropdown.png
+   :alt: Web Validator Phase Dropdown Menu
+
+
 
 Once all the dataset changes are complete, the submitter should register a DOI for their dataset and send it over via the validator.
 
