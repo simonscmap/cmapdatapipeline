@@ -80,3 +80,17 @@ vault_structure.py
 
 vault_structure contains the relative paths of vault as well as some directory creation structure.
 
+::
+
+    ├── assimilation
+    ├── model
+    ├── observation
+        ├── in-situ
+        │   ├── cruise
+        │   ├── float
+        │   └── station
+        └── remote
+            └── satellite
+
+
+

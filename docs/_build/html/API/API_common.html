@@ -337,20 +337,6 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="ingest.common.get_cols_in_table">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_cols_in_table</code><span class="sig-paren">(</span><em class="sig-param">tableName</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_cols_in_table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return list of columns in a table</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>tableName</strong> (<em>string</em>) – CMAP table name</p></li>
-<li><p><strong>Server</strong> (<em>string</em>) – Valid CMAP server name</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
 <dt id="ingest.common.get_cruise_IDS">
 <code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_cruise_IDS</code><span class="sig-paren">(</span><em class="sig-param">cruise_name_list</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_cruise_IDS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns IDs of input cruise names</p>
@@ -374,6 +360,20 @@
 <dt id="ingest.common.get_name_pkey">
 <code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_name_pkey</code><span class="sig-paren">(</span><em class="sig-param">tableName</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_name_pkey" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the name of the primary key column for a given table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tableName</strong> (<em>string</em>) – CMAP table name</p></li>
+<li><p><strong>Server</strong> (<em>string</em>) – Valid CMAP server name</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="ingest.common.get_numeric_cols_in_table_excluding_climatology">
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_numeric_cols_in_table_excluding_climatology</code><span class="sig-paren">(</span><em class="sig-param">tableName</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_numeric_cols_in_table_excluding_climatology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of columns in a table that are numeric (float &amp; int) and are not any climatology caluclated fields, eg. dayofyear</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
