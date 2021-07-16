@@ -11,7 +11,7 @@ import DB
 import transfer
 import data
 
-
+from tqdm import tqdm
 import dask.dataframe as dd
 
 pycmap.API(cr.api_key)
@@ -126,6 +126,30 @@ def aggregate_large_stats(branch, tableName, server):
         stats_DF.at["mean", var] = var_mean
         stats_DF.at["min", var] = var_min
         stats_DF.at["std", var] = var_std
+    return stats_DF
+
+
+def build_stats_df_from_db_calls(tableName, server):
+    """
+
+    Builds basic (min,max,count) summary stats from existing table in DB
+
+    Args:
+        tableName (string): CMAP table name
+        Server (string): Valid CMAP server name
+    """
+    col_list = cmn.get_numeric_cols_in_table_excluding_climatology(tableName, server)
+    stats_DF = pd.DataFrame(index=["count", "max", "mean", "min", "std"])
+    for var in tqdm(col_list):
+        print(var)
+        stats_qry = f"""SELECT COUNT({var}),MAX({var}),MIN({var}) FROM {tableName}"""
+        var_df = DB.dbRead(stats_qry, server)
+        stats_DF[var] = ""
+        stats_DF.at["count", var] = var_df.iloc[:, 0][0]
+        stats_DF.at["max", var] = var_df.iloc[:, 1][0]
+        stats_DF.at["mean", var] = ""
+        stats_DF.at["min", var] = var_df.iloc[:, 2][0]
+        stats_DF.at["std", var] = ""
     return stats_DF
 
 

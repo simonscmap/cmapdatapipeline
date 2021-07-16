@@ -27,10 +27,8 @@ def clear_directory(directory):
 
 def Zenodo_DOI_Formatter(DOI, filename):
     doi_record = DOI.split("zenodo.")[1]
-    doi_download_str = (
-        "https://zenodo.org/record/{doi_record}}/files/{filename}}?download=1".format(
-            doi_record=doi_record, filename=filename
-        )
+    doi_download_str = "https://zenodo.org/record/{doi_record}}/files/{filename}}?download=1".format(
+        doi_record=doi_record, filename=filename
     )
     return doi_download_str
 
@@ -180,8 +178,7 @@ def dropbox_file_transfer(input_file_path, output_file_path):
                 )
                 pbar.update(chunk_size)
                 cursor = dropbox.files.UploadSessionCursor(
-                    session_id=upload_session_start_result.session_id,
-                    offset=f.tell(),
+                    session_id=upload_session_start_result.session_id, offset=f.tell(),
                 )
                 commit = dropbox.files.CommitInfo(path=output_file_path)
 
@@ -193,9 +190,7 @@ def dropbox_file_transfer(input_file_path, output_file_path):
 
                     else:
                         dbx.files_upload_session_append(
-                            f.read(chunk_size),
-                            cursor.session_id,
-                            cursor.offset,
+                            f.read(chunk_size), cursor.session_id, cursor.offset,
                         )
                         cursor.offset = f.tell()
                     pbar.update(chunk_size)

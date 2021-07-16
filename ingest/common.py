@@ -465,3 +465,16 @@ def double_chars_in_col(df, col, list_of_chars):
     for char in list_of_chars:
         df[col] = df[col].str.replace(char, char * 2)
     return df
+
+
+def get_numeric_cols_in_table_excluding_climatology(tableName, server):
+    """Return list of columns in a table that are numeric (float & int) and are not any climatology caluclated fields, eg. dayofyear
+
+    Args:
+        tableName (string): CMAP table name
+        Server (string): Valid CMAP server name
+    """
+    qry = f"""select COLUMN_NAME from Information_schema.columns where Table_name = '{tableName}' and( DATA_TYPE = 'float' or DATA_TYPE = 'int') and COLUMN_NAME NOT IN ('year','month','week','dayofyear')"""
+    df = DB.dbRead(qry, server)
+    col_list = df["COLUMN_NAME"].to_list()
+    return col_list

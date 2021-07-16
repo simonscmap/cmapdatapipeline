@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>API Ref common.py &mdash; cmapdata 0.0.1 documentation</title>
   
@@ -17,10 +17,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -54,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> cmapdata
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> cmapdata
           
 
           
@@ -90,6 +87,7 @@
 </ul>
 <p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/installation.html">Installation and Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/database_design.html">Database Design and Table Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/workflow.html">Workflow</a></li>
@@ -142,8 +140,6 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -155,7 +151,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="../_sources/API/API_common.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -171,9 +167,9 @@
             
   <div class="section" id="module-ingest.common">
 <span id="api-ref-common-py"></span><h1>API Ref common.py<a class="headerlink" href="#module-ingest.common" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.datasetINtblDatasets">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">datasetINtblDatasets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_name</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.datasetINtblDatasets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">datasetINtblDatasets</code><span class="sig-paren">(</span><em class="sig-param">dataset_name</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.datasetINtblDatasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return boolean if table exists in tblDatasets</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -191,9 +187,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.decode_xarray_bytes">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">decode_xarray_bytes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xdf</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.decode_xarray_bytes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">decode_xarray_bytes</code><span class="sig-paren">(</span><em class="sig-param">xdf</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.decode_xarray_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decode any byte strings in any columns of an xarray dataset</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -208,9 +204,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.double_chars_in_col">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">double_chars_in_col</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">list_of_chars</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.double_chars_in_col" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">double_chars_in_col</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">col</em>, <em class="sig-param">list_of_chars</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.double_chars_in_col" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replaces a single character with two of the same character. To be used in SQL Server escaping.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -229,15 +225,15 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.empty_list_2_empty_str">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">empty_list_2_empty_str</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inlist</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.empty_list_2_empty_str" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">empty_list_2_empty_str</code><span class="sig-paren">(</span><em class="sig-param">inlist</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.empty_list_2_empty_str" title="Permalink to this definition">¶</a></dt>
 <dd><p>If a input list is empty returns an empty string, if not, list is returned</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.exclude_val_from_col">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">exclude_val_from_col</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">series</span></em>, <em class="sig-param"><span class="n">exclude_list</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.exclude_val_from_col" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">exclude_val_from_col</code><span class="sig-paren">(</span><em class="sig-param">series</em>, <em class="sig-param">exclude_list</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.exclude_val_from_col" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exclude any characters in a list from Pandas Series</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -255,15 +251,15 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.findVarID">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">findVarID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datasetID</span></em>, <em class="sig-param"><span class="n">Short_Name</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.findVarID" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">findVarID</code><span class="sig-paren">(</span><em class="sig-param">datasetID</em>, <em class="sig-param">Short_Name</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.findVarID" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get ID value from tblVariables for specific variable</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.getColBounds">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getColBounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">col</span></em>, <em class="sig-param"><span class="n">list_multiplier</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getColBounds" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getColBounds</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">col</em>, <em class="sig-param">list_multiplier=0</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getColBounds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the min and max bounds of a dataframe column</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -282,39 +278,39 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.getCruiseDetails">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getCruiseDetails</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cruiseName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getCruiseDetails" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getCruiseDetails</code><span class="sig-paren">(</span><em class="sig-param">cruiseName</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getCruiseDetails" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get cruise details from cruise name using uspCruiseByName</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.getDatasetID_DS_Name">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getDatasetID_DS_Name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datasetName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getDatasetID_DS_Name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getDatasetID_DS_Name</code><span class="sig-paren">(</span><em class="sig-param">datasetName</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getDatasetID_DS_Name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get DatasetID from input dataset name</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.getDatasetID_Tbl_Name">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getDatasetID_Tbl_Name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getDatasetID_Tbl_Name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getDatasetID_Tbl_Name</code><span class="sig-paren">(</span><em class="sig-param">tableName</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getDatasetID_Tbl_Name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get DatasetID from input table name</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.getKeywordIDsTableNameVarName">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getKeywordIDsTableNameVarName</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">var_short_name_list</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getKeywordIDsTableNameVarName" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getKeywordIDsTableNameVarName</code><span class="sig-paren">(</span><em class="sig-param">tableName</em>, <em class="sig-param">var_short_name_list</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getKeywordIDsTableNameVarName" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get list of keyword ID’s from input tableName</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.getKeywordsIDDataset">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getKeywordsIDDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_ID</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getKeywordsIDDataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getKeywordsIDDataset</code><span class="sig-paren">(</span><em class="sig-param">dataset_ID</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getKeywordsIDDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get list of keyword ID’s from input dataset ID</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.getLatCount">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getLatCount</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getLatCount" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getLatCount</code><span class="sig-paren">(</span><em class="sig-param">tableName</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getLatCount" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get count of number of latitude rows from a give table in the database
 :param tableName {string}: Valid CMAP tablename
 :param server {string}: Valid CMAP server name. ex Rainer</p>
@@ -328,21 +324,35 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.getListCruises">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getListCruises</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getListCruises" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getListCruises</code><span class="sig-paren">(</span><em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getListCruises" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get list of available cruises using uspCruises</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.getTableName_Dtypes">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getTableName_Dtypes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getTableName_Dtypes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">getTableName_Dtypes</code><span class="sig-paren">(</span><em class="sig-param">tableName</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.getTableName_Dtypes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get data types from input table name</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
+<dt id="ingest.common.get_cols_in_table">
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_cols_in_table</code><span class="sig-paren">(</span><em class="sig-param">tableName</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_cols_in_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of columns in a table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tableName</strong> (<em>string</em>) – CMAP table name</p></li>
+<li><p><strong>Server</strong> (<em>string</em>) – Valid CMAP server name</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="ingest.common.get_cruise_IDS">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_cruise_IDS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cruise_name_list</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_cruise_IDS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_cruise_IDS</code><span class="sig-paren">(</span><em class="sig-param">cruise_name_list</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_cruise_IDS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns IDs of input cruise names</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -360,9 +370,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.get_name_pkey">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_name_pkey</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_name_pkey" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_name_pkey</code><span class="sig-paren">(</span><em class="sig-param">tableName</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_name_pkey" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the name of the primary key column for a given table</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -374,9 +384,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.get_region_IDS">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_region_IDS</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">region_name_list</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_region_IDS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_region_IDS</code><span class="sig-paren">(</span><em class="sig-param">region_name_list</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_region_IDS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns IDs of input region names</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -394,9 +404,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.get_var_list_dataset">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_var_list_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_var_list_dataset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_var_list_dataset</code><span class="sig-paren">(</span><em class="sig-param">tableName</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_var_list_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns list of column names for a given dataset</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -411,9 +421,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.length_of_tbl">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">length_of_tbl</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tableName</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.length_of_tbl" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">length_of_tbl</code><span class="sig-paren">(</span><em class="sig-param">tableName</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.length_of_tbl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return length of CMAP database table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -428,9 +438,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.lowercase_List">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">lowercase_List</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">list</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.lowercase_List" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">lowercase_List</code><span class="sig-paren">(</span><em class="sig-param">list</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.lowercase_List" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert every string in a list to a lowercase string</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -445,9 +455,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.nanToNA">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">nanToNA</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.nanToNA" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">nanToNA</code><span class="sig-paren">(</span><em class="sig-param">df</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.nanToNA" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace numpy nan with ‘ ‘</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -462,9 +472,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.strip_leading_trailing_whitespace_column">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">strip_leading_trailing_whitespace_column</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">col_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.strip_leading_trailing_whitespace_column" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">strip_leading_trailing_whitespace_column</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">col_name</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.strip_leading_trailing_whitespace_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Using left and right string strip, remove trailing and leading whitespace from given column</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -482,9 +492,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.strip_whitespace_data">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">strip_whitespace_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.strip_whitespace_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">strip_whitespace_data</code><span class="sig-paren">(</span><em class="sig-param">df</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.strip_whitespace_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Strips leading and trailing whitespace from dataframe</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -499,9 +509,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.strip_whitespace_headers">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">strip_whitespace_headers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.strip_whitespace_headers" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">strip_whitespace_headers</code><span class="sig-paren">(</span><em class="sig-param">df</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.strip_whitespace_headers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Strips any whitespace from dataframe header</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -516,9 +526,9 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.tableInDB">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">tableInDB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.tableInDB" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">tableInDB</code><span class="sig-paren">(</span><em class="sig-param">tableName</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.tableInDB" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return boolean if table exists in database</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -536,15 +546,15 @@
 </dl>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.vault_struct_retrieval">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">vault_struct_retrieval</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">branch</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.vault_struct_retrieval" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">vault_struct_retrieval</code><span class="sig-paren">(</span><em class="sig-param">branch</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.vault_struct_retrieval" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns vault structure path for input branch</p>
 </dd></dl>
 
-<dl class="py function">
+<dl class="function">
 <dt id="ingest.common.verify_cruise_lists">
-<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">verify_cruise_lists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_metadata_df</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.verify_cruise_lists" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">verify_cruise_lists</code><span class="sig-paren">(</span><em class="sig-param">dataset_metadata_df</em>, <em class="sig-param">server</em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.verify_cruise_lists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take dataset_metadata_df, match cruise names with those in tblCruise, return tuple of matched and unmatched lists.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -569,25 +579,28 @@
            
           </div>
           <footer>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Norland Raphael Hagen.
+        
+        &copy; Copyright 2021, Norland Raphael Hagen
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 
