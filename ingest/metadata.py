@@ -287,10 +287,22 @@ def tblVariables_Insert(
             Data_Type,
         )
 
-        DB.lineInsert(
-            server, "[opedia].[dbo].[tblVariables]", columnList, query, ID_insert=True
-        )
-
+        try:
+            DB.lineInsert(
+                server,
+                "[opedia].[dbo].[tblVariables]",
+                columnList,
+                query,
+                ID_insert=True,
+            )
+        except:
+            DB.lineInsert(
+                server,
+                "[opedia].[dbo].[tblVariables]",
+                columnList,
+                query,
+                ID_insert=False,
+            )
     print("Inserting data into tblVariables")
 
 
@@ -324,11 +336,14 @@ def user_input_build_cruise(df, dataset_metadata_df, server):
     print("The cruise metadata dataframe you generated looks like: ")
     print(tblCruise_df)
     meta_cont = input(
-        "Do you want to ingest this [y], cancel the proces [n] or go through the metadata build again [r]? "
+        "Do you want to ingest this [y], cancel the process [n] or go through the metadata build again [r]? "
     )
     if meta_cont.lower() == "r":
         tblCruise_df, cruise_name = cruise.build_cruise_metadata_from_user_input(df)
     elif meta_cont.lower() == "y":
+        print(tuple(tblCruise_df.iloc[0].astype(str).to_list()))
+        # Cruise_ID = cmn.get_cruise_IDS([cruise_name], "Rainier")[
+
         DB.lineInsert(
             server,
             "tblCruise",
@@ -339,9 +354,7 @@ def user_input_build_cruise(df, dataset_metadata_df, server):
         sys.exit()
 
     Cruise_ID = cmn.get_cruise_IDS([cruise_name], server)
-    rdf = cruise.resample_trajectory(df)
-    traj_df = cruise.return_cruise_trajectory_from_df(rdf, Cruise_ID)
-    # Dev note, in future generate map for QA? add user input
+    traj_df = cruise.return_cruise_trajectory_from_df(df, Cruise_ID)
     data.data_df_to_db(
         traj_df, "tblCruise_Trajectory", server, clean_data_df_flag=False
     )

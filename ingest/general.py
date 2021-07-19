@@ -161,18 +161,18 @@ def full_ingestion(args):
         args.staging_filename,
         getBranch_Path(args),
         args.tableName,
-        remove_file_flag=True,
+        remove_file_flag=False,
     )
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=True
     )
-    # SQL_suggestion(data_dict, args.tableName, args.branch, args.Server)
-    # insertData(data_dict, args.tableName, args.Server)
+    SQL_suggestion(data_dict, args.tableName, args.branch, args.Server)
+    insertData(data_dict, args.tableName, args.Server)
     insertMetadata(data_dict, args.tableName, args.DOI_link_append, args.Server)
-    # insert_small_stats(data_dict, args.tableName, args.Server)
-    # if args.Server == "Rainier":
-    #     createIcon(data_dict, args.tableName)
-    #     push_icon()
+    insert_small_stats(data_dict, args.tableName, args.Server)
+    if args.Server == "Rainier":
+        createIcon(data_dict, args.tableName)
+        push_icon()
 
 
 def dataless_ingestion(args):
