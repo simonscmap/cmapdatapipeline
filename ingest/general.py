@@ -140,8 +140,8 @@ def insert_small_stats(data_dict, tableName, server):
     stats.updateStats_Small(tableName, server, data_dict["data_df"])
 
 
-def insert_large_stats(tableName, branch, server):
-    stats_df = stats.aggregate_large_stats(branch, tableName)
+def insert_large_stats(tableName, server):
+    stats_df = stats.build_stats_df_from_db_calls(tableName, server)
     stats.update_stats_large(tableName, stats_df, server)
 
 
@@ -194,6 +194,7 @@ def dataless_ingestion(args):
         args.branch, args.tableName, args.process_level, import_data=False
     )
     insertMetadata(data_dict, args.tableName, args.DOI_link_append, args.Server)
+    insert_large_stats(args.tablename, args.server)
 
 
 def main():
