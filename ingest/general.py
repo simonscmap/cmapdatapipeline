@@ -36,8 +36,17 @@ def splitExcel(staging_filename, data_missing_flag):
     transfer.single_file_split(staging_filename, data_missing_flag)
 
 
-def staging_to_vault(staging_filename, branch, tableName, remove_file_flag=False):
-    transfer.staging_to_vault(staging_filename, branch, tableName, remove_file_flag)
+def staging_to_vault(
+    staging_filename, branch, tableName, remove_file_flag, skip_data_flag, process_level
+):
+    transfer.staging_to_vault(
+        staging_filename,
+        branch,
+        tableName,
+        remove_file_flag,
+        skip_data_flag,
+        process_level,
+    )
 
 
 def importDataMemory(branch, tableName, process_level):
@@ -78,7 +87,9 @@ def insertData(data_dict, tableName, server):
     data.data_df_to_db(data_dict["data_df"], tableName, server)
 
 
-def insertMetdata_no_data(data_dict, tableName, DOI_link_append, server):
+def insertMetadata_no_data(
+    data_dict, tableName, DOI_link_append, server, process_level
+):
     metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server)
     metadata.tblDataset_References_Insert(
         data_dict["dataset_metadata_df"], server, DOI_link_append
@@ -90,7 +101,7 @@ def insertMetdata_no_data(data_dict, tableName, DOI_link_append, server):
         data_dict["variable_metadata_df"],
         tableName,
         server,
-        process_level="REP",
+        process_level,
         CRS="CRS",
     )
     metadata.tblKeywords_Insert(
@@ -105,7 +116,7 @@ def insertMetdata_no_data(data_dict, tableName, DOI_link_append, server):
         )
 
 
-def insertMetadata(data_dict, tableName, DOI_link_append, server):
+def insertMetadata(data_dict, tableName, DOI_link_append, server, process_level):
     metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server)
     metadata.tblDataset_References_Insert(
         data_dict["dataset_metadata_df"], server, DOI_link_append
@@ -116,7 +127,7 @@ def insertMetadata(data_dict, tableName, DOI_link_append, server):
         data_dict["variable_metadata_df"],
         tableName,
         server,
-        process_level="REP",
+        process_level,
         CRS="CRS",
     )
     metadata.tblKeywords_Insert(
@@ -162,13 +173,17 @@ def full_ingestion(args):
         getBranch_Path(args),
         args.tableName,
         remove_file_flag=False,
+        skip_data_flag=False,
+        process_level=args.process_level,
     )
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=True
     )
     SQL_suggestion(data_dict, args.tableName, args.branch, args.Server)
     insertData(data_dict, args.tableName, args.Server)
-    insertMetadata(data_dict, args.tableName, args.DOI_link_append, args.Server)
+    insertMetadata(
+        data_dict, args.tableName, args.DOI_link_append, args.Server, args.process_level
+    )
     insert_small_stats(data_dict, args.tableName, args.Server)
     if args.Server == "Rainier":
         createIcon(data_dict, args.tableName)
@@ -188,13 +203,18 @@ def dataless_ingestion(args):
         args.staging_filename,
         getBranch_Path(args),
         args.tableName,
-        remove_file_flag=True,
+        remove_file_flag=False,
+        skip_data_flag=True,
+        process_level=args.process_level,
     )
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=False
     )
-    insertMetadata(data_dict, args.tableName, args.DOI_link_append, args.Server)
-    insert_large_stats(args.tablename, args.server)
+    insertMetadata_no_data(
+        data_dict, args.tableName, args.DOI_link_append, args.Server, args.process_level
+    )
+
+    insert_large_stats(args.tableName, args.Server)
 
 
 def main():
@@ -221,7 +241,7 @@ def main():
         nargs="?",
     )
 
-    parser.add_argument("-D", "--Dataless_Ingestion", nargs="?", const=True)
+    parser.add_argument("-N", "--Dataless_Ingestion", nargs="?", const=True)
 
     parser.add_argument(
         "-S",
@@ -237,7 +257,8 @@ def main():
         dataless_ingestion(args)
 
     else:
-        full_ingestion(args)
+        print("missed")
+        # full_ingestion(args)
 
 
 if __name__ == main():

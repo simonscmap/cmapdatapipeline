@@ -27,14 +27,21 @@ def clear_directory(directory):
 
 def Zenodo_DOI_Formatter(DOI, filename):
     doi_record = DOI.split("zenodo.")[1]
-    doi_download_str = "https://zenodo.org/record/{doi_record}}/files/{filename}}?download=1".format(
-        doi_record=doi_record, filename=filename
+    doi_download_str = (
+        "https://zenodo.org/record/{doi_record}}/files/{filename}}?download=1".format(
+            doi_record=doi_record, filename=filename
+        )
     )
     return doi_download_str
 
 
 def staging_to_vault(
-    filename, branch, tableName, remove_file_flag=True, process_level="REP"
+    filename,
+    branch,
+    tableName,
+    remove_file_flag=True,
+    skip_data_flag=False,
+    process_level="REP",
 ):
 
     """
@@ -72,11 +79,11 @@ def staging_to_vault(
     vars_metadata_fname = (
         vs.staging + "metadata/" + base_filename + "_vars_metadata.csv"
     )
-
-    if process_level.lower() == "nrt":
-        shutil.copyfile(data_fname, nrt_tree + base_filename + "_data.csv")
-    else:
-        shutil.copyfile(data_fname, rep_tree + base_filename + "_data.csv")
+    if skip_data_flag == False:
+        if process_level.lower() == "nrt":
+            shutil.copyfile(data_fname, nrt_tree + base_filename + "_data.csv")
+        else:
+            shutil.copyfile(data_fname, rep_tree + base_filename + "_data.csv")
 
     shutil.copyfile(
         dataset_metadata_fname, metadata_tree + base_filename + "_dataset_metadata.csv"
@@ -86,9 +93,10 @@ def staging_to_vault(
     )
 
     if remove_file_flag == True:
-        os.remove(data_fname)
         os.remove(dataset_metadata_fname)
         os.remove(vars_metadata_fname)
+        if skip_data_flag == False:
+            os.remove(data_fname)
 
 
 def single_file_split(filename, data_missing_flag):
@@ -178,7 +186,8 @@ def dropbox_file_transfer(input_file_path, output_file_path):
                 )
                 pbar.update(chunk_size)
                 cursor = dropbox.files.UploadSessionCursor(
-                    session_id=upload_session_start_result.session_id, offset=f.tell(),
+                    session_id=upload_session_start_result.session_id,
+                    offset=f.tell(),
                 )
                 commit = dropbox.files.CommitInfo(path=output_file_path)
 
@@ -190,7 +199,9 @@ def dropbox_file_transfer(input_file_path, output_file_path):
 
                     else:
                         dbx.files_upload_session_append(
-                            f.read(chunk_size), cursor.session_id, cursor.offset,
+                            f.read(chunk_size),
+                            cursor.session_id,
+                            cursor.offset,
                         )
                         cursor.offset = f.tell()
                     pbar.update(chunk_size)

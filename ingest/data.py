@@ -173,7 +173,7 @@ def read_csv(path_and_filename, delim=","):
 def fetch_single_datafile(branch, tableName, process_level="REP", file_ext=".csv"):
     """Finds first file in glob with input path to vault structure. Returns path_filename"""
     vault_path = cmn.vault_struct_retrieval(branch)
-    print(vault_path)
+    print(vault_path + tableName + "/" + process_level.lower() + "/" + "*" + file_ext)
     flist = glob.glob(
         vault_path + tableName + "/" + process_level.lower() + "/" + "*" + file_ext
     )[0]
@@ -181,12 +181,12 @@ def fetch_single_datafile(branch, tableName, process_level="REP", file_ext=".csv
 
 
 def importDataMemory(branch, tableName, process_level, import_data=True):
-    data_file_name = fetch_single_datafile(branch, tableName, process_level)
 
     dataset_metadata_df, variable_metadata_df = metadata.import_metadata(
         branch, tableName
     )
     if import_data == True:
+        data_file_name = fetch_single_datafile(branch, tableName, process_level)
         data_df = read_csv(data_file_name)
         data_df = clean_data_df(data_df)
         data_df.rename(columns={"latitude": "lat", "longitude": "lon"}, inplace=True)
