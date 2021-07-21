@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="process" href="process.html" />
-    <link rel="prev" title="cmapdata" href="../index.html" /> 
+    <link rel="next" title="Code Changes" href="../future/code_changes.html" />
+    <link rel="prev" title="process" href="process.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -80,8 +80,20 @@
               
             
             
-              <p class="caption"><span class="caption-text">Package Overview</span></p>
+              <p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/installation.html">Installation and Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/database_design.html">Database Design and Table Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/compute_and_storage.html">Compute Resources and Data Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/web_validator.html">Web Validator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/pitfalls.html">Pitfalls</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package Overview</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="DB.html">DB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="collect.html">collect</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process.html">process</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">ingest</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#common-py">common.py</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#credentials-py">credentials.py</a></li>
@@ -99,16 +111,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#vault-structure-py">vault_structure.py</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="process.html">process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="collect.html">collect</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/installation.html">Installation and Setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/database_design.html">Database Design and Table Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/web_validator.html">Web Validator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/workflow.html">Workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/pitfalls.html">Pitfalls</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Future Improvements</span></p>
 <ul>
@@ -184,9 +186,9 @@
             
   <div class="section" id="ingest">
 <h1>ingest<a class="headerlink" href="#ingest" title="Permalink to this headline">¶</a></h1>
-<p>ingest/ is the submodule that contains ingestion and data processing functions, data vault strucutre logic and DB connection information.
+<p>ingest/ is the submodule that contains ingestion and data processing functions, data vault structure logic and DB connection information.
 Ingesting a dataset using this submodule will be covered in data_ingestion/workflow.</p>
-<p>ingest/ is broken into the multiple python scripts to seperate ingestion logic. Desiciptions and uses of each are descibed below.</p>
+<p>ingest/ is broken into the multiple python scripts to separate ingestion logic. Descriptions and uses of each are described below.</p>
 <div class="section" id="common-py">
 <h2>common.py<a class="headerlink" href="#common-py" title="Permalink to this headline">¶</a></h2>
 <p>This scrip holds many commonly used simple functions for data processing/cleaning. It is a good location for generalized use functions.</p>

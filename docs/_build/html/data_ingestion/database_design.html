@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Web Validator" href="web_validator.html" />
+    <link rel="next" title="Compute Resources and Data Storage" href="compute_and_storage.html" />
     <link rel="prev" title="Installation and Setup" href="installation.html" /> 
 </head>
 
@@ -80,13 +80,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Package Overview</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../subpackages/ingest.html">ingest</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../subpackages/process.html">process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../subpackages/collect.html">collect</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
+              <p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Setup</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Database Design and Table Structure</a><ul>
@@ -94,9 +88,17 @@
 <li class="toctree-l2"><a class="reference internal" href="#dataset-level-metadata">Dataset Level Metadata</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="compute_and_storage.html">Compute Resources and Data Storage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pitfalls.html">Pitfalls</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/DB.html">DB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/collect.html">collect</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/process.html">process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/ingest.html">ingest</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Future Improvements</span></p>
 <ul>
@@ -243,10 +245,12 @@ variable level tables that contain links between the ID’s in tblVariables and 
 <li><p>Dataset_History</p></li>
 </ul>
 <p><strong>Cruise Metadata</strong>
-The metadata for cruises in CMAP is seperated into multiple tables. A core <strong>tblCruise</strong> links together metadata tables for cruise trajectories, cruise keywords, cruise region links and cruise dataset links.
+The metadata for cruises in CMAP is separated into multiple tables. A core <strong>tblCruise</strong> links
+together metadata tables for cruise trajectories, cruise keywords, cruise region links and cruise dataset links.
 <strong>tblDataset_Cruises</strong> is the linking table to connect cruise_IDs with dataset_IDs.</p>
 <p><strong>Region Metadata</strong>
-The region tables in CMAP share a similar schema to the cruise tables layout. <strong>tblRegions</strong> contains the ocean regions (this can be expanded).
+The region tables in CMAP share a similar schema to the cruise tables layout. <strong>tblRegions</strong> contains the ocean regions
+(this can be expanded).
 <strong>tblDataset_Regions</strong> is similar to <strong>tblDataset_Cruises</strong> because it acts as the linking table between the region and dataset tables.
 <strong>tblCruise_Regions</strong> is a linking table between cruise IDs and region IDs.</p>
 </div>

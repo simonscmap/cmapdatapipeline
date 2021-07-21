@@ -88,11 +88,13 @@ Dataset Level Metadata
 
 
 **Cruise Metadata**
-The metadata for cruises in CMAP is seperated into multiple tables. A core **tblCruise** links together metadata tables for cruise trajectories, cruise keywords, cruise region links and cruise dataset links.
+The metadata for cruises in CMAP is separated into multiple tables. A core **tblCruise** links 
+together metadata tables for cruise trajectories, cruise keywords, cruise region links and cruise dataset links.
 **tblDataset_Cruises** is the linking table to connect cruise_IDs with dataset_IDs.  
 
 **Region Metadata**
-The region tables in CMAP share a similar schema to the cruise tables layout. **tblRegions** contains the ocean regions (this can be expanded). 
+The region tables in CMAP share a similar schema to the cruise tables layout. **tblRegions** contains the ocean regions 
+(this can be expanded). 
 **tblDataset_Regions** is similar to **tblDataset_Cruises** because it acts as the linking table between the region and dataset tables. 
 **tblCruise_Regions** is a linking table between cruise IDs and region IDs. 
 

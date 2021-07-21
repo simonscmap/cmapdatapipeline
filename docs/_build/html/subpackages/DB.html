@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Code Changes &mdash; cmapdata 0.0.1 documentation</title>
+  <title>DB &mdash; cmapdata 0.0.1 documentation</title>
   
 
   
@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="API Ref common.py" href="../API/API_common.html" />
-    <link rel="prev" title="ingest" href="../subpackages/ingest.html" /> 
+    <link rel="next" title="collect" href="collect.html" />
+    <link rel="prev" title="Pitfalls" href="../data_ingestion/pitfalls.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,15 +90,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/pitfalls.html">Pitfalls</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Package Overview</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../subpackages/DB.html">DB</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../subpackages/collect.html">collect</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../subpackages/process.html">process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../subpackages/ingest.html">ingest</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">DB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="collect.html">collect</a></li>
+<li class="toctree-l1"><a class="reference internal" href="process.html">process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ingest.html">ingest</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Future Improvements</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Code Changes</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../future/code_changes.html">Code Changes</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Ref</span></p>
 <ul>
@@ -149,13 +149,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Code Changes</li>
+      <li>DB</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/future/code_changes.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/subpackages/DB.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -168,19 +168,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="code-changes">
-<h1>Code Changes<a class="headerlink" href="#code-changes" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p>Improve test coverage</p></li>
-<li><p>Update all .format() to fstring formatting</p></li>
-<li><p>Rename dropbox pathing to remove any spacing</p></li>
-<li><p>Add the ability to ingest to add DB’s</p></li>
-<li><p>Metadata insert should all be captured in a SQL transaction, so that if a table insert fails, other tables and relations are rolled back.</p></li>
-<li><p>Move any r2r cruise collection remenant into collect/</p></li>
-<li><p>Build up cruise ingestion infrastructure</p></li>
-<li><p>Build gridded spatio-temporal dataset classifer</p></li>
-<li><p>Finish up cmapsync and put on cronjob with report emailed</p></li>
-</ul>
+  <div class="section" id="db">
+<h1>DB<a class="headerlink" href="#db" title="Permalink to this headline">¶</a></h1>
+<p>The repository DB (<a class="reference external" href="https://github.com/simonscmap/DB">https://github.com/simonscmap/DB</a>) under the Simons CMAP github page stores all of the SQL Server table creation scripts.</p>
+<p>This repo contains subdirectories for db creation, stored procedures (usp), user-defined functions(udf) and data and metadata tables.</p>
+<p>The structure with examples is outlined below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── db
+│   └── db.sql
+├── tables
+│   ├── api
+│   │   └── tblFront_End_Errors.sql
+│   ├── core
+│   │   ├── cruise
+│   │   │   └── tblCruise_Trajectory.sql
+│   │   └── tblVariables_update.sql
+│   ├── model
+│   │   └── tblPisces_NRT.sql
+│   ├── observation
+│   │   └── tblWOA_Climatology.sql
+│   └── satellite
+│       └── tblWind_NRT.sql
+├── udf
+│   └── udfVariableMetaData.sql
+└── usp
+    └── uspWeekly.sql
+</pre></div>
+</div>
 </div>
 
 

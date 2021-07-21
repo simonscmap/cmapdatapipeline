@@ -107,33 +107,33 @@ def insertMetdata_no_data(data_dict, tableName, DOI_link_append, server):
 
 def insertMetadata(data_dict, tableName, DOI_link_append, server):
     metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server)
-    metadata.tblDataset_References_Insert(
-        data_dict["dataset_metadata_df"], server, DOI_link_append
-    )
-    metadata.tblVariables_Insert(
-        data_dict["data_df"],
-        data_dict["dataset_metadata_df"],
-        data_dict["variable_metadata_df"],
-        tableName,
-        server,
-        process_level="REP",
-        CRS="CRS",
-    )
-    metadata.tblKeywords_Insert(
-        data_dict["variable_metadata_df"],
-        data_dict["dataset_metadata_df"],
-        tableName,
-        server,
-    )
-    metadata.ocean_region_classification(
-        data_dict["data_df"],
-        data_dict["dataset_metadata_df"]["dataset_short_name"].iloc[0],
-        server,
-    )
-    if data_dict["dataset_metadata_df"]["cruise_names"].dropna().empty == False:
-        metadata.tblDataset_Cruises_Insert(
-            data_dict["data_df"], data_dict["dataset_metadata_df"], server
-        )
+    # metadata.tblDataset_References_Insert(
+    #     data_dict["dataset_metadata_df"], server, DOI_link_append
+    # )
+    # metadata.tblVariables_Insert(
+    #     data_dict["data_df"],
+    #     data_dict["dataset_metadata_df"],
+    #     data_dict["variable_metadata_df"],
+    #     tableName,
+    #     server,
+    #     process_level="REP",
+    #     CRS="CRS",
+    # )
+    # metadata.tblKeywords_Insert(
+    #     data_dict["variable_metadata_df"],
+    #     data_dict["dataset_metadata_df"],
+    #     tableName,
+    #     server,
+    # )
+    # metadata.ocean_region_classification(
+    #     data_dict["data_df"],
+    #     data_dict["dataset_metadata_df"]["dataset_short_name"].iloc[0],
+    #     server,
+    # )
+    # if data_dict["dataset_metadata_df"]["cruise_names"].dropna().empty == False:
+    #     metadata.tblDataset_Cruises_Insert(
+    #         data_dict["data_df"], data_dict["dataset_metadata_df"], server
+    #     )
 
 
 def insert_small_stats(data_dict, tableName, server):

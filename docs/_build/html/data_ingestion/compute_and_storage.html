@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Code Changes &mdash; cmapdata 0.0.1 documentation</title>
+  <title>Compute Resources and Data Storage &mdash; cmapdata 0.0.1 documentation</title>
   
 
   
@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="API Ref common.py" href="../API/API_common.html" />
-    <link rel="prev" title="ingest" href="../subpackages/ingest.html" /> 
+    <link rel="next" title="Web Validator" href="web_validator.html" />
+    <link rel="prev" title="Database Design and Table Structure" href="database_design.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -81,13 +81,16 @@
             
             
               <p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/installation.html">Installation and Setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/database_design.html">Database Design and Table Structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/compute_and_storage.html">Compute Resources and Data Storage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/web_validator.html">Web Validator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/workflow.html">Workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/pitfalls.html">Pitfalls</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database_design.html">Database Design and Table Structure</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Compute Resources and Data Storage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-storage">Data Storage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="web_validator.html">Web Validator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pitfalls.html">Pitfalls</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Package Overview</span></p>
 <ul>
@@ -97,8 +100,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../subpackages/ingest.html">ingest</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Future Improvements</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Code Changes</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../future/code_changes.html">Code Changes</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Ref</span></p>
 <ul>
@@ -149,13 +152,13 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Code Changes</li>
+      <li>Compute Resources and Data Storage</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/future/code_changes.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/data_ingestion/compute_and_storage.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -168,19 +171,34 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="code-changes">
-<h1>Code Changes<a class="headerlink" href="#code-changes" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p>Improve test coverage</p></li>
-<li><p>Update all .format() to fstring formatting</p></li>
-<li><p>Rename dropbox pathing to remove any spacing</p></li>
-<li><p>Add the ability to ingest to add DB’s</p></li>
-<li><p>Metadata insert should all be captured in a SQL transaction, so that if a table insert fails, other tables and relations are rolled back.</p></li>
-<li><p>Move any r2r cruise collection remenant into collect/</p></li>
-<li><p>Build up cruise ingestion infrastructure</p></li>
-<li><p>Build gridded spatio-temporal dataset classifer</p></li>
-<li><p>Finish up cmapsync and put on cronjob with report emailed</p></li>
-</ul>
+  <div class="section" id="compute-resources-and-data-storage">
+<h1>Compute Resources and Data Storage<a class="headerlink" href="#compute-resources-and-data-storage" title="Permalink to this headline">¶</a></h1>
+<p>The two main computers used in the ingestion pipeline are a Dell XPS 15 laptop and a newer Exxact workstation.
+For memory intensive and multi-core data processing, the workstation is a useful resource.
+It could either be used directly from the lab or ssh’ed into to run processing jobs.
+Using VS Code’s <strong>Remote-SSH</strong> extension, you can connect and modify files over ssh without using command line editors.
+To start a connection, click on the bottom left green icon.
+The ip address is for the workstation is 128.208.238.117</p>
+<div class="figure align-default">
+<a class="reference internal image-reference" href="../_images/ssh_connect.png"><img alt="VS code ssh" src="../_images/ssh_connect.png" style="width: 176.0px; height: 181.60000000000002px;" /></a>
+</div>
+<div class="section" id="data-storage">
+<h2>Data Storage<a class="headerlink" href="#data-storage" title="Permalink to this headline">¶</a></h2>
+<p>Both the web application and the data ingestion pipeline share storage over dropbox. With an unlimited account,
+we can use dropbox to store all our pre-DB data. In addition to dropbox, the <strong>vault/</strong> also is synced on the workstation under:
+<strong>~/data/CMAP Data Submission Dropbox/Simons CMAP/vault/</strong></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ideally this path should be changed to remove any spaces. The one potential hold-up is where the web app is writing files.</p>
+</div>
+<p>Dropbox’s CLI tools are installed on the workstation. Using the selective sync feature of dropbox, the <strong>/vault</strong> stored on disk can be synced with the cloud.
+By reading/writing to disk, IO speeds for data processing should be improved.</p>
+<p>If dropbox has stopped syncing, you can start the CLI by typing in terminal:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">dropbox start</span>
+<span class="go">dropbox status</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 

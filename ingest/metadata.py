@@ -342,7 +342,6 @@ def user_input_build_cruise(df, dataset_metadata_df, server):
         tblCruise_df, cruise_name = cruise.build_cruise_metadata_from_user_input(df)
     elif meta_cont.lower() == "y":
         print(tuple(tblCruise_df.iloc[0].astype(str).to_list()))
-        # Cruise_ID = cmn.get_cruise_IDS([cruise_name], "Rainier")[
 
         DB.lineInsert(
             server,

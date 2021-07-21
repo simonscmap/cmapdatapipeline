@@ -37,8 +37,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Installation and Setup" href="../data_ingestion/installation.html" />
-    <link rel="prev" title="process" href="process.html" /> 
+    <link rel="next" title="process" href="process.html" />
+    <link rel="prev" title="DB" href="DB.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -80,19 +80,28 @@
               
             
             
-              <p class="caption"><span class="caption-text">Package Overview</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="ingest.html">ingest</a></li>
-<li class="toctree-l1"><a class="reference internal" href="process.html">process</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">collect</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
+              <p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/installation.html">Installation and Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/database_design.html">Database Design and Table Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/compute_and_storage.html">Compute Resources and Data Storage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/pitfalls.html">Pitfalls</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package Overview</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="DB.html">DB</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">collect</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#relation-to-vault">relation to vault</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#collection-strategies">collection strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ftp-servers">FTP Servers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#zipped-file-links">Zipped File Links</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#webscrapping">Webscrapping</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="process.html">process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ingest.html">ingest</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Future Improvements</span></p>
 <ul>
@@ -169,7 +178,49 @@
   <div class="section" id="collect">
 <h1>collect<a class="headerlink" href="#collect" title="Permalink to this headline">¶</a></h1>
 <p>This submodule contains various scripts for collecting outside data. Methods include FTP, curl, wget and others.
-Scripts are usually one-off and are a record of the method used to collect the data. They are organized heirerachically in a similar fashion to /vault</p>
+Scripts are usually one-off and are a record of the method used to collect the data.
+They are organized hierarchically in a similar fashion to <strong>/vault</strong>.</p>
+<div class="section" id="relation-to-vault">
+<h2>relation to vault<a class="headerlink" href="#relation-to-vault" title="Permalink to this headline">¶</a></h2>
+<p>In the vault_structure, a top level folder is named <strong>collected_data/</strong>. This</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── assimilation
+├── model
+├── observation
+    ├── in-situ
+    │   ├── cruise
+    |   |   |── cruise_name
+    |   |       |── collect_{cruise_name}.py
+    │   ├── float
+    │   └── station
+    └── remote
+        └── satellite
+</pre></div>
+</div>
+</div>
+<div class="section" id="collection-strategies">
+<h2>collection strategies<a class="headerlink" href="#collection-strategies" title="Permalink to this headline">¶</a></h2>
+<p>The oceanography data in CMAP comes from multiple sources which vary in the amount of data processing required and available metadata.
+The first step of ingesting a dataset from an outside source into CMAP is collecting the data.
+This generally starts with a python collection script. This both servers to collect the data as well as leave a record.</p>
+</div>
+<div class="section" id="ftp-servers">
+<h2>FTP Servers<a class="headerlink" href="#ftp-servers" title="Permalink to this headline">¶</a></h2>
+<p>Some datasets, especially when there are multiple files, are available over FTP servers.
+To retrieve this data, you can either use some GUI FTP application such as FileZilla or a command line utility such as wget or curl.
+Examples of using wget are available in some of the collect.py scripts. Some FTP sites required registrations and username/passwords.</p>
+<div class="figure align-default">
+<a class="reference internal image-reference" href="../_images/hot_ftp_site.png"><img alt="HOT FTP" src="../_images/hot_ftp_site.png" style="width: 526.4px; height: 752.0px;" /></a>
+</div>
+</div>
+<div class="section" id="zipped-file-links">
+<h2>Zipped File Links<a class="headerlink" href="#zipped-file-links" title="Permalink to this headline">¶</a></h2>
+<p>Some data providers such as Pangea provide datasets and metadata as zipped files. While this is very convenient,
+it is a good idea to still create a collect_datasetname.py file with the zipped file link.</p>
+</div>
+<div class="section" id="webscrapping">
+<h2>Webscrapping<a class="headerlink" href="#webscrapping" title="Permalink to this headline">¶</a></h2>
+<p>Some of the cruise trajectory and metadata was intially collected from R2R (Rolling Deck to Repository). Generally, webscraping is only a last resort.</p>
+</div>
 </div>
 
 

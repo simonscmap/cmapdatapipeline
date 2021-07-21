@@ -37,7 +37,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="ingest" href="subpackages/ingest.html" /> 
+    <link rel="next" title="Installation and Setup" href="data_ingestion/installation.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -79,19 +79,21 @@
               
             
             
-              <p class="caption"><span class="caption-text">Package Overview</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="subpackages/ingest.html">ingest</a></li>
-<li class="toctree-l1"><a class="reference internal" href="subpackages/process.html">process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="subpackages/collect.html">collect</a></li>
-</ul>
-<p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
+              <p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="data_ingestion/installation.html">Installation and Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_ingestion/database_design.html">Database Design and Table Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_ingestion/compute_and_storage.html">Compute Resources and Data Storage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_ingestion/web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_ingestion/workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_ingestion/pitfalls.html">Pitfalls</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Package Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="subpackages/DB.html">DB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subpackages/collect.html">collect</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subpackages/process.html">process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subpackages/ingest.html">ingest</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Future Improvements</span></p>
 <ul>
@@ -172,59 +174,12 @@ dataset processing (process) and dataset ingestion (ingest).
 These docs should provide a primer on data flow into CMAP’s databases along with
 suggested improvements.</p>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Package Overview</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="subpackages/ingest.html">ingest</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#common-py">common.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#credentials-py">credentials.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#cruise-py">cruise.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#data-py">data.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#db-py">DB.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#general-py">general.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#ingest-test-py">ingest_test.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#mapping-py">mapping.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#metadata-py">metadata.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#region-classification-py">region_classification.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#sql-py">SQL.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#stats-py">stats.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#transfer-py">transfer.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="subpackages/ingest.html#vault-structure-py">vault_structure.py</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="subpackages/process.html">process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="subpackages/collect.html">collect</a></li>
-</ul>
 </div>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Ingesting a Dataset</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="data_ingestion/installation.html">Installation and Setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_ingestion/database_design.html">Database Design and Table Structure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data_ingestion/database_design.html#variable-level-metadata">Variable Level Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_ingestion/database_design.html#dataset-level-metadata">Dataset Level Metadata</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="data_ingestion/web_validator.html">Web Validator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_ingestion/workflow.html">Workflow</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data_ingestion/workflow.html#user-submitted-datasets">User Submitted Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_ingestion/workflow.html#outside-small-datasets">Outside ‘Small’ Datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_ingestion/workflow.html#outside-large-datasets">Outside ‘Large’ Datasets</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="data_ingestion/pitfalls.html">Pitfalls</a></li>
-</ul>
 </div>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Future Improvements</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="future/code_changes.html">Code Changes</a></li>
-</ul>
 </div>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">API Ref</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="API/API_common.html">API Ref common.py</a></li>
-</ul>
 </div>
 </div>
 

@@ -1,10 +1,10 @@
 ingest
 ======
 
-ingest/ is the submodule that contains ingestion and data processing functions, data vault strucutre logic and DB connection information.
+ingest/ is the submodule that contains ingestion and data processing functions, data vault structure logic and DB connection information.
 Ingesting a dataset using this submodule will be covered in data_ingestion/workflow.
 
-ingest/ is broken into the multiple python scripts to seperate ingestion logic. Desiciptions and uses of each are descibed below.
+ingest/ is broken into the multiple python scripts to separate ingestion logic. Descriptions and uses of each are described below.
 
 common.py
 ---------
