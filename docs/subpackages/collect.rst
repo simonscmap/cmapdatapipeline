@@ -61,5 +61,5 @@ it is a good idea to still create a collect_datasetname.py file with the zipped 
 Webscrapping
 ------------
 
-Some of the cruise trajectory and metadata was intially collected from R2R (Rolling Deck to Repository). Generally, webscraping is only a last resort.
+Some of the cruise trajectory and metadata was initially collected from R2R (Rolling Deck to Repository). Generally, webscraping is only a last resort.
 

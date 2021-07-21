@@ -13,7 +13,7 @@ The status of the dataset is available to the curation team as well as the submi
 
 
 
-Once a colaborator has succesfully submitted a dataset through the validator, 
+Once a collaborator has successfully submitted a dataset through the validator, 
 the process will be handed over to the data curation team for additional QA/QC checks.
 Data and metadata should be checked to make sure it conforms to the data submission guide. 
 At this point it is also a good idea to do some sanity checks on the data itself. 
@@ -25,7 +25,7 @@ When the first check is complete, the dataset should have secondary independent 
    :alt: Web Validator Dataset Metadata Check
 
 
-Any edits of suggestions should be sent back to the submitter through the web validator. Addtionally, 
+Any edits of suggestions should be sent back to the submitter through the web validator. Additionally, 
 any changes in the 'phase' should be updated through the dropdown menu in the dashboard.
 
 .. figure:: ../_static/phase_dropdown.png
