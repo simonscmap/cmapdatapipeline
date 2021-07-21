@@ -34,3 +34,14 @@ If dropbox has stopped syncing, you can start the CLI by typing in terminal:
    dropbox start
    dropbox status 
 
+
+
+
+Synology NAS and Drobo Storage
+------------------------------
+
+
+Before storing data on Dropbox, two non-cloud storage methods were tried. Both the Drobo and Synology NAS are desktop size hard disk storage. Each contains ~40-50TB of disk space. 
+There are limitations to each of these. The Drobo requires a connection through usb-c/thunderbolt. The Synology NAS can be accessed over the internet, ie ((Network Attached Storage).
+They read/write speed for both is quite slow compared to the disks on the workstation. Perhaps one or both could be used as another backup?
+

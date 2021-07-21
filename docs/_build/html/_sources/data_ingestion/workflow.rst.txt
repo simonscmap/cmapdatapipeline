@@ -2,7 +2,7 @@ Workflow
 ========
 
 The process for ingesting datasets into CMAP differs based on a few factors. 
-The three main cateogries are *User Submitted Datasets*, *Outside 'Small' Datasets* and *Outside 'Large' Datasets*.
+The three main categories are *User Submitted Datasets*, *Outside 'Small' Datasets* and *Outside 'Large' Datasets*.
 User submitted datasets that pass through the web validator must be <150MB. 
 *Outside 'Small' Datasets* are datasets collected that are collected from an outside source that can generally fit in memory. An example would be an AMT or HOT dataset. 
 *Outside 'Large' Datasets* are datasets collected from an outside source that have multiple data files and cannot fit into memory. Examples are satellite data, model data or large insitu collections such as ARGO or GOSHIP.
@@ -10,7 +10,7 @@ User submitted datasets that pass through the web validator must be <150MB.
 
 User Submitted Datasets
 -----------------------
-User submitted datasets are submitted through the web validator. Once the QA/QC checks are completed and a DOI is recieved, the dataset can be ingested into CMAP.
+User submitted datasets are submitted through the web validator. Once the QA/QC checks are completed and a DOI is received, the dataset can be ingested into CMAP.
 Starting out with the dataset in '/CMAP Data Submission Dropbox/Simons CMAP/staging/combined/{dataset_name}.xlsx, the data ingestion pipeline should work.
 
 Using general.py, you can pass command line arguments to specify which server you wish to add the dataset to as well as including a DOI.
@@ -48,7 +48,7 @@ Outside 'Small' Datasets
 ------------------------
 
 These datasets usually need quite a bit of data munging to make them match the CMAP data format. Additionally, metadata needs to be collected and created.
-To keep a record of data transformations, any processing scripts should be placed in **/process/../process_datasetname.py**. Additionally, any relevent collection information should be placed in **/collect/../collect_datasetname.py**
+To keep a record of data transformations, any processing scripts should be placed in **/process/../process_datasetname.py**. Additionally, any relevant collection information should be placed in **/collect/../collect_datasetname.py**
 
 
 Outside 'Large' Datasets
@@ -63,5 +63,5 @@ In this data processing script, data should be read from **/collected_data/**, c
 .. note::
    You will need to create a SQL table and add it to the databases prior to ingestion. Any SQL table creation script should be recorded in DB/ (repository is on Simons CMAP github). Adding indexes once the ingestion has completed might speed up ingestion.
 
-After the data has been inserted and the indicies successfully created, metadata will need to be created and added to the databases. A standard excel template should be used for the dataset and vars metadata sheets.
+After the data has been inserted and the indices successfully created, metadata will need to be created and added to the databases. A standard excel template should be used for the dataset and vars metadata sheets.
 

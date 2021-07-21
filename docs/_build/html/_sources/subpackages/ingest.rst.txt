@@ -63,7 +63,7 @@ This uses input dataset coordinates along with a geopackage of ocean regions to 
 SQL.py
 ------
 
-Has functionallity to suggest SQL tables and basic indicies.
+Has functionality to suggest SQL tables and basic indices.
 
 stats.py
 --------
