@@ -140,7 +140,7 @@ def tblVariables_Insert(
     variable_metadata_df,
     Table_Name,
     server,
-    process_level="REP",
+    process_level,
     CRS="CRS",
 ):
     Db_list = len(variable_metadata_df) * ["Opedia"]
@@ -166,7 +166,7 @@ def tblVariables_Insert(
         server,
     )
 
-    if data_df.empty != True:
+    if data_df != False:
         Temporal_Coverage_Begin_list, Temporal_Coverage_End_list = cmn.getColBounds(
             data_df, "time", list_multiplier=len(variable_metadata_df)
         )
@@ -177,14 +177,17 @@ def tblVariables_Insert(
             data_df, "lon", list_multiplier=len(variable_metadata_df)
         )
     else:
-        Temporal_Coverage_Begin_list, Temporal_Coverage_End_list = cmn.getColBounds(
-            Table_Name, "time", list_multiplier=len(variable_metadata_df)
+        (
+            Temporal_Coverage_Begin_list,
+            Temporal_Coverage_End_list,
+        ) = cmn.getColBounds_from_DB(
+            Table_Name, "time", server, list_multiplier=len(variable_metadata_df)
         )
-        Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds(
-            Table_Name, "lat", list_multiplier=len(variable_metadata_df)
+        Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds_from_DB(
+            Table_Name, "lat", server, list_multiplier=len(variable_metadata_df)
         )
-        Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds(
-            Table_Name, "lon", list_multiplier=len(variable_metadata_df)
+        Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds_from_DB(
+            Table_Name, "lon", server, list_multiplier=len(variable_metadata_df)
         )
 
     Grid_Mapping_list = [CRS] * len(variable_metadata_df)

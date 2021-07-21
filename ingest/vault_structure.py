@@ -27,37 +27,18 @@ def leafStruc(base):
     return nrt, rep, metadata, stats, doc, code
 
 
-# """synced dropbox path"""
-# vault = r"/data/CMAP Data Submission Dropbox/Simons CMAP/vault/"
-# staging = r"/data/CMAP Data Submission Dropbox/Simons CMAP/staging/"
-# collected_data = r"/data/CMAP Data Submission Dropbox/Simons CMAP/collected_data/"
-# spatial_data = r"/data/CMAP Data Submission Dropbox/Simons CMAP/spatial_data/"
-# dataset_audit = r"/data/CMAP Data Submission Dropbox/Simons CMAP/dataset_audit/"
-# download_transfer = r"/data/CMAP Data Submission Dropbox/Simons CMAP/download_transfer/"
-
-
-# ################# Static Mission Icon Directory ##################
-# static = r"/data/CMAP Data Submission Dropbox/Simons CMAP/static/"
-# mission_icons = static + r"mission_icons/"
-
-"""synced dropbox path"""
-
-
-vault = r"/home/nrhagen/CMAP Data Submission Dropbox/Simons CMAP/vault/"
-staging = r"/home/nrhagen/CMAP Data Submission Dropbox/Simons CMAP/staging/"
-collected_data = (
-    r"/home/nrhagen/CMAP Data Submission Dropbox/Simons CMAP/collected_data/"
-)
-spatial_data = r"/home/nrhagen/CMAP Data Submission Dropbox/Simons CMAP/spatial_data/"
-dataset_audit = r"/home/nrhagen/CMAP Data Submission Dropbox/Simons CMAP/dataset_audit/"
-download_transfer = (
-    r"/home/nrhagen/CMAP Data Submission Dropbox/Simons CMAP/download_transfer/"
-)
+vault = r"/data/CMAP Data Submission Dropbox/Simons CMAP/vault/"
+staging = r"/data/CMAP Data Submission Dropbox/Simons CMAP/staging/"
+collected_data = r"/data/CMAP Data Submission Dropbox/Simons CMAP/collected_data/"
+spatial_data = r"/data/CMAP Data Submission Dropbox/Simons CMAP/spatial_data/"
+dataset_audit = r"/data/CMAP Data Submission Dropbox/Simons CMAP/dataset_audit/"
+download_transfer = r"/data/CMAP Data Submission Dropbox/Simons CMAP/download_transfer/"
 
 
 ################# Static Mission Icon Directory ##################
-static = r"/home/nrhagen/CMAP Data Submission Dropbox/Simons CMAP/static/"
+static = r"/data/CMAP Data Submission Dropbox/Simons CMAP/static/"
 mission_icons = static + r"mission_icons/"
+
 
 ################# Download Transfer Structure   ##################
 makedir(download_transfer)

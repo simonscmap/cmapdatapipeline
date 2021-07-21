@@ -154,7 +154,7 @@ def build_stats_df_from_db_calls(tableName, server):
 
 
 def update_stats_large(tableName, stats_df, server):
-    Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName)
+    Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, server)
     json_str = stats_df.to_json(date_format="iso")
     sql_df = pd.DataFrame({"Dataset_ID": [Dataset_ID], "JSON": [json_str]})
     updateStatsTable(Dataset_ID, json_str, server)
