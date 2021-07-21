@@ -110,10 +110,10 @@ def insertMetadata_no_data(
         tableName,
         server,
     )
-    if data_dict["dataset_metadata_df"]["cruise_names"].dropna().empty == False:
-        metadata.tblDataset_Cruises_Insert(
-            data_dict["data_df"], data_dict["dataset_metadata_df"], server
-        )
+    # if data_dict["dataset_metadata_df"]["cruise_names"].dropna().empty == False:
+    #     metadata.tblDataset_Cruises_Insert(
+    #         data_dict["data_df"], data_dict["dataset_metadata_df"], server
+    #     )
 
 
 def insertMetadata(data_dict, tableName, DOI_link_append, server, process_level):
@@ -213,7 +213,7 @@ def dataless_ingestion(args):
     insertMetadata_no_data(
         data_dict, args.tableName, args.DOI_link_append, args.Server, args.process_level
     )
-
+    print('metadata built')
     insert_large_stats(args.tableName, args.Server)
 
 
@@ -258,7 +258,7 @@ def main():
 
     else:
         print("missed")
-        # full_ingestion(args)
+        full_ingestion(args)
 
 
 if __name__ == main():
