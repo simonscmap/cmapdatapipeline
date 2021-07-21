@@ -176,13 +176,13 @@
   <div class="section" id="workflow">
 <h1>Workflow<a class="headerlink" href="#workflow" title="Permalink to this headline">¶</a></h1>
 <p>The process for ingesting datasets into CMAP differs based on a few factors.
-The three main cateogries are <em>User Submitted Datasets</em>, <em>Outside ‘Small’ Datasets</em> and <em>Outside ‘Large’ Datasets</em>.
+The three main categories are <em>User Submitted Datasets</em>, <em>Outside ‘Small’ Datasets</em> and <em>Outside ‘Large’ Datasets</em>.
 User submitted datasets that pass through the web validator must be &lt;150MB.
 <em>Outside ‘Small’ Datasets</em> are datasets collected that are collected from an outside source that can generally fit in memory. An example would be an AMT or HOT dataset.
 <em>Outside ‘Large’ Datasets</em> are datasets collected from an outside source that have multiple data files and cannot fit into memory. Examples are satellite data, model data or large insitu collections such as ARGO or GOSHIP.</p>
 <div class="section" id="user-submitted-datasets">
 <h2>User Submitted Datasets<a class="headerlink" href="#user-submitted-datasets" title="Permalink to this headline">¶</a></h2>
-<p>User submitted datasets are submitted through the web validator. Once the QA/QC checks are completed and a DOI is recieved, the dataset can be ingested into CMAP.
+<p>User submitted datasets are submitted through the web validator. Once the QA/QC checks are completed and a DOI is received, the dataset can be ingested into CMAP.
 Starting out with the dataset in ‘/CMAP Data Submission Dropbox/Simons CMAP/staging/combined/{dataset_name}.xlsx, the data ingestion pipeline should work.</p>
 <p>Using general.py, you can pass command line arguments to specify which server you wish to add the dataset to as well as including a DOI.</p>
 <p>Where we have:</p>
@@ -207,7 +207,7 @@ Starting out with the dataset in ‘/CMAP Data Submission Dropbox/Simons CMAP/st
 <div class="section" id="outside-small-datasets">
 <h2>Outside ‘Small’ Datasets<a class="headerlink" href="#outside-small-datasets" title="Permalink to this headline">¶</a></h2>
 <p>These datasets usually need quite a bit of data munging to make them match the CMAP data format. Additionally, metadata needs to be collected and created.
-To keep a record of data transformations, any processing scripts should be placed in <strong>/process/../process_datasetname.py</strong>. Additionally, any relevent collection information should be placed in <strong>/collect/../collect_datasetname.py</strong></p>
+To keep a record of data transformations, any processing scripts should be placed in <strong>/process/../process_datasetname.py</strong>. Additionally, any relevant collection information should be placed in <strong>/collect/../collect_datasetname.py</strong></p>
 </div>
 <div class="section" id="outside-large-datasets">
 <h2>Outside ‘Large’ Datasets<a class="headerlink" href="#outside-large-datasets" title="Permalink to this headline">¶</a></h2>
@@ -219,7 +219,7 @@ Once data has been transfered, the next step is any data processing. This should
 <p class="admonition-title">Note</p>
 <p>You will need to create a SQL table and add it to the databases prior to ingestion. Any SQL table creation script should be recorded in DB/ (repository is on Simons CMAP github). Adding indexes once the ingestion has completed might speed up ingestion.</p>
 </div>
-<p>After the data has been inserted and the indicies successfully created, metadata will need to be created and added to the databases. A standard excel template should be used for the dataset and vars metadata sheets.</p>
+<p>After the data has been inserted and the indices successfully created, metadata will need to be created and added to the databases. A standard excel template should be used for the dataset and vars metadata sheets.</p>
 </div>
 </div>
 

@@ -86,6 +86,7 @@
 <li class="toctree-l1"><a class="reference internal" href="database_design.html">Database Design and Table Structure</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Compute Resources and Data Storage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#data-storage">Data Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#synology-nas-and-drobo-storage">Synology NAS and Drobo Storage</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="web_validator.html">Web Validator</a></li>
@@ -198,6 +199,12 @@ By reading/writing to disk, IO speeds for data processing should be improved.</p
 <span class="go">dropbox status</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="synology-nas-and-drobo-storage">
+<h2>Synology NAS and Drobo Storage<a class="headerlink" href="#synology-nas-and-drobo-storage" title="Permalink to this headline">¶</a></h2>
+<p>Before storing data on Dropbox, two non-cloud storage methods were tried. Both the Drobo and Synology NAS are desktop size hard disk storage. Each contains ~40-50TB of disk space.
+There are limitations to each of these. The Drobo requires a connection through usb-c/thunderbolt. The Synology NAS can be accessed over the internet, ie ((Network Attached Storage).
+They read/write speed for both is quite slow compared to the disks on the workstation. Perhaps one or both could be used as another backup?</p>
 </div>
 </div>
 

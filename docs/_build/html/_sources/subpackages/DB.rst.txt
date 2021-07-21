@@ -31,3 +31,20 @@ The structure with examples is outlined below:
     │   └── udfVariableMetaData.sql
     └── usp
         └── uspWeekly.sql
+
+
+Custom Table Creation
+---------------------
+
+* FG's, columns, datatypes
+
+
+
+
+
+Indexing Strategy
+-----------------
+
+
+* indices (time/lat/lon depth) climatology etc.
+	-how these relate to performance 

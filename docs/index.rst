@@ -8,6 +8,39 @@ suggested improvements.
 
 
 
+
+Todo
+----
+
+Add examples to collect:
+
+collect example for satellite or eddy etc. (from cmems & argo & eddy)
+
+discuss a bit about multiple data sources. For example argo, release schedule, etc. Reading their data dictionary
+
+
+
+Add complete walkthough(s) of a public dataset and a colaborator dataset.
+From collection, processing, validation, ingestion.
+
+If there is a part of process we can highlight, give an example of this.
+
+
+
+
+In DB structure explain:
+
+
+-creating a custom table
+	-FG's and indices (time/lat/lon depth) climatology etc.
+	-how these relate to preformance 
+
+-docstrings
+
+
+
+
+
 .. toctree::
     :maxdepth: 2
     :caption: Ingesting a Dataset
@@ -43,4 +76,7 @@ suggested improvements.
     :hidden:
 
     API/API_common.rst
+    
+
+
     
