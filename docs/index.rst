@@ -14,7 +14,7 @@ Todo
 
 Add examples to collect:
 
-collect example for satellite or eddy etc. (from cmems & argo & eddy)
+collect example for satellite or eddy etc. (from cmems/argo/eddy)
 
 discuss a bit about multiple data sources. For example argo, release schedule, etc. Reading their data dictionary
 
@@ -40,18 +40,23 @@ In DB structure explain:
 
 
 
+.. toctree::
+    :maxdepth: 2
+    :caption: Getting Started
+    :hidden:
+
+    getting_started/installation.rst
+    getting_started/database_design.rst
+    getting_started/compute_and_storage.rst
+    getting_started/pitfalls.rst
 
 .. toctree::
     :maxdepth: 2
-    :caption: Ingesting a Dataset
+    :caption: Dataset Ingestion Examples
     :hidden:
 
-    data_ingestion/installation.rst
-    data_ingestion/database_design.rst
-    data_ingestion/compute_and_storage.rst
     data_ingestion/web_validator.rst
     data_ingestion/workflow.rst
-    data_ingestion/pitfalls.rst
 
 .. toctree::
     :maxdepth: 2
