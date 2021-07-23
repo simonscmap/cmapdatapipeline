@@ -1,4 +1,10 @@
-"""Folium based mapping functions adapted from pycmap"""
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - mapping - dataset mapping functionallity. Using folium, adapted from pycmap.
+"""
+
 
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium import webdriver

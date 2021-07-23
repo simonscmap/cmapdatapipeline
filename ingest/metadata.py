@@ -1,3 +1,11 @@
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - metadata - cmap metadata formatting for table insertion.
+"""
+
+
 import sys
 
 import credentials as cr

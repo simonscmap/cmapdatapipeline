@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - general - main ingestion wrapper functions
+"""
+
 
 import sys
 import os

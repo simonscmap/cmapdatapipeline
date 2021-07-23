@@ -1,3 +1,11 @@
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - common - commonly used, generalized functions.
+"""
+
+
 import sys
 import os
 import pandas as pd

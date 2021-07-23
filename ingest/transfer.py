@@ -1,3 +1,11 @@
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - transfer - dataset template moveing and splitting.
+"""
+
+
 import os
 import sys
 import glob

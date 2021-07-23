@@ -1,3 +1,11 @@
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - SQL - SQL table/index suggestions and formatting
+"""
+
+
 import os
 import sys
 import pandas as pd

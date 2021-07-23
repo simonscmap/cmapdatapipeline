@@ -1,3 +1,11 @@
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - cruise - cruise metadata and trajectory functionallity. 
+"""
+
+
 import sys
 import os
 import shutil

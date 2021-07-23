@@ -1,3 +1,11 @@
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - stats - cmap summary stats functionallity. 
+"""
+
+
 import sys
 import os
 import credentials as cr

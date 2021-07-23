@@ -1,3 +1,11 @@
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - vault_structure - generalized vault structure. Adapted from opedia.
+"""
+
+
 import os
 from pathlib import Path
 

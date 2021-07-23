@@ -1,3 +1,11 @@
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - region_classification - region classification functionallity.
+"""
+
+
 import sys
 import os
 import glob

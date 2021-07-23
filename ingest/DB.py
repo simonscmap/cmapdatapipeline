@@ -1,3 +1,11 @@
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - DB - database connections and CRUD operations. 
+"""
+
+
 import sys
 import os
 
@@ -98,37 +106,6 @@ def dbConnect(server):
     conn_str = pyodbc_connection_string(server)
     conn = pyodbc.connect(conn_str)
     cursor = conn.cursor()
-
-    # conn = pyodbc.connect(
-    #     "DRIVER={SQL Server};SERVER="
-    #     + server
-    #     + ";DATABASE="
-    #     + db
-    #     + ";Uid="
-    #     + usr
-    #     + ";Pwd="
-    #     + psw
-    # )
-    # elif platform.system().lower().find("darwin") != -1:
-    # conn = pyodbc.connect(
-    #     "DRIVER=/usr/local/lib/libtdsodbc.so;SERVER="
-    #     + server
-    #     + ";DATABASE="
-    #     + db
-    #     + ";Uid="
-    #     + usr
-    #     + ";Pwd="
-    #     + psw
-    # )
-    # elif platform.system().lower().find("linux") != -1:
-    # conn = pyodbc.connect(
-    #     DRIVER="/usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so",
-    #     TDS_Version=TDS_Version,
-    #     server=ip,
-    #     port=port,
-    #     uid=usr,
-    #     pwd=psw,
-    #     )
 
     return conn, cursor
 

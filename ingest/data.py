@@ -1,3 +1,11 @@
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - data - data cleaning and reformatting functions.
+"""
+
+
 import sys
 import os
 import pandas as pd

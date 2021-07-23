@@ -1,3 +1,11 @@
+"""
+Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
+Date: 07-23-2021
+
+cmapdata - ingest_test - fragment of post-ingestion testing functions
+"""
+
+
 ###
 # PI = post ingestion test
 ###
