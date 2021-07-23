@@ -98,6 +98,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#removal-of-previously-existing-dataset">Removal of Previously Existing Dataset</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="#transfering-the-dataset-to-staging">Transfering the Dataset to Staging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#specifying-the-ingestion-arguments">Specifying the Ingestion Arguments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
 </ul>
@@ -203,6 +205,54 @@ Because this dataset already exists in the database, we must first remove the ol
 </pre></div>
 </div>
 <p>Continue this function for any other existing servers. ex. ‘Mariana’,’Rossby’</p>
+</div>
+</div>
+<div class="section" id="transfering-the-dataset-to-staging">
+<h1>Transfering the Dataset to Staging<a class="headerlink" href="#transfering-the-dataset-to-staging" title="Permalink to this headline">¶</a></h1>
+<p>Currently there is a disconnect from where the web validator places datasets and where the ingestion pipeline starts.
+The temporary workaround is to download the completed and QA’ed dataset with the <strong>download dataset</strong> button.
+Transfer the dataset to the shared dropbox vault of ‘/CMAP Data Submission Dropbox/Simons CMAP/staging/combined/’
+From here, the data ingestion pipeline can begin.</p>
+<div class="figure align-default">
+<a class="reference internal image-reference" href="data_ingestion/gallery_examples/../_static/dataset_download.png"><img alt="Dataset Download Button" src="data_ingestion/gallery_examples/../_static/dataset_download.png" /></a>
+</div>
+</div>
+<div class="section" id="specifying-the-ingestion-arguments">
+<h1>Specifying the Ingestion Arguments<a class="headerlink" href="#specifying-the-ingestion-arguments" title="Permalink to this headline">¶</a></h1>
+<p>Using ingest/general.py, you can pass command line arguments to specify which server you wish to add the dataset to as well as including a DOI.
+This dataset does not have a user submitted DOI link, so it is excluded in the example.</p>
+<p>Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="p">{</span><span class="n">table_name</span><span class="p">}</span> <span class="p">{</span><span class="n">branch</span><span class="p">}</span> <span class="p">{</span><span class="n">filename</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">d</span><span class="p">}</span> <span class="p">{</span><span class="n">DOI</span> <span class="n">link</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">S</span><span class="p">}</span> <span class="p">{</span><span class="n">server</span><span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>{<strong>branch</strong>}: Branch where dataset should be placed in Vault. Ex’s: cruise, float, station, satellite, model, assimilation]</p></li>
+<li><p>{<strong>filename</strong>}: Base file name in vault/staging/combined/. Ex.: ‘global_diazotroph_nifH.xlsx’</p></li>
+<li><p>{<strong>-d</strong>}: Optional flag for including DOI with dataset in tblReferences. DOI link string follows flag arg.</p></li>
+<li><p>{<strong>DOI link</strong>}: String for full web address of CMAP specific DOI. Ex. “<a class="reference external" href="http://doi.org/10.5281/zenodo.4968554">http://doi.org/10.5281/zenodo.4968554</a>”</p></li>
+<li><p>{<strong>-S</strong>}: Required flag for specifying server choice. Server name string follows flag.</p></li>
+<li><p>{<strong>server</strong>}: Valid server name string.  Ex. “Rainier”, “Mariana” or “Rossby”</p></li>
+</ul>
+<p>An example string would be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="n">tblFalkor_2018</span> <span class="n">cruise</span> <span class="s1">&#39;Falkor_2018.xlsx&#39;</span>  <span class="o">-</span><span class="n">S</span> <span class="s2">&quot;Rainier&quot;</span>
+</pre></div>
+</div>
+<p>Behind the scenes, the script is doing:
+1. parsing the user supplied arguments.
+2. Splitting the data template into data, dataset_metadata and vars_metadata files.
+3. Transfering the files to <strong>vault/</strong>.
+4. Importing into memory the data, dataset_metadata and vars_metadata sheets as pandas dataframes.
+5. Creating a suggested SQL table and index based on the infered data.
+6. Insert data into newly created table.
+7. Insert metadata into various metadata tables, match cruises and classify ocean region(s).
+8. Create summary stats and insert into tblDataset_Stats
+9. Create dataset icon and push to github.</p>
+<p>Once the first server ingestion completes without any errors, check the catalog to see if the table is visable.
+It is also advisable to try to plot one or more variables.
+When you are satisfied with the ingestion, continue adding to any remaining servers.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See the future code changes section for ideas on improvements.</p>
 </div>
 </div>
 
