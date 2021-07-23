@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>User Submitted Dataset Walkthrough &mdash; cmapdata 0.0.1 documentation</title>
   
@@ -17,10 +17,7 @@
 
   
   
-
   
-  
-
   
 
   
@@ -55,7 +52,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> cmapdata
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> cmapdata
           
 
           
@@ -96,10 +93,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../workflow.html">Workflow</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">User Submitted Dataset Walkthrough</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#removal-of-previously-existing-dataset">Removal of Previously Existing Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#transferring-the-dataset-to-staging">Transferring the Dataset to Staging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#specifying-the-ingestion-arguments">Specifying the Ingestion Arguments</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#transfering-the-dataset-to-staging">Transfering the Dataset to Staging</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#specifying-the-ingestion-arguments">Specifying the Ingestion Arguments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
 </ul>
@@ -157,8 +154,6 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -170,7 +165,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="../../_sources/data_ingestion/gallery_examples/user_submitted_dataset_walkthrough.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -192,7 +187,7 @@
 <h2>Removal of Previously Existing Dataset<a class="headerlink" href="#removal-of-previously-existing-dataset" title="Permalink to this headline">¶</a></h2>
 <p>This dataset was an early submitted dataset and has recently been revised to being it up to line with the current CMAP data submission guidelines.
 Because this dataset already exists in the database, we must first remove the old version.</p>
-<p>To do this, we can use some of the functionallity in cmapdata/ingest/metadata.py</p>
+<p>To do this, we can use some of the functionality in cmapdata/ingest/metadata.py</p>
 <p>By calling this function <strong>deleteCatalogTables(tableName, server)</strong>, we can remove any metadata and data tables from a given server.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -206,19 +201,18 @@ Because this dataset already exists in the database, we must first remove the ol
 </div>
 <p>Continue this function for any other existing servers. ex. ‘Mariana’,’Rossby’</p>
 </div>
-</div>
-<div class="section" id="transfering-the-dataset-to-staging">
-<h1>Transfering the Dataset to Staging<a class="headerlink" href="#transfering-the-dataset-to-staging" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="transferring-the-dataset-to-staging">
+<h2>Transferring the Dataset to Staging<a class="headerlink" href="#transferring-the-dataset-to-staging" title="Permalink to this headline">¶</a></h2>
 <p>Currently there is a disconnect from where the web validator places datasets and where the ingestion pipeline starts.
 The temporary workaround is to download the completed and QA’ed dataset with the <strong>download dataset</strong> button.
 Transfer the dataset to the shared dropbox vault of ‘/CMAP Data Submission Dropbox/Simons CMAP/staging/combined/’
 From here, the data ingestion pipeline can begin.</p>
 <div class="figure align-default">
-<a class="reference internal image-reference" href="data_ingestion/gallery_examples/../_static/dataset_download.png"><img alt="Dataset Download Button" src="data_ingestion/gallery_examples/../_static/dataset_download.png" /></a>
+<a class="reference internal image-reference" href="../../_images/dataset_download.png"><img alt="Dataset Download Button" src="../../_images/dataset_download.png" style="width: 296.8px; height: 169.60000000000002px;" /></a>
 </div>
 </div>
 <div class="section" id="specifying-the-ingestion-arguments">
-<h1>Specifying the Ingestion Arguments<a class="headerlink" href="#specifying-the-ingestion-arguments" title="Permalink to this headline">¶</a></h1>
+<h2>Specifying the Ingestion Arguments<a class="headerlink" href="#specifying-the-ingestion-arguments" title="Permalink to this headline">¶</a></h2>
 <p>Using ingest/general.py, you can pass command line arguments to specify which server you wish to add the dataset to as well as including a DOI.
 This dataset does not have a user submitted DOI link, so it is excluded in the example.</p>
 <p>Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal.</p>
@@ -237,16 +231,20 @@ This dataset does not have a user submitted DOI link, so it is excluded in the e
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="n">tblFalkor_2018</span> <span class="n">cruise</span> <span class="s1">&#39;Falkor_2018.xlsx&#39;</span>  <span class="o">-</span><span class="n">S</span> <span class="s2">&quot;Rainier&quot;</span>
 </pre></div>
 </div>
-<p>Behind the scenes, the script is doing:
-1. parsing the user supplied arguments.
-2. Splitting the data template into data, dataset_metadata and vars_metadata files.
-3. Transfering the files to <strong>vault/</strong>.
-4. Importing into memory the data, dataset_metadata and vars_metadata sheets as pandas dataframes.
-5. Creating a suggested SQL table and index based on the infered data.
-6. Insert data into newly created table.
-7. Insert metadata into various metadata tables, match cruises and classify ocean region(s).
-8. Create summary stats and insert into tblDataset_Stats
-9. Create dataset icon and push to github.</p>
+<p>Behind the scenes, the script is doing:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>parsing the user supplied arguments.</p></li>
+<li><p>Splitting the data template into data, dataset_metadata and vars_metadata files.</p></li>
+<li><p>Transfering the files to <strong>vault/</strong>.</p></li>
+<li><p>Importing into memory the data, dataset_metadata and vars_metadata sheets as pandas dataframes.</p></li>
+<li><p>Creating a suggested SQL table and index based on the infered data.</p></li>
+<li><p>Insert data into newly created table.</p></li>
+<li><p>Insert metadata into various metadata tables, match cruises and classify ocean region(s).</p></li>
+<li><p>Create summary stats and insert into tblDataset_Stats</p></li>
+<li><p>Create dataset icon and push to github.</p></li>
+</ol>
+</div></blockquote>
 <p>Once the first server ingestion completes without any errors, check the catalog to see if the table is visable.
 It is also advisable to try to plot one or more variables.
 When you are satisfied with the ingestion, continue adding to any remaining servers.</p>
@@ -255,31 +253,35 @@ When you are satisfied with the ingestion, continue adding to any remaining serv
 <p>See the future code changes section for ideas on improvements.</p>
 </div>
 </div>
+</div>
 
 
            </div>
            
           </div>
           <footer>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Norland Raphael Hagen.
+        
+        &copy; Copyright 2021, Norland Raphael Hagen
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 

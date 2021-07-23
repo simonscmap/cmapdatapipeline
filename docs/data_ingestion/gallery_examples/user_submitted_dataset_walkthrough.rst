@@ -13,7 +13,7 @@ Removal of Previously Existing Dataset
 This dataset was an early submitted dataset and has recently been revised to being it up to line with the current CMAP data submission guidelines.
 Because this dataset already exists in the database, we must first remove the old version.
 
-To do this, we can use some of the functionallity in cmapdata/ingest/metadata.py
+To do this, we can use some of the functionality in cmapdata/ingest/metadata.py
 
 
 By calling this function **deleteCatalogTables(tableName, server)**, we can remove any metadata and data tables from a given server. 
@@ -36,8 +36,8 @@ Continue this function for any other existing servers. ex. 'Mariana','Rossby'
 
 
 
-Transfering the Dataset to Staging
-==================================
+Transferring the Dataset to Staging
+-----------------------------------
 
 
 Currently there is a disconnect from where the web validator places datasets and where the ingestion pipeline starts. 
@@ -46,13 +46,15 @@ Transfer the dataset to the shared dropbox vault of '/CMAP Data Submission Dropb
 From here, the data ingestion pipeline can begin.
 
 
-.. figure:: ../_static/dataset_download.png
+
+
+.. figure:: ../../_static/dataset_download.png
    :scale: 80 %
    :alt: Dataset Download Button 
 
 
 Specifying the Ingestion Arguments 
-==================================
+----------------------------------
 
 
 Using ingest/general.py, you can pass command line arguments to specify which server you wish to add the dataset to as well as including a DOI.
@@ -81,15 +83,16 @@ An example string would be:
 
 
 Behind the scenes, the script is doing:
-1. parsing the user supplied arguments. 
-2. Splitting the data template into data, dataset_metadata and vars_metadata files. 
-3. Transfering the files to **vault/**.
-4. Importing into memory the data, dataset_metadata and vars_metadata sheets as pandas dataframes. 
-5. Creating a suggested SQL table and index based on the infered data.
-6. Insert data into newly created table. 
-7. Insert metadata into various metadata tables, match cruises and classify ocean region(s). 
-8. Create summary stats and insert into tblDataset_Stats
-9. Create dataset icon and push to github. 
+
+ 1. parsing the user supplied arguments. 
+ 2. Splitting the data template into data, dataset_metadata and vars_metadata files. 
+ 3. Transfering the files to **vault/**.
+ 4. Importing into memory the data, dataset_metadata and vars_metadata sheets as pandas dataframes. 
+ 5. Creating a suggested SQL table and index based on the infered data.
+ 6. Insert data into newly created table. 
+ 7. Insert metadata into various metadata tables, match cruises and classify ocean region(s). 
+ 8. Create summary stats and insert into tblDataset_Stats
+ 9. Create dataset icon and push to github. 
 
 
 Once the first server ingestion completes without any errors, check the catalog to see if the table is visable.
