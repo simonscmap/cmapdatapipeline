@@ -57,6 +57,10 @@ In DB structure explain:
 
     data_ingestion/web_validator.rst
     data_ingestion/workflow.rst
+    data_ingestion/gallery_examples/user_submitted_dataset_walkthrough.rst
+    data_ingestion/gallery_examples/outside_small_dataset_walkthrough.rst
+    data_ingestion/gallery_examples/outside_large_dataset_walkthrough.rst
+
 
 .. toctree::
     :maxdepth: 2

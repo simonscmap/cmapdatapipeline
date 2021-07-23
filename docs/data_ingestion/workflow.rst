@@ -1,5 +1,5 @@
-Workflow
-========
+Workflow for User Submitted Datasets
+====================================
 
 The process for ingesting datasets into CMAP differs based on a few factors. 
 The three main categories are *User Submitted Datasets*, *Outside 'Small' Datasets* and *Outside 'Large' Datasets*.
