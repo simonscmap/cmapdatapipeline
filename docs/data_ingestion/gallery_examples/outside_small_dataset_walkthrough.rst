@@ -87,12 +87,14 @@ The full CTD processing steps can be found in this file, but in summary they are
 
  1. Use the glob library to create a list of all .ctd files collected previously. 
  2. Iterate thorough list
+   
     * read csv into pandas dataframe 
     * replace '-9' missing values with np.nan 
     * extract station,cast,cast direction and num_observations from filename using string splitting. 
     * create new columns of variable specific quality flags out of strange combined flag column. 
     * drop unneeded columns
     * append data 
+  
  3. concatenate cleaned data into Pandas Dataframe 
 
 Other datasets in the CMORE-BULA cruise required additional processing. Some required time and depth formatting. 

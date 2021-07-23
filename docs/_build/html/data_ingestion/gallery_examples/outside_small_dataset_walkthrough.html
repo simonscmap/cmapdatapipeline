@@ -240,13 +240,16 @@ This should be placed in the <strong>collect/</strong> submodule of cmapdata.</p
 <blockquote>
 <div><ol class="arabic simple">
 <li><p>Use the glob library to create a list of all .ctd files collected previously.</p></li>
-<li><p>Iterate thorough list
-* read csv into pandas dataframe
-* replace ‘-9’ missing values with np.nan
-* extract station,cast,cast direction and num_observations from filename using string splitting.
-* create new columns of variable specific quality flags out of strange combined flag column.
-* drop unneeded columns
-* append data</p></li>
+<li><p>Iterate thorough list</p>
+<ul class="simple">
+<li><p>read csv into pandas dataframe</p></li>
+<li><p>replace ‘-9’ missing values with np.nan</p></li>
+<li><p>extract station,cast,cast direction and num_observations from filename using string splitting.</p></li>
+<li><p>create new columns of variable specific quality flags out of strange combined flag column.</p></li>
+<li><p>drop unneeded columns</p></li>
+<li><p>append data</p></li>
+</ul>
+</li>
 <li><p>concatenate cleaned data into Pandas Dataframe</p></li>
 </ol>
 </div></blockquote>
