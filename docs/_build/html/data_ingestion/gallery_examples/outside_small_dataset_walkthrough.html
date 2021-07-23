@@ -92,9 +92,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user_submitted_dataset_walkthrough.html#transfering-the-dataset-to-staging">Transfering the Dataset to Staging</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user_submitted_dataset_walkthrough.html#specifying-the-ingestion-arguments">Specifying the Ingestion Arguments</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Outside Small Dataset Walkthrough</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Outside Small Dataset Walkthrough</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#collecting-a-small-dataset-from-an-ftp-site-using-wget">Collecting a small dataset from an FTP site using wget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#processing-a-small-dataset">Processing a small dataset</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Package Overview</span></p>
@@ -178,7 +180,81 @@
             
   <div class="section" id="outside-small-dataset-walkthrough">
 <h1>Outside Small Dataset Walkthrough<a class="headerlink" href="#outside-small-dataset-walkthrough" title="Permalink to this headline">¶</a></h1>
-<p>ex. Wind_NRT</p>
+<p>Datasets from outside sources do not follow CMAPs data guidelines and vary drastically in quality of metadata.
+Many dataset have variables that are not self explanatory and may have data flags or conventions that will take some work to understand.
+One of the best resources is the rest of the Armbrust lab, which has tons of oceanography domain knowledge and experience working with these datasets.
+Additionally, contacting the dataset owner/provider can also provide insight.</p>
+<p>In this example, we are going to walkthrough collecting, processing and ingesting a small outside dataset into CMAP.</p>
+<p>Recently, we wanted to add multiple datasets from the CMORE-BULA cruise that traveled from Hawaii south to Fiji.
+These data were available on the HOT (Hawaii Ocean Time-series) FTP site.</p>
+<div class="section" id="collecting-a-small-dataset-from-an-ftp-site-using-wget">
+<h2>Collecting a small dataset from an FTP site using wget<a class="headerlink" href="#collecting-a-small-dataset-from-an-ftp-site-using-wget" title="Permalink to this headline">¶</a></h2>
+<p>From the UH CMORE-BULA site: <a class="reference external" href="https://hahana.soest.hawaii.edu/cmorebula/cmorebula.html">https://hahana.soest.hawaii.edu/cmorebula/cmorebula.html</a> there are links for data access.
+Each of these leads you to an FTP site.</p>
+<div class="figure align-default">
+<a class="reference internal image-reference" href="../../_images/cmore_bula_data_link.png"><img alt="CMORE-BULA" src="../../_images/cmore_bula_data_link.png" style="width: 379.20000000000005px; height: 212.8px;" /></a>
+</div>
+<p>The FTP site for the CMORE-BULA CTD dataset contains 46 individual CTD casts.
+Instead of downloading them all by hand, we can use some functionality from the wget command line tool.</p>
+<div class="figure align-default">
+<a class="reference internal image-reference" href="../../_images/cmore_bula_ctd_ftp.png"><img alt="CMORE-BULA" src="../../_images/cmore_bula_ctd_ftp.png" style="width: 464.0px; height: 628.8000000000001px;" /></a>
+</div>
+<p>To keep a record of dataset processing, it is a good idea to create a collect_{dataset_name}.py script in the collect/ submodule of cmapdata.
+For this example, we have created a directory with the tree structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── insitu
+    ├── cruise
+        ├── misc_cruise
+            ├── KM0704_CMORE_BULA
+                └── collect_KM0704_CMORE_BULA.py
+</pre></div>
+</div>
+<p>For each dataset in this cruise (CTD, underway, underway sample, bottle  &amp; wind), we can collect any files using wget.</p>
+<p>For CTD we can write a download function using wget and pass the FTP link for the CTD files. Using wget, we can specify the output directory.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">odir</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">collected_data</span> <span class="o">+</span> <span class="s2">&quot;insitu/cruise/misc_cruise/KM0704_CMORE_BULA/&quot;</span>
+
+<span class="k">def</span> <span class="nf">download_KM0704_data</span><span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="n">download_link</span><span class="p">):</span>
+    <span class="n">wget_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;wget -P &#39;</span><span class="si">{outputdir}</span><span class="s2">&#39; -np -R &quot;&#39;index.html*&quot; robots=off -nH --cut-dirs 8 -r  </span><span class="si">{download_link}</span><span class="s2">&quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">wget_str</span><span class="p">)</span>
+
+<span class="c1"># #download ctd</span>
+<span class="n">download_KM0704_data</span><span class="p">(</span>
+    <span class="n">odir</span> <span class="o">+</span> <span class="s2">&quot;CTD/&quot;</span><span class="p">,</span> <span class="s2">&quot;https://hahana.soest.hawaii.edu/FTP/cmore/ctd/bula1/&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>For all the datasets in CMORE-BULA, this process would need to be repeated.</p>
+</div>
+<div class="section" id="processing-a-small-dataset">
+<h2>Processing a small dataset<a class="headerlink" href="#processing-a-small-dataset" title="Permalink to this headline">¶</a></h2>
+<p>Now that the CTD files have been collected, we can begin processing them.
+Once again, we are going to create a dataset/collection specific file for a record. In this example, we will call it process_KM0704_CMORE_BULA.py
+This should be placed in the <strong>collect/</strong> submodule of cmapdata.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── insitu
+    ├── cruise
+        ├── misc_cruise
+            ├── KM0704_CMORE_BULA
+                └── process_KM0704_CMORE_BULA.py
+</pre></div>
+</div>
+<p>The full CTD processing steps can be found in this file, but in summary they are:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Use the glob library to create a list of all .ctd files collected previously.</p></li>
+<li><p>Iterate thorough list
+* read csv into pandas dataframe
+* replace ‘-9’ missing values with np.nan
+* extract station,cast,cast direction and num_observations from filename using string splitting.
+* create new columns of variable specific quality flags out of strange combined flag column.
+* drop unneeded columns
+* append data</p></li>
+<li><p>concatenate cleaned data into Pandas Dataframe</p></li>
+</ol>
+</div></blockquote>
+<p>Other datasets in the CMORE-BULA cruise required additional processing. Some required time and depth formatting.
+Others were missing spatio-temporal coordinates, which had to be collected using spatial or station/cast # joins to the other datasets.</p>
+<p>Once all the data are processed, the can be exported to dropbox/../vault/staging/combined/ where dataset and variable metadata sheets can be added. Once these are complete, the dataset should run through the validator.
+From here, follow the steps outlined in the <strong>user submitted datasets walkthrough</strong> section to ingest the data into the database.</p>
+</div>
 </div>
 
 
