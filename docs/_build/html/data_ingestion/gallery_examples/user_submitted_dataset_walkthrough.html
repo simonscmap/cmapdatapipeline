@@ -41,7 +41,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Outside Small Dataset Walkthrough" href="outside_small_dataset_walkthrough.html" />
-    <link rel="prev" title="Workflow for User Submitted Datasets" href="../workflow.html" /> 
+    <link rel="prev" title="Workflow" href="../workflow.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -93,8 +93,11 @@
 <p class="caption"><span class="caption-text">Dataset Ingestion Examples</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../web_validator.html">Web Validator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../workflow.html">Workflow for User Submitted Datasets</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">User Submitted Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workflow.html">Workflow</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Submitted Dataset Walkthrough</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#removal-of-previously-existing-dataset">Removal of Previously Existing Dataset</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
 </ul>
@@ -181,6 +184,26 @@
             
   <div class="section" id="user-submitted-dataset-walkthrough">
 <h1>User Submitted Dataset Walkthrough<a class="headerlink" href="#user-submitted-dataset-walkthrough" title="Permalink to this headline">¶</a></h1>
+<p>This example should walk you through the steps of ingesting a user submitted dataset into the database.</p>
+<p>For this example, we are going to be using the dataset: <strong>Falkor_2018 - 2018 SCOPE Falkor Cruise Water Column Data</strong></p>
+<div class="section" id="removal-of-previously-existing-dataset">
+<h2>Removal of Previously Existing Dataset<a class="headerlink" href="#removal-of-previously-existing-dataset" title="Permalink to this headline">¶</a></h2>
+<p>This dataset was an early submitted dataset and has recently been revised to being it up to line with the current CMAP data submission guidelines.
+Because this dataset already exists in the database, we must first remove the old version.</p>
+<p>To do this, we can use some of the functionallity in cmapdata/ingest/metadata.py</p>
+<p>By calling this function <strong>deleteCatalogTables(tableName, server)</strong>, we can remove any metadata and data tables from a given server.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function has drop privileges! Make sure you want to wipe the dataset metadata and table.</p>
+</div>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python metadata.py</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">deleteCatalogTables</span><span class="p">(</span><span class="s1">&#39;tblFalkor_2018&#39;</span><span class="p">,</span><span class="s1">&#39;Rainier&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Continue this function for any other existing servers. ex. ‘Mariana’,’Rossby’</p>
+</div>
 </div>
 
 
