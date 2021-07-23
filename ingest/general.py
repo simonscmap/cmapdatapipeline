@@ -7,7 +7,6 @@ import glob
 import pandas as pd
 import numpy as np
 
-# sys.path.append("../login/")
 import credentials as cr
 
 import pycmap
@@ -110,6 +109,12 @@ def insertMetadata_no_data(
         tableName,
         server,
     )
+
+    # region id 114 is global
+    metadata.ocean_region_insert(
+        ["114"], data_dict["dataset_metadata_df"]["dataset_short_name"].iloc[0], server
+    )
+
     # if data_dict["dataset_metadata_df"]["cruise_names"].dropna().empty == False:
     #     metadata.tblDataset_Cruises_Insert(
     #         data_dict["data_df"], data_dict["dataset_metadata_df"], server
@@ -213,7 +218,6 @@ def dataless_ingestion(args):
     insertMetadata_no_data(
         data_dict, args.tableName, args.DOI_link_append, args.Server, args.process_level
     )
-    print('metadata built')
     insert_large_stats(args.tableName, args.Server)
 
 
@@ -257,7 +261,6 @@ def main():
         dataless_ingestion(args)
 
     else:
-        print("missed")
         full_ingestion(args)
 
 

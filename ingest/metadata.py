@@ -181,13 +181,13 @@ def tblVariables_Insert(
             Temporal_Coverage_Begin_list,
             Temporal_Coverage_End_list,
         ) = cmn.getColBounds_from_DB(
-            Table_Name, "time", server, list_multiplier=len(variable_metadata_df)
+            Table_Name, "time", "Rossby", list_multiplier=len(variable_metadata_df)
         )
         Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds_from_DB(
-            Table_Name, "lat", server, list_multiplier=len(variable_metadata_df)
+            Table_Name, "lat", "Rossby", list_multiplier=len(variable_metadata_df)
         )
         Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds_from_DB(
-            Table_Name, "lon", server, list_multiplier=len(variable_metadata_df)
+            Table_Name, "lon", "Rossby", list_multiplier=len(variable_metadata_df)
         )
 
     Grid_Mapping_list = [CRS] * len(variable_metadata_df)
@@ -325,7 +325,7 @@ def tblKeywords_Insert(variable_metadata_df, dataset_metadata_df, Table_Name, se
             if len(keyword) > 0:  # won't insert empty values
                 try:  # Cannot insert duplicate entries, so skips if duplicate
                     DB.lineInsert(
-                        server,
+                        "Rossby",
                         "[opedia].[dbo].[tblKeywords]",
                         "(var_ID, keywords)",
                         query,
@@ -487,7 +487,6 @@ def deleteCatalogTables(tableName, server):
         deleteFromtblVariables(Dataset_ID, server)
         deleteFromtblDatasets(Dataset_ID, server)
         dropTable(tableName, server)
-        # dropTable(tableName, "Mariana")
     else:
         print("Catalog tables for ID" + Dataset_ID + " not deleted")
 
@@ -598,6 +597,20 @@ def classified_gdf_to_list(classified_gdf):
     return region_set
 
 
+def ocean_region_insert(region_id_list, dataset_name, server):
+    dataset_ID = cmn.getDatasetID_DS_Name(dataset_name, server)
+    region_ID_list = cmn.get_region_IDS(region_id_list, server)
+
+    for region_ID in region_ID_list:
+        query = (dataset_ID, region_ID)
+        DB.lineInsert(
+            server,
+            "[opedia].[dbo].[tblDataset_Regions]",
+            "(Dataset_ID, Region_ID)",
+            query,
+        )
+
+
 def ocean_region_classification(data_df, dataset_name, server):
     """This function geographically classifes a sparse dataset into a specific ocean region
 
@@ -612,19 +625,9 @@ def ocean_region_classification(data_df, dataset_name, server):
     )
     classified_gdf = classify_gdf_with_gpkg_regions(data_gdf, region_gdf)
     region_set = classified_gdf_to_list(classified_gdf)
+    ocean_region_insert(region_set, dataset_name, server)
 
-    dataset_ID = cmn.getDatasetID_DS_Name(dataset_name, server)
-    region_ID_list = cmn.get_region_IDS(region_set, server)
     print("Dataset matched to the following Regions: ", region_set)
-
-    for region_ID in region_ID_list:
-        query = (dataset_ID, region_ID)
-        DB.lineInsert(
-            server,
-            "[opedia].[dbo].[tblDataset_Regions]",
-            "(Dataset_ID, Region_ID)",
-            query,
-        )
 
 
 def if_exists_dataset_region(dataset_name, server):
@@ -644,27 +647,3 @@ def if_exists_dataset_region(dataset_name, server):
     else:
         bool_return = True
     return bool_return
-
-
-# for index, row in insitu_df.iterrows():
-#     print(row['Dataset_Name'], row['Table_Name'])
-#     bool_return = if_exists_dataset_region(row['Dataset_Name'])
-#     if bool_return == False:
-#         data_df = DB.dbRead("""SELECT * FROM {tblname}""".format(tblname=row['Table_Name']))
-#         ocean_region_classification(data_df,row['Dataset_Name'])
-
-
-# for val in region_gdf["NAME"]:
-#     DB.DB_modify("""INSERT INTO tblRegions (Region_Name) VALUES ('{val}')""".format(val=val),"Rainier")
-
-
-""" tblDatasets: ID,Name, etc...
-tblDataset_Region: Dataset_ID, Region_ID
-tblRegion: ID, Name of Region
-
-
--Fill tblDataset_Region with ID's from gpkg...When/where?
--How to handle if Name of Region is missing...Warning/Flag? Warning then add..
--
-
-"""

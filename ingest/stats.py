@@ -138,12 +138,16 @@ def build_stats_df_from_db_calls(tableName, server):
         tableName (string): CMAP table name
         Server (string): Valid CMAP server name
     """
-    col_list = ['time'] + cmn.get_numeric_cols_in_table_excluding_climatology(tableName, server)
+    col_list = ["time"] + cmn.get_numeric_cols_in_table_excluding_climatology(
+        tableName, server
+    )
     stats_DF = pd.DataFrame(index=["count", "max", "mean", "min", "std"])
     for var in tqdm(col_list):
         print(var)
         try:
-            stats_qry = f"""SELECT count_big({var}),MAX({var}),MIN({var}) FROM {tableName}"""
+            stats_qry = (
+                f"""SELECT count_big({var}),MAX({var}),MIN({var}) FROM {tableName}"""
+            )
             var_df = DB.dbRead(stats_qry, server)
         except:
             stats_qry = f"""SELECT count_big({var}),MAX(cast({var} as numeric(12, 0))),MIN(cast({var} as numeric(12, 0))) FROM {tableName}"""
