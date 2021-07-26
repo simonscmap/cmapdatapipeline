@@ -41,6 +41,9 @@ def getBranch_Path(args):
 def splitExcel(staging_filename, data_missing_flag):
     transfer.single_file_split(staging_filename, data_missing_flag)
 
+def splitCruiseExcel(staging_filename):
+    transfer.cruise_file_split(staging_filename)
+
 
 def staging_to_vault(
     staging_filename, branch, tableName, remove_file_flag, skip_data_flag, process_level
@@ -53,6 +56,11 @@ def staging_to_vault(
         skip_data_flag,
         process_level,
     )
+def cruise_staging_to_vault(
+    staging_filename, cruise_name, remove_file_flag
+):
+    transfer.cruise_staging_to_vault(staging_filename, cruise_name, remove_file_flag)
+
 
 
 def importDataMemory(branch, tableName, process_level):
@@ -177,6 +185,23 @@ def push_icon():
     os.system('git add . && git commit -m "add mission icons to git repo" && git push')
 
 
+def cruise_ingestion(args):
+    splitCruiseExcel(args.staging_filename)
+    cruise_staging_to_vault
+    """need: 
+    *path to cruise template
+    *split cruise template and put somewhere
+    load cruise metadata and trajectory
+    insert into table cruise
+    insert into table cruise metadata
+    update table cruise with spatial bounds
+    classify cruise region
+    insert into tblCruise_Regions
+
+
+    """
+
+
 def full_ingestion(args):
     print("Full Ingestion")
     splitExcel(args.staging_filename, data_missing_flag=False)
@@ -264,7 +289,11 @@ def main():
 
     args = parser.parse_args()
 
-    if args.Dataless_Ingestion:
+    if args.Cruise_Ingestion:
+        cruise_ingestion():
+
+
+    elif args.Dataless_Ingestion:
         dataless_ingestion(args)
 
     else:

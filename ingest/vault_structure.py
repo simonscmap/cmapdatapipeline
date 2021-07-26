@@ -16,6 +16,18 @@ def makedir(directory):
     return
 
 
+def cruise_leaf_structure(base):
+    if base[-1] != "/":
+        base = base + "/"
+    traj = base + "trajectory/"
+    makedir(traj)
+    meta = base + "metadata/"
+    makedir(meta)
+    return meta, traj
+
+    makedir(rep)
+
+
 def leafStruc(base):
     makedir(base)
     if base[-1] != "/":
