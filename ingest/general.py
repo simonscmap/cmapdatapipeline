@@ -31,6 +31,7 @@ import SQL
 import mapping
 import stats
 import common as cmn
+import cruise
 
 
 def getBranch_Path(args):
@@ -40,6 +41,7 @@ def getBranch_Path(args):
 
 def splitExcel(staging_filename, data_missing_flag):
     transfer.single_file_split(staging_filename, data_missing_flag)
+
 
 def splitCruiseExcel(staging_filename):
     transfer.cruise_file_split(staging_filename)
@@ -56,11 +58,26 @@ def staging_to_vault(
         skip_data_flag,
         process_level,
     )
-def cruise_staging_to_vault(
-    staging_filename, cruise_name, remove_file_flag
-):
+
+
+def cruise_staging_to_vault(staging_filename, cruise_name, remove_file_flag):
     transfer.cruise_staging_to_vault(staging_filename, cruise_name, remove_file_flag)
 
+
+def import_cruise_data_dict(cruise_name):
+    cruise_path = vs.r2r_cruise + cruise_name
+    metadata_df = pd.read_csv(
+        cruise_path + """metadata/{cruise_name}_cruise_metadata.csv""",
+        sep=",",
+        index=False,
+    )
+    traj_df = pd.read_csv(
+        cruise_path + """trajectory/{cruise_name}_cruise_trajectory.csv""",
+        sep=",",
+        index=False,
+    )
+    data_dict = {"metadata_df": metadata_df, "trajectory_df": traj_df}
+    return data_dict
 
 
 def importDataMemory(branch, tableName, process_level):
@@ -95,6 +112,22 @@ def SQL_suggestion(data_dict, tableName, branch, server):
     else:
         sys.exit()
     SQL.write_SQL_file(sql_combined_str, tableName, make)
+
+
+def add_ST_cols_cruise(metadata_df, traj_df):
+    metadata_df = cruise.add_ST_cols_to_metadata_df(metadata_df, traj_df)
+    return metadata_df
+
+
+def insertCruise(metadata_df, trajectory_df, cruise_name, server):
+    DB.lineInsert(
+        server,
+        "tblCruise",
+        "(Nickname,Name,Ship_Name,Start_Time,End_Time,Lat_Min,Lat_Max,Lon_Min,Lon_Max,Chief_Name)",
+        tuple(metadata_df.iloc[0].astype(str).to_list()),
+    )
+    data.data_df_to_db(trajectory_df, "tblCruise", server, clean_data_df_flag=False)
+    metadata.ocean_region_classification_cruise(trajectory_df, cruise_name, server)
 
 
 def insertData(data_dict, tableName, server):
@@ -187,14 +220,26 @@ def push_icon():
 
 def cruise_ingestion(args):
     splitCruiseExcel(args.staging_filename)
-    cruise_staging_to_vault
+    cruise_staging_to_vault(
+        args.staging_filename, args.cruise_name, args.remove_file_flag
+    )
+    data_dict = import_cruise_data_dict(args.cruise_name)
+    data_dict["metadata_df"] = add_ST_cols_cruise(
+        data_dict["metadata_df"], data_dict["traj_df"]
+    )
+    insertCruise(
+        data_dict["metadata_df"], data_dict["traj_df"], args.cruise_name, server
+    )
+
     """need: 
     *path to cruise template
     *split cruise template and put somewhere
-    load cruise metadata and trajectory
+    *load cruise metadata and trajectory
+    *add cols to metadata
+    *fill cols in metadata from traj min/max
+
     insert into table cruise
     insert into table cruise metadata
-    update table cruise with spatial bounds
     classify cruise region
     insert into tblCruise_Regions
 
@@ -278,7 +323,7 @@ def main():
     )
 
     parser.add_argument("-N", "--Dataless_Ingestion", nargs="?", const=True)
-
+    parser.add_argument("-C", "--cruise_name", help="UNOLS Name", nargs="?")
     parser.add_argument(
         "-S",
         "--Server",
@@ -290,8 +335,7 @@ def main():
     args = parser.parse_args()
 
     if args.Cruise_Ingestion:
-        cruise_ingestion():
-
+        cruise_ingestion()
 
     elif args.Dataless_Ingestion:
         dataless_ingestion(args)

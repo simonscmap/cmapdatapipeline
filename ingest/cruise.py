@@ -93,6 +93,35 @@ def download_cruise_data_from_url(cruise_name, download_url_str, dataset_categor
     )
 
 
+def add_ST_cols_to_metadata_df(metadata_df, trajectory_df):
+    time_min, time_max, lat_min, lat_max, lon_min, lon_max = ST_bounds_from_df(
+        trajectory_df
+    )
+    metadata_df["Start_Time"] = time_min
+    metadata_df["End_Time"] = time_max
+    metadata_df.at[0, "Lat_Min"] = lat_min
+    metadata_df.at[0, "Lat_Max"] = lat_max
+    metadata_df.at[0, "Lon_Min"] = lon_min
+    metadata_df.at[0, "Lon_Max"] = lon_max
+
+    metadata_df = metadata_df[
+        [
+            "Nickname",
+            "Name",
+            "Ship_Name",
+            "Start_Time",
+            "End_Time",
+            "Lat_Min",
+            "Lat_Max",
+            "Lon_Min",
+            "Lon_Max",
+            "Chief_Name",
+            "Cruise_Series",
+        ]
+    ]
+    return metadata_df
+
+
 def ST_bounds_from_df(df):
     time_min = np.min(df["time"])
     time_max = np.max(df["time"])
