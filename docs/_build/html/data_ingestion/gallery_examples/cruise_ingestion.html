@@ -1,0 +1,323 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Ingesting Cruise Metdata and Trajectory &mdash; cmapdata 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="DB" href="../../subpackages/DB.html" />
+    <link rel="prev" title="Outside Large Dataset Walkthrough" href="outside_large_dataset_walkthrough.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> cmapdata
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/installation.html">Installation and Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/database_design.html">Database Design and Table Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/compute_and_storage.html">Compute Resources and Data Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/pitfalls.html">Pitfalls</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Dataset Ingestion Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../web_validator.html">Web Validator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../indexing_strategies.html">Indexing Strategies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Ingesting Cruise Metdata and Trajectory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#metadata-sheet">Metadata Sheet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trajectory-sheet">Trajectory Sheet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ingesting-cruise-templates">Ingesting Cruise Templates</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Package Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../subpackages/DB.html">DB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../subpackages/collect.html">collect</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../subpackages/process.html">process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../subpackages/ingest.html">ingest</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Future Improvements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../future/code_changes.html">Code Changes</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Ref</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_common.html">API Ref common.py</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cmapdata</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Ingesting Cruise Metdata and Trajectory</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/data_ingestion/gallery_examples/cruise_ingestion.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ingesting-cruise-metdata-and-trajectory">
+<h1>Ingesting Cruise Metdata and Trajectory<a class="headerlink" href="#ingesting-cruise-metdata-and-trajectory" title="Permalink to this headline">¶</a></h1>
+<p>CMAP contains cruise trajectories and metadata stored in seperate tables (tblCruise and tblCruise_Trajectory).
+These allow us to visualize cruise tracks on map, colocalize datasets with cruise tracks and links datasets to specific cruises.</p>
+<p>A cruise ingestion template should contain two sheets. One for cruise metadata and another for cruise trajectory.</p>
+<div class="section" id="metadata-sheet">
+<h2>Metadata Sheet<a class="headerlink" href="#metadata-sheet" title="Permalink to this headline">¶</a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 17%" />
+<col style="width: 19%" />
+<col style="width: 23%" />
+<col style="width: 23%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Nickname</p></td>
+<td><p>Name</p></td>
+<td><p>Ship_Name</p></td>
+<td><p>Chief_Name</p></td>
+<td><p>Cruise_Series</p></td>
+</tr>
+<tr class="row-even"><td><p>&lt; Ship Nickname (ex. Gradients 3) &gt;</p></td>
+<td><p>&lt; UNOLS Cruise Name (ex. KM1906) &gt;</p></td>
+<td><p>&lt; Official Ship Name (ex. Kilo Moana) &gt;</p></td>
+<td><p>&lt; Chief Scientist Name (ex. Ginger Armbrust) &gt;</p></td>
+<td><p>&lt; opt. Cruise Series (ex. Gradients/HOT/etc.) &gt;</p></td>
+</tr>
+</tbody>
+</table>
+<p>The metadata sheet contains cruise metadata that will populate tblCruise. The ST bounds will be filled in with the ingestion process.</p>
+</div>
+<div class="section" id="trajectory-sheet">
+<h2>Trajectory Sheet<a class="headerlink" href="#trajectory-sheet" title="Permalink to this headline">¶</a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 34%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>time</p></td>
+<td><p>lat</p></td>
+<td><p>lon</p></td>
+</tr>
+<tr class="row-even"><td><p>&lt; Format  %Y-%m-%dT%H:%M:%S,  Time-Zone:  UTC,  example: 2014-02-28T14:25:55 &gt;</p></td>
+<td><p>&lt; Format: Decimal (not military grid system), Unit: degree, Range: [-90, 90] &gt;</p></td>
+<td><p>&lt; Format: Decimal (not military grid system), Unit: degree, Range: [-180, 180] &gt;</p></td>
+</tr>
+</tbody>
+</table>
+<p>The trajectory sheet contains ST information of the cruise. This should have enough points to give an accurate cruise trajectory, without having too high a sampling interval. A good target might be minute scale.</p>
+</div>
+<div class="section" id="ingesting-cruise-templates">
+<h2>Ingesting Cruise Templates<a class="headerlink" href="#ingesting-cruise-templates" title="Permalink to this headline">¶</a></h2>
+<p>Similar to how datasets are ingested into CMAP, we can use the functionallity in the <strong>ingest</strong> subpackage.</p>
+<p>Completed crusie templates should start the ingestion process in ‘/CMAP Data Submission Dropbox/Simons CMAP/staging/combined/{cruise_name_template.xlsx}’</p>
+<p>Using ingest/general.py, you can pass command line arguments to specify a cruise ingestion as well as a server.</p>
+<p>Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="p">{</span><span class="n">filename</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">C</span><span class="p">}</span> <span class="p">{</span><span class="n">cruise_name</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">S</span><span class="p">}</span> <span class="p">{</span><span class="n">server</span><span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>{<strong>filename</strong>}: Base file name in vault/staging/combined/. Ex.: ‘TN278_cruise_meta_nav_data.xlsx’</p></li>
+<li><p>{<strong>-C</strong>}: Flag indicating for cruise ingestion. Follow with cruise_name.</p></li>
+<li><p>{<strong>cruise_name</strong>}: String for official (UNOLS) cruise name Ex. TN278</p></li>
+<li><p>{<strong>-S</strong>}: Required flag for specifying server choice. Server name string follows flag.</p></li>
+<li><p>{<strong>server</strong>}: Valid server name string.  Ex. “Rainier”, “Mariana” or “Rossby”</p></li>
+</ul>
+<p>An example string would be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="s1">&#39;TN278_cruise_meta_nav_data.xlsx&#39;</span> <span class="o">-</span><span class="n">C</span> <span class="n">TN278</span> <span class="o">-</span><span class="n">S</span> <span class="s2">&quot;Rainier&quot;</span>
+</pre></div>
+</div>
+<p>Behind the scenes, the script is doing:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>parsing the user supplied arguments.</p></li>
+<li><p>Splitting the data template into cruise_metadata and cruise_trajectory files.</p></li>
+<li><p>Transfering the files to <strong>vault/</strong>.</p></li>
+<li><p>Importing into memory the cruise_metadata and cruise_trajectory sheets as pandas dataframes.</p></li>
+<li><p>Filling in the ST bounds for the cruise_metdata dataframe with min/max’s from the trajectory dataframe.</p></li>
+<li><p>Inserting the metadata dataframe into tblCruise.</p></li>
+<li><p>Inserting the trajectory dataframe into tblCruise_Trajectory.</p></li>
+<li><p>Using the trajectory dataframe to classify the cruise by ocean region(s).</p></li>
+<li><p>Inserting the cruise_ID and region_ID’s into tblCruise_Regions.</p></li>
+</ol>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Norland Raphael Hagen.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
