@@ -174,7 +174,7 @@ def tblVariables_Insert(
         server,
     )
 
-    if data_df != False:
+    if data_df.empty:
         Temporal_Coverage_Begin_list, Temporal_Coverage_End_list = cmn.getColBounds(
             data_df, "time", list_multiplier=len(variable_metadata_df)
         )
@@ -189,13 +189,13 @@ def tblVariables_Insert(
             Temporal_Coverage_Begin_list,
             Temporal_Coverage_End_list,
         ) = cmn.getColBounds_from_DB(
-            Table_Name, "time", "Rossby", list_multiplier=len(variable_metadata_df)
+            Table_Name, "time", server, list_multiplier=len(variable_metadata_df)
         )
         Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds_from_DB(
-            Table_Name, "lat", "Rossby", list_multiplier=len(variable_metadata_df)
+            Table_Name, "lat", server, list_multiplier=len(variable_metadata_df)
         )
         Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds_from_DB(
-            Table_Name, "lon", "Rossby", list_multiplier=len(variable_metadata_df)
+            Table_Name, "lon", server, list_multiplier=len(variable_metadata_df)
         )
 
     Grid_Mapping_list = [CRS] * len(variable_metadata_df)
@@ -333,7 +333,7 @@ def tblKeywords_Insert(variable_metadata_df, dataset_metadata_df, Table_Name, se
             if len(keyword) > 0:  # won't insert empty values
                 try:  # Cannot insert duplicate entries, so skips if duplicate
                     DB.lineInsert(
-                        "Rossby",
+                        server,
                         "[opedia].[dbo].[tblKeywords]",
                         "(var_ID, keywords)",
                         query,
@@ -410,7 +410,6 @@ def tblDataset_Cruises_Insert(data_df, dataset_metadata_df, server):
 def deleteFromtblKeywords(Dataset_ID, server):
     Keyword_ID_list = cmn.getKeywordsIDDataset(Dataset_ID, server)
     Keyword_ID_str = "','".join(str(key) for key in Keyword_ID_list)
-    # print(Keyword_ID_str)
     cur_str = (
         """DELETE FROM [Opedia].[dbo].[tblKeywords] WHERE [var_ID] IN ('"""
         + Keyword_ID_str
