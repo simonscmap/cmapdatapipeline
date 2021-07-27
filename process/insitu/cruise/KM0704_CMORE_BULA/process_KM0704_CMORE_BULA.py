@@ -37,7 +37,7 @@ def ckdnearest(df1, df2, cols_2_drop):
 
 
 def process_ctd():
-    """concat CTD, build station/cast/direction out of filename, zero padd number"""
+    """concat CTD, build station/cast/direction out of filename, zero pad number"""
     ctd_concat_list = []
     ctd_flist = glob.glob(CMORE_BULA_path + "CTD/" + "*.ctd")
     for ctd_cast in ctd_flist:

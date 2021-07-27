@@ -1,5 +1,5 @@
 import os
-import vault_structure as vs
+from ingest import vault_structure as vs
 
 
 odir = vs.collected_data + "insitu/cruise/misc_cruise/KM0704_CMORE_BULA/"
@@ -8,7 +8,6 @@ odir = vs.collected_data + "insitu/cruise/misc_cruise/KM0704_CMORE_BULA/"
 def download_KM0704_data(outputdir, download_link):
     wget_str = f"""wget -P '{outputdir}' -np -R "'index.html*" robots=off -nH --cut-dirs 8 -r  {download_link}"""
     os.system(wget_str)
-
 
 # #download ctd
 download_KM0704_data(
