@@ -620,7 +620,7 @@ def ocean_region_insert(region_id_list, dataset_name, server):
 
 
 def ocean_region_cruise_insert(region_id_list, cruise_name, server):
-    cruise_ID = cmn.get_cruise_IDS([cruise_name], server)
+    cruise_ID = cmn.get_cruise_IDS([cruise_name], server)[0]
     region_ID_list = cmn.get_region_IDS(region_id_list, server)
     for region_ID in region_ID_list:
         query = (cruise_ID, region_ID)
@@ -630,6 +630,7 @@ def ocean_region_cruise_insert(region_id_list, cruise_name, server):
             "(Cruise_ID, Region_ID)",
             query,
         )
+    print("cruises classified by ocean region.")
 
 
 def ocean_region_classification_cruise(trajectory_df, cruise_name, server):

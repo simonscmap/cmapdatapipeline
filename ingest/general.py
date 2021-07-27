@@ -43,8 +43,8 @@ def splitExcel(staging_filename, data_missing_flag):
     transfer.single_file_split(staging_filename, data_missing_flag)
 
 
-def splitCruiseExcel(staging_filename):
-    transfer.cruise_file_split(staging_filename)
+def splitCruiseExcel(staging_filename, cruise_name):
+    transfer.cruise_file_split(staging_filename, cruise_name)
 
 
 def staging_to_vault(
@@ -60,22 +60,28 @@ def staging_to_vault(
     )
 
 
-def cruise_staging_to_vault(staging_filename, cruise_name, remove_file_flag):
-    transfer.cruise_staging_to_vault(staging_filename, cruise_name, remove_file_flag)
+def cruise_staging_to_vault(cruise_name, remove_file_flag):
+    transfer.cruise_staging_to_vault(cruise_name, remove_file_flag)
 
 
 def import_cruise_data_dict(cruise_name):
     cruise_path = vs.r2r_cruise + cruise_name
+    print(cruise_name)
+    print(cruise_path)
     metadata_df = pd.read_csv(
-        cruise_path + """metadata/{cruise_name}_cruise_metadata.csv""",
-        sep=",",
-        index=False,
+        cruise_path + f"""/metadata/{cruise_name}_cruise_metadata.csv""", sep=","
     )
     traj_df = pd.read_csv(
-        cruise_path + """trajectory/{cruise_name}_cruise_trajectory.csv""",
-        sep=",",
-        index=False,
+        cruise_path + f"""/trajectory/{cruise_name}_cruise_trajectory.csv""", sep=","
     )
+    metadata_df = metadata_df[
+        metadata_df.columns.drop(list(metadata_df.filter(regex="Unnamed:")))
+    ]
+    traj_df = traj_df[traj_df.columns.drop(list(traj_df.filter(regex="Unnamed:")))]
+    traj_df["time"] = pd.to_datetime(
+        traj_df["time"].astype(str), format="%Y-%m-%d %H:%M:%S"
+    ).astype("datetime64[s]")
+
     data_dict = {"metadata_df": metadata_df, "trajectory_df": traj_df}
     return data_dict
 
@@ -120,13 +126,18 @@ def add_ST_cols_cruise(metadata_df, traj_df):
 
 
 def insertCruise(metadata_df, trajectory_df, cruise_name, server):
+    metadata_df = cmn.nanToNA(metadata_df)
+
     DB.lineInsert(
         server,
         "tblCruise",
-        "(Nickname,Name,Ship_Name,Start_Time,End_Time,Lat_Min,Lat_Max,Lon_Min,Lon_Max,Chief_Name)",
+        "(Nickname,Name,Ship_Name,Start_Time,End_Time,Lat_Min,Lat_Max,Lon_Min,Lon_Max,Chief_Name,Cruise_Series)",
         tuple(metadata_df.iloc[0].astype(str).to_list()),
     )
-    data.data_df_to_db(trajectory_df, "tblCruise", server, clean_data_df_flag=False)
+    trajectory_df = cruise.add_ID_trajectory_df(trajectory_df, cruise_name, server)
+    data.data_df_to_db(
+        trajectory_df, "tblCruise_Trajectory", server, clean_data_df_flag=False
+    )
     metadata.ocean_region_classification_cruise(trajectory_df, cruise_name, server)
 
 
@@ -219,32 +230,19 @@ def push_icon():
 
 
 def cruise_ingestion(args):
-    splitCruiseExcel(args.staging_filename)
-    cruise_staging_to_vault(
-        args.staging_filename, args.cruise_name, args.remove_file_flag
-    )
+    splitCruiseExcel(args.staging_filename, args.cruise_name)
+    cruise_staging_to_vault(args.cruise_name, remove_file_flag=False)
     data_dict = import_cruise_data_dict(args.cruise_name)
     data_dict["metadata_df"] = add_ST_cols_cruise(
-        data_dict["metadata_df"], data_dict["traj_df"]
+        data_dict["metadata_df"], data_dict["trajectory_df"]
     )
+
     insertCruise(
-        data_dict["metadata_df"], data_dict["traj_df"], args.cruise_name, server
+        data_dict["metadata_df"],
+        data_dict["trajectory_df"],
+        args.cruise_name,
+        args.Server,
     )
-
-    """need: 
-    *path to cruise template
-    *split cruise template and put somewhere
-    *load cruise metadata and trajectory
-    *add cols to metadata
-    *fill cols in metadata from traj min/max
-
-    insert into table cruise
-    insert into table cruise metadata
-    classify cruise region
-    insert into tblCruise_Regions
-
-
-    """
 
 
 def full_ingestion(args):
@@ -302,12 +300,16 @@ def main():
     parser = argparse.ArgumentParser(description="Ingestion datasets into CMAP")
 
     parser.add_argument(
-        "tableName", type=str, help="Desired SQL and Vault Table Name. Ex: tblSeaFlow"
+        "tableName",
+        type=str,
+        help="Desired SQL and Vault Table Name. Ex: tblSeaFlow",
+        nargs="?",
     )
     parser.add_argument(
         "branch",
         type=str,
         help="Branch where dataset should be placed in Vault. Ex's: cruise, float, station, satellite, model, assimilation.",
+        nargs="?",
     )
     parser.add_argument(
         "staging_filename",
@@ -334,8 +336,8 @@ def main():
 
     args = parser.parse_args()
 
-    if args.Cruise_Ingestion:
-        cruise_ingestion()
+    if args.cruise_name:
+        cruise_ingestion(args)
 
     elif args.Dataless_Ingestion:
         dataless_ingestion(args)

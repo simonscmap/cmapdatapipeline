@@ -93,6 +93,13 @@ def download_cruise_data_from_url(cruise_name, download_url_str, dataset_categor
     )
 
 
+def add_ID_trajectory_df(trajectory_df, cruise_name, server):
+    cruise_ID = cmn.get_cruise_IDS([cruise_name], server)
+    trajectory_df["Cruise_ID"] = cruise_ID[0]
+    trajectory_df = trajectory_df[["Cruise_ID", "time", "lat", "lon"]]
+    return trajectory_df
+
+
 def add_ST_cols_to_metadata_df(metadata_df, trajectory_df):
     time_min, time_max, lat_min, lat_max, lon_min, lon_max = ST_bounds_from_df(
         trajectory_df
