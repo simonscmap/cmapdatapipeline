@@ -116,7 +116,6 @@
 <li class="toctree-l1"><a class="reference internal" href="API/API_data.html">API Ref data.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API/API_DB.html">API Ref DB.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API/API_general.html">API Ref general.py</a></li>
-<li class="toctree-l1"><a class="reference internal" href="API/API_ingest_test.html">API Ref ingest_test.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API/API_mapping.html">API Ref mapping.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API/API_metadata.html">API Ref metadata.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API/API_region_classifcation.html">API/API_region_classification.py</a></li>
@@ -212,6 +211,8 @@
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
  
 </div>
 <h2 id="A">A</h2>
@@ -272,6 +273,8 @@
       <li><a href="API/API_cruise.html#ingest.cruise.clean_cruise_traj">clean_cruise_traj() (in module ingest.cruise)</a>
 </li>
       <li><a href="API/API_data.html#ingest.data.clean_data_df">clean_data_df() (in module ingest.data)</a>
+</li>
+      <li><a href="API/API_transfer.html#ingest.transfer.clear_directory">clear_directory() (in module ingest.transfer)</a>
 </li>
       <li><a href="API/API_transfer.html#ingest.transfer.cruise_file_split">cruise_file_split() (in module ingest.transfer)</a>
 </li>
@@ -340,6 +343,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="API/API_common.html#ingest.common.findVarID">findVarID() (in module ingest.common)</a>
+</li>
+      <li><a href="API/API_mapping.html#ingest.mapping.folium_map">folium_map() (in module ingest.mapping)</a>
 </li>
       <li><a href="API/API_cruise.html#ingest.cruise.format_cruise_metadata">format_cruise_metadata() (in module ingest.cruise)</a>
 </li>
@@ -450,21 +455,14 @@
 </li>
       </ul></li>
       <li>
-    ingest.ingest_test
-
-      <ul>
-        <li><a href="API/API_ingest_test.html#module-ingest.ingest_test">module</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
     ingest.mapping
 
       <ul>
         <li><a href="API/API_mapping.html#module-ingest.mapping">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     ingest.metadata
 
@@ -507,6 +505,10 @@
         <li><a href="API/API_vault_structure.html#module-ingest.vault_structure">module</a>
 </li>
       </ul></li>
+      <li><a href="API/API_region_classifcation.html#ingest.region_classification.insert_into_tblCruise_Regions">insert_into_tblCruise_Regions() (in module ingest.region_classification)</a>
+</li>
+      <li><a href="API/API_region_classifcation.html#ingest.region_classification.insert_into_tblDataset_Regions">insert_into_tblDataset_Regions() (in module ingest.region_classification)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -544,8 +546,6 @@
         <li><a href="API/API_data.html#module-ingest.data">ingest.data</a>
 </li>
         <li><a href="API/API_DB.html#module-ingest.DB">ingest.DB</a>
-</li>
-        <li><a href="API/API_ingest_test.html#module-ingest.ingest_test">ingest.ingest_test</a>
 </li>
         <li><a href="API/API_mapping.html#module-ingest.mapping">ingest.mapping</a>
 </li>
@@ -616,9 +616,11 @@
 </li>
       <li><a href="API/API_metadata.html#ingest.metadata.removeKeywords">removeKeywords() (in module ingest.metadata)</a>
 </li>
+      <li><a href="API/API_data.html#ingest.data.removeMissings">removeMissings() (in module ingest.data)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="API/API_data.html#ingest.data.removeMissings">removeMissings() (in module ingest.data)</a>
+      <li><a href="API/API_transfer.html#ingest.transfer.requests_Download">requests_Download() (in module ingest.transfer)</a>
 </li>
       <li><a href="API/API_cruise.html#ingest.cruise.resample_trajectory">resample_trajectory() (in module ingest.cruise)</a>
 </li>
@@ -636,10 +638,14 @@
 </li>
       <li><a href="API/API_data.html#ingest.data.sort_values">sort_values() (in module ingest.data)</a>
 </li>
-      <li><a href="API/API_cruise.html#ingest.cruise.ST_bounds_from_df">ST_bounds_from_df() (in module ingest.cruise)</a>
+      <li><a href="API/API_SQL.html#ingest.SQL.SQL_index_suggestion_formatter">SQL_index_suggestion_formatter() (in module ingest.SQL)</a>
+</li>
+      <li><a href="API/API_SQL.html#ingest.SQL.SQL_tbl_suggestion_formatter">SQL_tbl_suggestion_formatter() (in module ingest.SQL)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/API_cruise.html#ingest.cruise.ST_bounds_from_df">ST_bounds_from_df() (in module ingest.cruise)</a>
+</li>
       <li><a href="API/API_data.html#ingest.data.ST_columns">ST_columns() (in module ingest.data)</a>
 </li>
       <li><a href="API/API_transfer.html#ingest.transfer.staging_to_vault">staging_to_vault() (in module ingest.transfer)</a>
@@ -676,10 +682,16 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/API_stats.html#ingest.stats.update_stats_large">update_stats_large() (in module ingest.stats)</a>
+</li>
       <li><a href="API/API_cruise.html#ingest.cruise.update_tblCruises">update_tblCruises() (in module ingest.cruise)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/API_stats.html#ingest.stats.updateStats_Small">updateStats_Small() (in module ingest.stats)</a>
+</li>
+      <li><a href="API/API_stats.html#ingest.stats.updateStatsTable">updateStatsTable() (in module ingest.stats)</a>
+</li>
       <li><a href="API/API_DB.html#ingest.DB.urllib_pyodbc_format">urllib_pyodbc_format() (in module ingest.DB)</a>
 </li>
   </ul></td>
@@ -695,6 +707,22 @@
       <li><a href="API/API_common.html#ingest.common.vault_struct_retrieval">vault_struct_retrieval() (in module ingest.common)</a>
 </li>
       <li><a href="API/API_common.html#ingest.common.verify_cruise_lists">verify_cruise_lists() (in module ingest.common)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/API_SQL.html#ingest.SQL.write_SQL_file">write_SQL_file() (in module ingest.SQL)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API/API_transfer.html#ingest.transfer.Zenodo_DOI_Formatter">Zenodo_DOI_Formatter() (in module ingest.transfer)</a>
 </li>
   </ul></td>
 </tr></table>

@@ -176,8 +176,8 @@ def get_name_pkey(tableName, server):
     """Returns the name of the primary key column for a given table
 
     Args:
-        tableName (string): CMAP table name
-        Server (string): Valid CMAP server name
+        tableName (str): CMAP table name
+        Server (str): Valid CMAP server name
     """
     query = f"""
     SELECT Col.Column_Name from 

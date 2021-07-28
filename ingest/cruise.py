@@ -123,7 +123,7 @@ def add_ID_trajectory_df(trajectory_df, cruise_name, server):
     Args:
         trajectory_df (Pandas DataFrame): Input dataframe containing time/lat/lon cols.
         cruise_name (str): Valid CMAP cruise name (UNOLS ex. KM1906)
-        server (str): [description]
+        Server (string): Valid CMAP server name
 
     Returns:
         Pandas DataFrame: Trajectory df with Cruise_ID column added

@@ -118,7 +118,6 @@
 <li class="toctree-l1"><a class="reference internal" href="API_data.html">API Ref data.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_DB.html">API Ref DB.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_general.html">API Ref general.py</a></li>
-<li class="toctree-l1"><a class="reference internal" href="API_ingest_test.html">API Ref ingest_test.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_mapping.html">API Ref mapping.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_metadata.html">API Ref metadata.py</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API/API_region_classification.py</a></li>
@@ -258,6 +257,35 @@ Date: 07-23-2021</p>
 </dd>
 </dl>
 <p>Returns: Boolean</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.region_classification.insert_into_tblCruise_Regions">
+<code class="sig-prename descclassname">ingest.region_classification.</code><code class="sig-name descname">insert_into_tblCruise_Regions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">region_set</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.region_classification.insert_into_tblCruise_Regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts region set into tblCruise_Regions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>region_set</strong> (<em>set</em>) – set of region_ID’s from tblRegions</p></li>
+<li><p><strong>server</strong> (<em>str</em>) – Valid CMAP server name. ex Rainier</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.region_classification.insert_into_tblDataset_Regions">
+<code class="sig-prename descclassname">ingest.region_classification.</code><code class="sig-name descname">insert_into_tblDataset_Regions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">region_set</span></em>, <em class="sig-param"><span class="n">dataset_name</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.region_classification.insert_into_tblDataset_Regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts region set into tblDataset_Regions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>region_set</strong> (<em>set</em>) – set of region_ID’s from tblRegions</p></li>
+<li><p><strong>dataset_name</strong> (<em>str</em>) – valid dataset name in CMAP</p></li>
+<li><p><strong>server</strong> (<em>str</em>) – Valid CMAP server name. ex Rainier</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

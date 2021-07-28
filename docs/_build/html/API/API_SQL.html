@@ -118,7 +118,6 @@
 <li class="toctree-l1"><a class="reference internal" href="API_data.html">API Ref data.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_DB.html">API Ref DB.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_general.html">API Ref general.py</a></li>
-<li class="toctree-l1"><a class="reference internal" href="API_ingest_test.html">API Ref ingest_test.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_mapping.html">API Ref mapping.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_metadata.html">API Ref metadata.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_region_classifcation.html">API/API_region_classification.py</a></li>
@@ -199,9 +198,36 @@
 Date: 07-23-2021</p>
 <p>cmapdata - SQL - SQL table/index suggestions and formatting</p>
 <dl class="py function">
+<dt id="ingest.SQL.SQL_index_suggestion_formatter">
+<code class="sig-prename descclassname">ingest.SQL.</code><code class="sig-name descname">SQL_index_suggestion_formatter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_df</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em>, <em class="sig-param"><span class="n">FG</span><span class="o">=</span><span class="default_value">'Primary'</span></em>, <em class="sig-param"><span class="n">DB</span><span class="o">=</span><span class="default_value">'Opedia'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.SQL.SQL_index_suggestion_formatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates SQL index suggestion from input data DF</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.SQL.SQL_tbl_suggestion_formatter">
+<code class="sig-prename descclassname">ingest.SQL.</code><code class="sig-name descname">SQL_tbl_suggestion_formatter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sdf</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em>, <em class="sig-param"><span class="n">FG</span><span class="o">=</span><span class="default_value">'Primary'</span></em>, <em class="sig-param"><span class="n">DB</span><span class="o">=</span><span class="default_value">'Opedia'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.SQL.SQL_tbl_suggestion_formatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates SQL table suggestion from input dataframe</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="ingest.SQL.build_SQL_suggestion_df">
 <code class="sig-prename descclassname">ingest.SQL.</code><code class="sig-name descname">build_SQL_suggestion_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.SQL.build_SQL_suggestion_df" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds a dataframe of colulmn name and datatype for an input data specific dataframe</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.SQL.write_SQL_file">
+<code class="sig-prename descclassname">ingest.SQL.</code><code class="sig-name descname">write_SQL_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sql_str</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">make</span><span class="o">=</span><span class="default_value">'observation'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.SQL.write_SQL_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes SQL sugested string and builds a .sql record file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sql_str</strong> (<em>str</em>) – SQL string for table creation</p></li>
+<li><p><strong>tableName</strong> (<em>str</em>) – Valid CMAP table name</p></li>
+<li><p><strong>make</strong> (<em>str</em><em>, </em><em>optional</em>) – observation, model, assimilation. Defaults to “observation”.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

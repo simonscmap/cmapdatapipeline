@@ -6,33 +6,30 @@ cmapdata - stats - cmap summary stats functionallity.
 """
 
 
-import sys
 import os
 import credentials as cr
-
+from tqdm import tqdm
+import dask.dataframe as dd
 import pandas as pd
 import numpy as np
-import pycmap
 
 import common as cmn
 import DB
 import transfer
 import data
 
-from tqdm import tqdm
-import dask.dataframe as dd
-
-pycmap.API(cr.api_key)
-
-api = pycmap.API()
-
 
 def updateStatsTable(ID, json_str, server):
+    """Updates entry for tblDataset_Stats
+
+    Args:
+        ID (str): Dataset_ID
+        json_str (str): Formatted JSON string for tblDataset_Stats
+        Server (str): Valid CMAP server name
+    """
     conn, cursor = DB.dbConnect(server)
-    deleteQuery = """DELETE FROM tblDataset_Stats WHERE Dataset_ID = '{}'""".format(ID)
-    insertQuery = """INSERT INTO tblDataset_Stats (Dataset_ID, JSON_stats) VALUES('{}','{}')""".format(
-        ID, json_str
-    )
+    deleteQuery = f"""DELETE FROM tblDataset_Stats WHERE Dataset_ID = '{ID}'"""
+    insertQuery = f"""INSERT INTO tblDataset_Stats (Dataset_ID, JSON_stats) VALUES('{ID}','{json_str}')"""
     try:
         DB.DB_modify(deleteQuery, server)
         DB.DB_modify(insertQuery, server)
@@ -42,6 +39,13 @@ def updateStatsTable(ID, json_str, server):
 
 
 def updateStats_Small(tableName, server, data_df=None):
+    """Updates entry for tblDataset_Stats, wraps around updateStatsTable, but with common inputs.
+
+    Args:
+        tableName (str): CMAP table name
+        Server (str): Valid CMAP server name
+        data_df (Pandas DataFrame, optional): datframe to build stats from, if not provided table is queried from database. Defaults to None.
+    """
     if data_df is not None:
         data_df = data_df
     else:
@@ -59,13 +63,16 @@ def updateStats_Small(tableName, server, data_df=None):
     print("Updated stats for " + tableName)
 
 
-def retrieve_stats_from_DB(tableName, server):
-    st_cols = data.ST_columns(df)
-
-    qry = f"""SELECT MIN(time),MAX(time),MIN(lat),MAX(lat),MIN(lon),MAX(depth),"""
-
-
 def buildLarge_Stats(df, datetime_slice, tableName, branch, transfer_flag="dropbox"):
+    """Calculates summary stats for a dataframe. Can be used when calculating stats for large dataset ingestion. Alternative is build_stats_df_from_db_calls().
+
+    Args:
+        df (Pandas DataFrame): Input cleaned dataframe
+        datetime_slice (str): time slice of input data. Ex. daily sat would be daily.
+        tableName (str): CMAP table name
+        branch (str): vault branch path, ex float.
+        transfer_flag (str, optional): Way to transfer data, either dropbox or sshfs. Defaults to "dropbox".
+    """
     """Input is dataframe slice (daily, 8 day, monthly etc.) of a dataset that is split into multiple files"""
     df_stats = df.describe()
     df_stats.insert(loc=0, column="time", value="")
@@ -100,6 +107,16 @@ def buildLarge_Stats(df, datetime_slice, tableName, branch, transfer_flag="dropb
 
 
 def aggregate_large_stats(branch, tableName, server):
+    """Aggregates stats of stats files for large dataset ingestion. Alternative is db calls using build_stats_df_from_db_calls()
+
+    Args:
+        branch (str): vault branch path, ex float.
+        tableName (str): CMAP table name
+        Server (str): Valid CMAP server name
+
+    Returns:
+        Pandas DataFrame: stats dataframe
+    """
     """aggregates summary stats files and computes stats of stats. Returns stats dataframe"""
     branch_path = cmn.vault_struct_retrieval(branch)
     df = dd.read_csv(branch_path + tableName + "/stats/" + "*.csv*")
@@ -143,8 +160,11 @@ def build_stats_df_from_db_calls(tableName, server):
     Builds basic (min,max,count) summary stats from existing table in DB
 
     Args:
-        tableName (string): CMAP table name
-        Server (string): Valid CMAP server name
+        tableName (str): CMAP table name
+        Server (str): Valid CMAP server name
+
+    Returns:
+        Pandas DataFrame: stats dataframe
     """
     col_list = ["time"] + cmn.get_numeric_cols_in_table_excluding_climatology(
         tableName, server
@@ -171,6 +191,13 @@ def build_stats_df_from_db_calls(tableName, server):
 
 
 def update_stats_large(tableName, stats_df, server):
+    """Updates tblDataset_Stats entry with new stats
+
+    Args:
+        tableName (str): CMAP table name
+        stats_df (Pandas DataFrame): Input stats dataframe
+        Server (str): Valid CMAP server name
+    """
     Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, server)
     json_str = stats_df.to_json(date_format="iso")
     sql_df = pd.DataFrame({"Dataset_ID": [Dataset_ID], "JSON": [json_str]})

@@ -35,21 +35,25 @@ import cruise
 
 
 def getBranch_Path(args):
+    """Wrapper function that returns branchpath given branch input. ex. float, cruise etc."""
     branch_path = cmn.vault_struct_retrieval(args.branch)
     return branch_path
 
 
 def splitExcel(staging_filename, data_missing_flag):
+    """Wrapper function for transfer.single_file_split."""
     transfer.single_file_split(staging_filename, data_missing_flag)
 
 
 def splitCruiseExcel(staging_filename, cruise_name):
+    """Wrapper function for transfer.cruise_file_split"""
     transfer.cruise_file_split(staging_filename, cruise_name)
 
 
 def staging_to_vault(
     staging_filename, branch, tableName, remove_file_flag, skip_data_flag, process_level
 ):
+    """Wrapper function for transfer.staging_to_vault"""
     transfer.staging_to_vault(
         staging_filename,
         branch,
@@ -61,10 +65,12 @@ def staging_to_vault(
 
 
 def cruise_staging_to_vault(cruise_name, remove_file_flag):
+    """Wrapper function for transfer.cruise_staging_to_vault"""
     transfer.cruise_staging_to_vault(cruise_name, remove_file_flag)
 
 
 def import_cruise_data_dict(cruise_name):
+    """Imports cruise metadata and trajectory dataframes into pandas and returns a data dict of both dataframes"""
     cruise_path = vs.r2r_cruise + cruise_name
     print(cruise_name)
     print(cruise_path)
@@ -87,6 +93,16 @@ def import_cruise_data_dict(cruise_name):
 
 
 def importDataMemory(branch, tableName, process_level):
+    """Given a branch, tablename and process level, imports data, dataset_metadata and vars_metadata into pandas DataFrames, wrapped in a dictionary.
+
+    Args:
+        branch (str): vault branch path, ex float.
+        tableName (str): CMAP table name
+        process_level (str): rep or nrt
+
+    Returns:
+        dictionary: dictionary containing data, dataset_metadata and vars_metadata dataframes.
+    """
     data_file_name = data.fetch_single_datafile(branch, tableName, process_level)
     data_df = data.read_csv(data_file_name)
     dataset_metadata_df, variable_metadata_df = metadata.import_metadata(
@@ -101,13 +117,23 @@ def importDataMemory(branch, tableName, process_level):
 
 
 def SQL_suggestion(data_dict, tableName, branch, server):
+    """Creates suggested SQL table based on data types of input dataframe.
+
+    Args:
+        data_dict (dictionary): Input data dictionary containing all three sheets.
+        tableName (str): CMAP table name
+        branch (str): vault branch path, ex float.
+        server (str): Valid CMAP server
+    """
     if branch != "model" or branch != "satellite":
         make = "observation"
     else:
         make = branch
     cdt = SQL.build_SQL_suggestion_df(data_dict["data_df"])
-    sql_tbl = SQL.SQL_tbl_suggestion_formatter(cdt, tableName)
-    sql_index = SQL.SQL_index_suggestion_formatter(data_dict["data_df"], tableName)
+    sql_tbl = SQL.SQL_tbl_suggestion_formatter(cdt, tableName, server)
+    sql_index = SQL.SQL_index_suggestion_formatter(
+        data_dict["data_df"], tableName, server
+    )
     sql_combined_str = sql_tbl["sql_tbl"] + sql_index["sql_index"]
     print(sql_combined_str)
     contYN = input("Do you want to build this table in SQL? " + " ?  [yes/no]: ")
@@ -121,11 +147,21 @@ def SQL_suggestion(data_dict, tableName, branch, server):
 
 
 def add_ST_cols_cruise(metadata_df, traj_df):
+    """Wrapper function for cruiseadd_ST_cols_to_metadata_df"""
     metadata_df = cruise.add_ST_cols_to_metadata_df(metadata_df, traj_df)
     return metadata_df
 
 
 def insertCruise(metadata_df, trajectory_df, cruise_name, server):
+    """Inserts metadata_df, trajectory_df into server as well as ocean region classifcation into tblCruise_Regions. If you want to add more to the template such as keywords etc, they could be included here.
+
+
+    Args:
+        metadata_df (Pandas DataFrame): cruise metadata dataframe
+        trajectory_df (Pandas DataFrame): cruise trajectory dataframe
+        cruise_name (str): Valid CMAP cruise name (UNOLS ex. KM1906)
+        Server (str): Valid CMAP server name
+    """
     metadata_df = cmn.nanToNA(metadata_df)
 
     DB.lineInsert(
@@ -142,12 +178,22 @@ def insertCruise(metadata_df, trajectory_df, cruise_name, server):
 
 
 def insertData(data_dict, tableName, server):
+    "Wrapper function for data.data_df_to_db"
     data.data_df_to_db(data_dict["data_df"], tableName, server)
 
 
 def insertMetadata_no_data(
     data_dict, tableName, DOI_link_append, server, process_level
 ):
+    """Main argparse wrapper function for inserting metadata for large datasets that do not have a single data sheet (ex. ARGO, sat etc.)
+
+    Args:
+        data_dict (dictionary): data dictionary containing data and metadata dataframes
+        tableName (str): CMAP table name
+        DOI_link_append (str): DOI link to append to tblDataset_References
+        server (str): Valid CMAP server
+        process_level (str): rep or nrt
+    """
     metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server)
     metadata.tblDataset_References_Insert(
         data_dict["dataset_metadata_df"], server, DOI_link_append
@@ -181,6 +227,15 @@ def insertMetadata_no_data(
 
 
 def insertMetadata(data_dict, tableName, DOI_link_append, server, process_level):
+    """Wrapper function for metadata ingestion. Used for datasets that can fit in memory and can pass through the validator.
+
+    Args:
+        data_dict (dictionary): Input data dictionary containing all three sheets.
+        tableName (str): CMAP table name
+        DOI_link_append (str): DOI link to append to tblDataset_References
+        server (str): Valid CMAP server
+        process_level (str): rep or nrt
+    """
     metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server)
     metadata.tblDataset_References_Insert(
         data_dict["dataset_metadata_df"], server, DOI_link_append
@@ -191,7 +246,7 @@ def insertMetadata(data_dict, tableName, DOI_link_append, server, process_level)
         data_dict["variable_metadata_df"],
         tableName,
         server,
-        process_level="REP",
+        process_level,
         CRS="CRS",
     )
     metadata.tblKeywords_Insert(
@@ -212,24 +267,29 @@ def insertMetadata(data_dict, tableName, DOI_link_append, server, process_level)
 
 
 def insert_small_stats(data_dict, tableName, server):
+    """Wrapper function for stats.updateStats_Small"""
     stats.updateStats_Small(tableName, server, data_dict["data_df"])
 
 
 def insert_large_stats(tableName, server):
+    """Wrapper function for stats.build_stats_df_from_db_calls and stats.update_stats_large"""
     stats_df = stats.build_stats_df_from_db_calls(tableName, server)
     stats.update_stats_large(tableName, stats_df, server)
 
 
 def createIcon(data_dict, tableName):
+    """Wrapper function for mapping.folium_map"""
     mapping.folium_map(data_dict["data_df"], tableName)
 
 
 def push_icon():
+    """Pushes newly creation mission icon gto github"""
     os.chdir(vs.mission_icons)
     os.system('git add . && git commit -m "add mission icons to git repo" && git push')
 
 
 def cruise_ingestion(args):
+    """Main wrapper function for inserting cruise metadata and trajectory"""
     splitCruiseExcel(args.staging_filename, args.cruise_name)
     cruise_staging_to_vault(args.cruise_name, remove_file_flag=False)
     data_dict = import_cruise_data_dict(args.cruise_name)
@@ -246,6 +306,8 @@ def cruise_ingestion(args):
 
 
 def full_ingestion(args):
+    """Main argparse function for small dataset ingestion. Used for datasets that can fit in memory and can pass through the validator."""
+
     print("Full Ingestion")
     splitExcel(args.staging_filename, data_missing_flag=False)
     staging_to_vault(
@@ -271,13 +333,7 @@ def full_ingestion(args):
 
 
 def dataless_ingestion(args):
-    """This wrapper function adds metadata into the database for large datasets that already exist in the database. ex. satellite, model, argo etc.
-
-
-    Args:
-        args (): Arguments from input argparse
-
-    """
+    """This wrapper function adds metadata into the database for large datasets that already exist in the database. ex. satellite, model, argo etc."""
     splitExcel(args.staging_filename, data_missing_flag=True)
     staging_to_vault(
         args.staging_filename,
@@ -297,6 +353,7 @@ def dataless_ingestion(args):
 
 
 def main():
+    """Main function that parses arguments and determines which data ingestion path depending on args"""
     parser = argparse.ArgumentParser(description="Ingestion datasets into CMAP")
 
     parser.add_argument(
@@ -327,7 +384,7 @@ def main():
     parser.add_argument("-N", "--Dataless_Ingestion", nargs="?", const=True)
     parser.add_argument("-C", "--cruise_name", help="UNOLS Name", nargs="?")
     parser.add_argument(
-        "-S", "--Server", help="Server choice: Rainier, Mariana, Beast", nargs="?"
+        "-S", "--Server", help="Server choice: Rainier, Mariana", nargs="?"
     )
 
     args = parser.parse_args()

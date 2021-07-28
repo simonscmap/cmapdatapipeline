@@ -118,7 +118,6 @@
 <li class="toctree-l1"><a class="reference internal" href="API_data.html">API Ref data.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_DB.html">API Ref DB.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_general.html">API Ref general.py</a></li>
-<li class="toctree-l1"><a class="reference internal" href="API_ingest_test.html">API Ref ingest_test.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_mapping.html">API Ref mapping.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_metadata.html">API Ref metadata.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_region_classifcation.html">API/API_region_classification.py</a></li>
@@ -199,6 +198,18 @@
 Date: 07-23-2021</p>
 <p>cmapdata - transfer - dataset template moveing and splitting.</p>
 <dl class="py function">
+<dt id="ingest.transfer.Zenodo_DOI_Formatter">
+<code class="sig-prename descclassname">ingest.transfer.</code><code class="sig-name descname">Zenodo_DOI_Formatter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">DOI</span></em>, <em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.transfer.Zenodo_DOI_Formatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formats DOI into zenodod format</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.transfer.clear_directory">
+<code class="sig-prename descclassname">ingest.transfer.</code><code class="sig-name descname">clear_directory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">directory</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.transfer.clear_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes any files in directory</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="ingest.transfer.cruise_file_split">
 <code class="sig-prename descclassname">ingest.transfer.</code><code class="sig-name descname">cruise_file_split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">cruise_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.transfer.cruise_file_split" title="Permalink to this definition">¶</a></dt>
 <dd><p>Splits combined cruise template file into cruise metadata and cruise trajectory</p>
@@ -239,6 +250,12 @@ Flag option for removing input file from staging</p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.transfer.requests_Download">
+<code class="sig-prename descclassname">ingest.transfer.</code><code class="sig-name descname">requests_Download</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">download_str</span></em>, <em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.transfer.requests_Download" title="Permalink to this definition">¶</a></dt>
+<dd><p>downloads url with requests module</p>
 </dd></dl>
 
 <dl class="py function">

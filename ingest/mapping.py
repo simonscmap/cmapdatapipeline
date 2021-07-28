@@ -11,17 +11,11 @@ from selenium import webdriver
 import numpy as np
 
 import folium
-from folium.plugins import (
-    HeatMap,
-    MarkerCluster,
-    FastMarkerCluster,
-    Fullscreen,
-    MousePosition,
-)
+from folium.plugins import HeatMap, MarkerCluster
+
+
 import time
 import os
-from PIL import Image
-from PIL import ImageOps
 
 import DB
 import common as cmn
@@ -29,7 +23,7 @@ import vault_structure as vs
 
 
 def addLayers(m):
-    """Adds webtiles to folium map"""
+    """Adds webtiles to created folium map. Uses World_Imagery ESRI tile data."""
     tiles = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
     folium.TileLayer(tiles=tiles, attr=(" ")).add_to(m)
     return m
@@ -77,8 +71,8 @@ def html_to_static(m, tableName):
 
 
 def folium_map(df, tableName):
-    print("Creating Icon and Map..")
     """Creates folium map object from input DataFrame"""
+    print("Creating Icon and Map..")
     if len(df) > 5000:
         df = df.sample(5000)
     df.reset_index(drop=True, inplace=True)

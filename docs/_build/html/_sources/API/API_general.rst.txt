@@ -2,5 +2,5 @@ API Ref general.py
 ==================
 
 
-.. automodule:: general.DB
+.. automodule:: ingest.general
     :members:

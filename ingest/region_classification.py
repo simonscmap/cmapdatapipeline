@@ -6,40 +6,16 @@ cmapdata - region_classification - region classification functionallity.
 """
 
 
-import sys
 import os
 import glob
 import pandas as pd
 import geopandas as gpd
 from geopandas.tools import sjoin
-from tqdm import tqdm
 
 import credentials as cr
-
-
-import pycmap
-
-pycmap.API(cr.api_key)
-
-
 import vault_structure as vs
-import transfer
-import data
 import DB
-import metadata
-import SQL
-import mapping
-import stats
 import common as cmn
-import cruise
-
-"""
-###############################################
-###############################################
-     Ocean Region Classification Functions
-###############################################
-###############################################
-"""
 
 
 def if_exists_dataset_region(dataset_name, server):
@@ -131,6 +107,13 @@ def ocean_region_classification(data_df):
 
 
 def insert_into_tblDataset_Regions(region_set, dataset_name, server):
+    """Inserts region set into tblDataset_Regions
+
+    Args:
+        region_set (set): set of region_ID's from tblRegions
+        dataset_name (str): valid dataset name in CMAP
+        server (str): Valid CMAP server name. ex Rainier
+    """
     dataset_ID = cmn.getDatasetID_DS_Name(dataset_name)
     region_ID_list = cmn.get_region_IDS(region_set)
     for region_ID in region_ID_list:
@@ -144,6 +127,12 @@ def insert_into_tblDataset_Regions(region_set, dataset_name, server):
 
 
 def insert_into_tblCruise_Regions(region_set, server):
+    """Inserts region set into tblCruise_Regions
+
+    Args:
+        region_set (set): set of region_ID's from tblRegions
+        server (str): Valid CMAP server name. ex Rainier
+    """
     region_ID_list = cmn.get_region_IDS(region_set)
     for region_ID in region_ID_list:
         query = (cruise_ID, region_ID)

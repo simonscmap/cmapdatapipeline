@@ -7,7 +7,6 @@ cmapdata - transfer - dataset template moveing and splitting.
 
 
 import os
-import sys
 import glob
 import shutil
 import pandas as pd
@@ -15,17 +14,18 @@ import requests
 from tqdm import tqdm
 import dropbox
 import credentials as cr
-
 import vault_structure as vs
 
 
 def requests_Download(download_str, filename, path):
+    """downloads url with requests module"""
     r = requests.get(download_str, stream=True)
     with open(path + filename, "wb") as f:
         f.write(r.content)
 
 
 def clear_directory(directory):
+    """Removes any files in directory"""
     try:
         flist = glob.glob(directory + "*")
         [os.remove(fil) for fil in flist]
@@ -34,6 +34,7 @@ def clear_directory(directory):
 
 
 def Zenodo_DOI_Formatter(DOI, filename):
+    """Formats DOI into zenodod format"""
     doi_record = DOI.split("zenodo.")[1]
     doi_download_str = (
         "https://zenodo.org/record/{doi_record}}/files/{filename}}?download=1".format(

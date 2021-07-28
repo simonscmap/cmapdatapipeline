@@ -7,28 +7,19 @@ cmapdata - metadata - cmap metadata formatting for table insertion.
 
 
 import sys
-
 import credentials as cr
-
-
 import glob
 import geopandas
 from geopandas.tools import sjoin
-
-import markdown
 import pandas as pd
-import pycmap
 import numpy as np
 
 
 import common as cmn
 import cruise
 import data
-
 import DB
 import vault_structure as vs
-
-api = pycmap.API(token=cr.api_key)
 
 
 def ID_Var_Map(series_to_map, res_col, tableName, server):

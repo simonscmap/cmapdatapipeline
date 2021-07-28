@@ -41,7 +41,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="API Ref metadata.py" href="API_metadata.html" />
-    <link rel="prev" title="API Ref ingest_test.py" href="API_ingest_test.html" /> 
+    <link rel="prev" title="API Ref general.py" href="API_general.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -118,7 +118,6 @@
 <li class="toctree-l1"><a class="reference internal" href="API_data.html">API Ref data.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_DB.html">API Ref DB.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_general.html">API Ref general.py</a></li>
-<li class="toctree-l1"><a class="reference internal" href="API_ingest_test.html">API Ref ingest_test.py</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Ref mapping.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_metadata.html">API Ref metadata.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API_region_classifcation.html">API/API_region_classification.py</a></li>
@@ -201,13 +200,19 @@ Date: 07-23-2021</p>
 <dl class="py function">
 <dt id="ingest.mapping.addLayers">
 <code class="sig-prename descclassname">ingest.mapping.</code><code class="sig-name descname">addLayers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">m</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.mapping.addLayers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds webtiles to folium map</p>
+<dd><p>Adds webtiles to created folium map. Uses World_Imagery ESRI tile data.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="ingest.mapping.addMarkers">
 <code class="sig-prename descclassname">ingest.mapping.</code><code class="sig-name descname">addMarkers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">m</span></em>, <em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.mapping.addMarkers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds CircleMarker points to folium map</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.mapping.folium_map">
+<code class="sig-prename descclassname">ingest.mapping.</code><code class="sig-name descname">folium_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">tableName</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.mapping.folium_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates folium map object from input DataFrame</p>
 </dd></dl>
 
 <dl class="py function">
