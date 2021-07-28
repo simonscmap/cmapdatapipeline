@@ -2,5 +2,8 @@ API Ref general.py
 ==================
 
 
-.. automodule:: ingest.general
-    :members:
+.. argparse::
+    :module: ingest.general
+    :func: main()
+    :prog: general
+
