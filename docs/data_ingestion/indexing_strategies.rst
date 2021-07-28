@@ -1,5 +1,5 @@
-Indexing Strategies 
-===================
+Table Creation and Indexing
+===========================
 
 
 
