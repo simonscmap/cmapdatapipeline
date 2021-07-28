@@ -25,13 +25,19 @@ pycmap.API(cr.api_key)
 
 
 def DB_query(query):
+    """runs a SQL query using the pycmap query functionality"""
     api = pycmap.API()
     query_result = api.query(query)
     return query_result
 
 
 def DB_modify(cmnd, server):
+    """SQL modification function, use with caution!
 
+    Args:
+        cmnd (str): SQL query. ex. UPDATE tblRegions SET Region = 'North Pole' WHERE ID = '54NTA'
+        server (str): Valid CMAP server name. ex Rainier
+    """
     try:
         conn, cursor = dbConnect(server)
         conn.autocommit = True
@@ -43,6 +49,7 @@ def DB_modify(cmnd, server):
 
 
 def dbRead(query, server):
+    """runs a SQL query using the pyodbc query functionality"""
     conn, cursor = dbConnect(server)
     df = sql.read_sql(query, conn)
     conn.close()
@@ -50,6 +57,14 @@ def dbRead(query, server):
 
 
 def server_select_credentials(server):
+    """Select and returns server credentials based on input server name. Add more servers if needed.
+
+    Args:
+        server (str): Valid CMAP server name. ex Rainier
+
+    Returns:
+        str(s): usr,psw,ip,port,db_name,TDS_Version
+    """
     db_name = "opedia"
     TDS_Version = "7.3"
     if server.lower() == "rainier":
@@ -80,6 +95,14 @@ def server_select_credentials(server):
 
 
 def pyodbc_connection_string(server):
+    """Returns pyodbc connection string
+
+    Args:
+        server (str): Valid CMAP server name. ex Rainier
+
+    Returns:
+        str: connection string
+    """
     usr, psw, ip, port, db_name, TDS_Version = server_select_credentials(server)
     server = ip + "," + port
 
@@ -103,6 +126,14 @@ def pyodbc_connection_string(server):
 
 
 def dbConnect(server):
+    """Creates connection with pyodbc
+
+    Args:
+        server (str): Valid CMAP server name. ex Rainier
+
+    Returns:
+        conn, cursor: Returns connection and cursor object for pyodbc connection
+    """
     conn_str = pyodbc_connection_string(server)
     conn = pyodbc.connect(conn_str)
     cursor = conn.cursor()
@@ -111,6 +142,15 @@ def dbConnect(server):
 
 
 def lineInsert(server, tableName, columnList, query, ID_insert=False):
+    """Single line insert functionallity
+
+    Args:
+        server (str): Valid CMAP server name. ex Rainier
+        tableName (str): Valid CMAP table name
+        columnList (list): list of columns in table
+        query (str): sql query values
+        ID_insert (bool, optional): Identity_insert. Defaults to False.
+    """
     insertQuery = """INSERT INTO {} {} VALUES {} """.format(
         tableName, columnList, query
     )
@@ -126,11 +166,19 @@ def lineInsert(server, tableName, columnList, query, ID_insert=False):
 
 
 def urllib_pyodbc_format(conn_str):
+    """formats pyodbc connection string with urllib"""
     quoted_conn_str = urllib.parse.quote_plus(conn_str)
     return quoted_conn_str
 
 
 def toSQLpandas(df, tableName, server):
+    """SQL ingestion option, uses padnas to_sql functionallity.
+
+    Args:
+        df (Pandas DataFrame): Input Pandas DataFrame
+        tableName (str): Valid CMAP table name
+        server (str): Valid CMAP server. ex. Rainier
+    """
     conn_str = pyodbc_connection_string(server)
     quoted_conn_str = urllib_pyodbc_format(conn_str)
     # engine = sqlalchemy.create_engine(
@@ -143,19 +191,14 @@ def toSQLpandas(df, tableName, server):
 
 
 def toSQLbcpandas(df, tableName, server):
+    """SQL ingestion option, exploritory, uses bcpandas"""
     usr, psw, ip, port, db_name, TDS_Version = server_select_credentials(server)
     creds = bcpandas.SqlCreds(ip, db_name, usr, psw)
     bcpandas.to_sql(df, tableName, creds, index=False, if_exists="append")
 
 
-def retrive_from_SOT(tableName, server="Rainier"):
-    qry = f"""SELECT * FROM {tableName}"""
-    df = dbRead(qry, server=server)
-    df[list(df)] = df[list(df)].astype(str)
-    return df
-
-
 def toSQLbcp_wrapper(df, tableName, server):
+    """wrapper func for toSQLbcp function. Simplifies arguments"""
     export_path = "temp_bcp.csv"
     df.to_csv(export_path, index=False)
     toSQLbcp(export_path, tableName, server)
@@ -163,6 +206,7 @@ def toSQLbcp_wrapper(df, tableName, server):
 
 
 def toSQLbcp(export_path, tableName, server):
+    """SQL ingestion option, uses bcp (BULK COPY PROGRAM) from MSSQL tools. See: https://docs.microsoft.com/en-us/sql/tools/bcp-utility?view=sql-server-ver15"""
 
     usr, psw, ip, port, db_name, TDS_Version = server_select_credentials(server)
     bcp_str = (

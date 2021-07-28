@@ -327,11 +327,7 @@ def main():
     parser.add_argument("-N", "--Dataless_Ingestion", nargs="?", const=True)
     parser.add_argument("-C", "--cruise_name", help="UNOLS Name", nargs="?")
     parser.add_argument(
-        "-S",
-        "--Server",
-        help="Server choice: Rainier, Mariana, Beast",
-        nargs="?",
-        default="Rainier",
+        "-S", "--Server", help="Server choice: Rainier, Mariana, Beast", nargs="?"
     )
 
     args = parser.parse_args()

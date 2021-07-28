@@ -19,9 +19,6 @@ import common as cmn
 import metadata
 
 
-""" Data Cleaning"""
-
-
 def removeMissings(df, cols):
     """Removes missing rows for all columns provided
 
@@ -39,7 +36,6 @@ def removeMissings(df, cols):
     """
     for col in cols:
         df[col].replace(r"^\s*$", np.nan, regex=True, inplace=True)
-        # df[col].replace("", np.nan, inplace=True)
         df.dropna(subset=[col], inplace=True)
     return df
 
@@ -130,6 +126,14 @@ def clean_data_df(df):
 
 
 def ensureST_numeric(df):
+    """Ensures non time, ST cols are numeric
+
+    Args:
+        df (Pandas DataFrame): Input dataframe with ST cols
+
+    Returns:
+        Pandas DataFrame: Pandas DataFrame with numeric ST cols.
+    """
     ST_cols = ST_columns(df)
     ST_cols.remove("time")
     for col in ST_cols:
@@ -170,10 +174,10 @@ def add_day_week_month_year_clim(df):
 ##############   Data Import    ############
 
 
-def read_csv(path_and_filename, delim=","):
+def read_csv(path_and_filename):
     """Imports csv into pandas DataFrame"""
     df = pd.read_csv(
-        path_and_filename, sep=delim, skipinitialspace=True, parse_dates=["time"]
+        path_and_filename, sep=",", skipinitialspace=True, parse_dates=["time"]
     )
     return df
 
@@ -181,7 +185,6 @@ def read_csv(path_and_filename, delim=","):
 def fetch_single_datafile(branch, tableName, process_level="REP", file_ext=".csv"):
     """Finds first file in glob with input path to vault structure. Returns path_filename"""
     vault_path = cmn.vault_struct_retrieval(branch)
-    print(vault_path + tableName + "/" + process_level.lower() + "/" + "*" + file_ext)
     flist = glob.glob(
         vault_path + tableName + "/" + process_level.lower() + "/" + "*" + file_ext
     )[0]
@@ -189,7 +192,17 @@ def fetch_single_datafile(branch, tableName, process_level="REP", file_ext=".csv
 
 
 def importDataMemory(branch, tableName, process_level, import_data=True):
+    """Imports csv from vault into pandas DataFrame
 
+    Args:
+        branch (str): vault_structure branch. ex. cruise, float, model
+        tableName (str): tableName of data import
+        process_level (str): rep or nrt, determines which leaf level to search
+        import_data (bool, optional): Bool flag for if data should be imported or only metadata. Defaults to True.
+
+    Returns:
+        dictionary: dictionary containing Pandas Dataframes for data, dataset_meta_data and vars_meta_data
+    """
     dataset_metadata_df, variable_metadata_df = metadata.import_metadata(
         branch, tableName
     )
@@ -215,7 +228,14 @@ def importDataMemory(branch, tableName, process_level, import_data=True):
 
 
 def data_df_to_db(df, tableName, server, clean_data_df_flag=True):
-    """Inserts dataframe into SQL tbl"""
+    """Inserts pandas DataFrame into database using DB.toSQLbcp function.
+
+    Args:
+        df (Pandas DataFrame): Input Pandas DataFrame
+        tableName (str): Valid CMAP table name
+        server (str): Valid CMAP server. ex. Rainier
+        clean_data_df_flag (bool, optional): Flag to determine if data should be cleaned with the clean_data_df func. Defaults to True.
+    """
     if clean_data_df_flag == True:
         clean_data_df(df)
     temp_file_path = tableName + ".csv"

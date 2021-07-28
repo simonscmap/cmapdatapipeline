@@ -1,6 +1,10 @@
 *credentials.py
 *.pyc
+*.log
 *.zip
 *.vscode/
 *.pickle
+ingest/error
+ingest/geckodriver.log
+*geckodriver.log*
 *__pycache__

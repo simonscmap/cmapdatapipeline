@@ -193,6 +193,8 @@ def get_name_pkey(tableName, server):
 
 
 def get_last_ID(tableName, server):
+    """last ID in table"""
+
     pkey_col_name = get_name_pkey(tableName, server)
     last_ID_qry = f"""SELECT TOP 1 * FROM {tableName} ORDER BY {pkey_col_name} DESC"""
     last_ID = DB.dbRead(last_ID_qry, server).iloc[0][0]
