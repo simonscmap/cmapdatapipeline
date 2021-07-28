@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>API Ref common.py &mdash; cmapdata 0.0.1 documentation</title>
+  <title>API Ref &mdash; cmapdata 0.0.1 documentation</title>
   
 
   
@@ -112,7 +112,7 @@
 </ul>
 <p class="caption"><span class="caption-text">API Ref</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API Ref common.py</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Ref</a></li>
 </ul>
 
             
@@ -161,7 +161,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>API Ref common.py</li>
+      <li>API Ref</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -181,7 +181,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-ingest.common">
-<span id="api-ref-common-py"></span><h1>API Ref common.py<a class="headerlink" href="#module-ingest.common" title="Permalink to this headline">¶</a></h1>
+<span id="api-ref"></span><h1>API Ref<a class="headerlink" href="#module-ingest.common" title="Permalink to this headline">¶</a></h1>
 <p>Author: Norland Raphael Hagen &lt;<a class="reference external" href="mailto:norlandrhagen&#37;&#52;&#48;gmail&#46;com">norlandrhagen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;
 Date: 07-23-2021</p>
 <p>cmapdata - common - commonly used, generalized functions.</p>
@@ -372,6 +372,12 @@ Date: 07-23-2021</p>
 <dd class="field-odd"><p>{list}</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.common.get_last_ID">
+<code class="sig-prename descclassname">ingest.common.</code><code class="sig-name descname">get_last_ID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.common.get_last_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>last ID in table</p>
 </dd></dl>
 
 <dl class="py function">
@@ -590,6 +596,887 @@ Date: 07-23-2021</p>
 </dl>
 </dd></dl>
 
+<span class="target" id="module-ingest.cruise"></span><p>Author: Norland Raphael Hagen &lt;<a class="reference external" href="mailto:norlandrhagen&#37;&#52;&#48;gmail&#46;com">norlandrhagen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;
+Date: 07-23-2021</p>
+<p>cmapdata - cruise - cruise metadata and trajectory functionallity.</p>
+<dl class="py function">
+<dt id="ingest.cruise.ST_bounds_from_df">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">ST_bounds_from_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.ST_bounds_from_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve ST bounds from input dataframe with time/lat/lon</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.add_ID_trajectory_df">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">add_ID_trajectory_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trajectory_df</span></em>, <em class="sig-param"><span class="n">cruise_name</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.add_ID_trajectory_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds Cruise_ID column to a trajectory dataframe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectory_df</strong> (<em>Pandas DataFrame</em>) – Input dataframe containing time/lat/lon cols.</p></li>
+<li><p><strong>cruise_name</strong> (<em>str</em>) – Valid CMAP cruise name (UNOLS ex. KM1906)</p></li>
+<li><p><strong>server</strong> (<em>str</em>) – [description]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Trajectory df with Cruise_ID column added</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.add_ST_cols_to_metadata_df">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">add_ST_cols_to_metadata_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">metadata_df</span></em>, <em class="sig-param"><span class="n">trajectory_df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.add_ST_cols_to_metadata_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds Space-Time columns to metadata df from trajectory df</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata_df</strong> (<em>Pandas DataFrame</em>) – cruise specific metadata df for tblCruise</p></li>
+<li><p><strong>trajectory_df</strong> (<em>Pandas DataFrame</em>) – cruise specific trajectory df for tblCruise_Trajectory</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>cruise specific metadata df for tblCruise with ST columns added.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.build_cruise_metadata_from_user_input">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">build_cruise_metadata_from_user_input</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.build_cruise_metadata_from_user_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempts to build cruise_metadata dataframe from input trajectory metadata + user input. Recomended to ingest via cruise template instead.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>Pandas DataFrame</em>) – Input dataset dataframe with time/lat/lon.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas dataframe for tblCruise ingestion.
+string: cruise_name</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Pandas Dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.clean_cruise_traj">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">clean_cruise_traj</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cruise_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.clean_cruise_traj" title="Permalink to this definition">¶</a></dt>
+<dd><p>cleans cruise trajectory from r2r</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.download_all_cruises">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">download_all_cruises</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.download_all_cruises" title="Permalink to this definition">¶</a></dt>
+<dd><p>webscraping</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.download_cruise_data_from_url">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">download_cruise_data_from_url</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cruise_name</span></em>, <em class="sig-param"><span class="n">download_url_str</span></em>, <em class="sig-param"><span class="n">dataset_category</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.download_cruise_data_from_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>webscraping helper function for downloading from url</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.download_hot_cruises">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">download_hot_cruises</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.download_hot_cruises" title="Permalink to this definition">¶</a></dt>
+<dd><p>webscraping</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.fill_ST_bounds_metadata">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">fill_ST_bounds_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cruise_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.fill_ST_bounds_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>ST filler func for webscraping - old</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.fill_ST_meta">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">fill_ST_meta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cruise_meta_df</span></em>, <em class="sig-param"><span class="n">cruise_traj_df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.fill_ST_meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>webscraping</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.format_cruise_metadata">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">format_cruise_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cruise_name</span></em>, <em class="sig-param"><span class="n">cruise_nickname</span></em>, <em class="sig-param"><span class="n">cruise_shipname</span></em>, <em class="sig-param"><span class="n">chief_sci</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.format_cruise_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>webscraping formatting</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.gather_cruise_links">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">gather_cruise_links</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.gather_cruise_links" title="Permalink to this definition">¶</a></dt>
+<dd><p>webscraping</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.get_chief_sci">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">get_chief_sci</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cmdf</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.get_chief_sci" title="Permalink to this definition">¶</a></dt>
+<dd><p>webscraping chief sci</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.get_cruise_data">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">get_cruise_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cmdf</span></em>, <em class="sig-param"><span class="n">cruise_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.get_cruise_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>old webscraping script</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.get_cruise_metadata">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">get_cruise_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cmdf</span></em>, <em class="sig-param"><span class="n">cruise_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.get_cruise_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>webscraping r2r metadata</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.get_cruise_traj">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">get_cruise_traj</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cmdf</span></em>, <em class="sig-param"><span class="n">cruise_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.get_cruise_traj" title="Permalink to this definition">¶</a></dt>
+<dd><p>old webscraping trajectory downloading from r2r</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.parse_cruise_metadata">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">parse_cruise_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cruise_name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">cruise_url</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.parse_cruise_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>webscraping</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.parse_r2r_page">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">parse_r2r_page</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.parse_r2r_page" title="Permalink to this definition">¶</a></dt>
+<dd><p>webscraping</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.resample_trajectory">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">resample_trajectory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">interval</span><span class="o">=</span><span class="default_value">'1min'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.resample_trajectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resamples a cruise trajectory dataframe based on given interval. Default is one minute. Use cases are downsampling super high temporal resolution. ex. GPS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Pandas DataFrame</em>) – Input dataset dataframe with time/lat/lon.</p></li>
+<li><p><strong>interval</strong> (<em>str</em><em>, </em><em>optional</em>) – valid pandas resample() interval. Defaults to “1min”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Resampled Pandas DataFrame</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.return_cruise_trajectory_from_df">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">return_cruise_trajectory_from_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">Cruise_ID</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.return_cruise_trajectory_from_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Pandas DataFrame of time/lat/lon from input dataframe and cruise_ID</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.trim_returned_link">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">trim_returned_link</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">link_str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.trim_returned_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>webscraping helper func for triming strings</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.update_tblCruises">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">update_tblCruises</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.update_tblCruises" title="Permalink to this definition">¶</a></dt>
+<dd><p>old webscraping updating func</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.cruise.vault_cruises">
+<code class="sig-prename descclassname">ingest.cruise.</code><code class="sig-name descname">vault_cruises</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ingest.cruise.vault_cruises" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns cruise dirs from r2r_cruise dir in vault_structure</p>
+</dd></dl>
+
+<span class="target" id="module-ingest.data"></span><p>Author: Norland Raphael Hagen &lt;<a class="reference external" href="mailto:norlandrhagen&#37;&#52;&#48;gmail&#46;com">norlandrhagen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;
+Date: 07-23-2021</p>
+<p>cmapdata - data - data cleaning and reformatting functions.</p>
+<dl class="py function">
+<dt id="ingest.data.ST_columns">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">ST_columns</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.ST_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns SpaceTime related columns in a dataset as a list</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.add_day_week_month_year_clim">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">add_day_week_month_year_clim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.add_day_week_month_year_clim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes input pandas DataFrame and adds year, month, week, dayofyear columns to end.
+IMPORTANT, time column must be in dataframe and be named [time]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>Pandas DataFrame</em>) – Input Pandas DataFrame containing ‘time’ column.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output Pandas DataFrame with appended climatology columns</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>df Pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.check_ST_ordering">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">check_ST_ordering</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ST_vars</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.check_ST_ordering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensures that ST column list is in correct order. ie [‘time’,’lat’,’lon’] not [‘time’,’lon’,’lat]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ST_vars</strong> (<em>[</em><em>type</em><em>]</em>) – [description]</p>
+</dd>
+</dl>
+<p>Returns: ST_vars (sorted)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.clean_data_df">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">clean_data_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.clean_data_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combines multiple data functions to apply a clean to a pandas df</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.data_df_to_db">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">data_df_to_db</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em>, <em class="sig-param"><span class="n">clean_data_df_flag</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.data_df_to_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts pandas DataFrame into database using DB.toSQLbcp function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Pandas DataFrame</em>) – Input Pandas DataFrame</p></li>
+<li><p><strong>tableName</strong> (<em>str</em>) – Valid CMAP table name</p></li>
+<li><p><strong>server</strong> (<em>str</em>) – Valid CMAP server. ex. Rainier</p></li>
+<li><p><strong>clean_data_df_flag</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to determine if data should be cleaned with the clean_data_df func. Defaults to True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.decode_df_columns">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">decode_df_columns</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.decode_df_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decodes any bytestring columns in pandas</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>Pandas DataFrame</em>) – Input DataFrame</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas DataFrame</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>df</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.ensureST_numeric">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">ensureST_numeric</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.ensureST_numeric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensures non time, ST cols are numeric</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>Pandas DataFrame</em>) – Input dataframe with ST cols</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas DataFrame with numeric ST cols.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Pandas DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.fetch_single_datafile">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">fetch_single_datafile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">branch</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">process_level</span><span class="o">=</span><span class="default_value">'REP'</span></em>, <em class="sig-param"><span class="n">file_ext</span><span class="o">=</span><span class="default_value">'.csv'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.fetch_single_datafile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds first file in glob with input path to vault structure. Returns path_filename</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.format_time_col">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">format_time_col</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">time_col</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'%Y-%m-%d %H:%M:%S'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.format_time_col" title="Permalink to this definition">¶</a></dt>
+<dd><p>Formats dataframe timecolumn</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Pandas DataFrame</em>) – The dataframe to be modified</p></li>
+<li><p><strong>time_col</strong> (<em>str</em>) – Name of the time column. ex: ‘time’</p></li>
+<li><p><strong>format</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default = %Y-%m-%d %H:%M:%S</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas DataFrame with time col formatted</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>df</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.importDataMemory">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">importDataMemory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">branch</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">process_level</span></em>, <em class="sig-param"><span class="n">import_data</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.importDataMemory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports csv from vault into pandas DataFrame</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>branch</strong> (<em>str</em>) – vault_structure branch. ex. cruise, float, model</p></li>
+<li><p><strong>tableName</strong> (<em>str</em>) – tableName of data import</p></li>
+<li><p><strong>process_level</strong> (<em>str</em>) – rep or nrt, determines which leaf level to search</p></li>
+<li><p><strong>import_data</strong> (<em>bool</em><em>, </em><em>optional</em>) – Bool flag for if data should be imported or only metadata. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary containing Pandas Dataframes for data, dataset_meta_data and vars_meta_data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.netcdf4_to_pandas">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">netcdf4_to_pandas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">netcdf_file</span></em>, <em class="sig-param"><span class="n">data_var</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.netcdf4_to_pandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports a netcdf file into a pandas dataframe</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.netcdf4_to_vaexdf">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">netcdf4_to_vaexdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">netcdf_file</span></em>, <em class="sig-param"><span class="n">data_var</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.netcdf4_to_vaexdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports a netcdf file into a vaex dataframe using pandas</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.read_csv">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">read_csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path_and_filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.read_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports csv into pandas DataFrame</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.removeMissings">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">removeMissings</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">cols</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.removeMissings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes missing rows for all columns provided</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Pandas DataFrame</em>) – The dataframe to be modified</p></li>
+<li><p><strong>cols</strong> (<em>list</em>) – List of column names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas DataFrame with missing rows removed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>df</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.data.sort_values">
+<code class="sig-prename descclassname">ingest.data.</code><code class="sig-name descname">sort_values</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">cols</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.data.sort_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sorts dataframe cols</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Pandas DataFrame</em>) – The dataframe to be modified</p></li>
+<li><p><strong>cols</strong> (<em>list</em>) – List of column name strings</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pandas DataFrame with input cols sorts in ASC order.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>df</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-ingest.DB"></span><p>Author: Norland Raphael Hagen &lt;<a class="reference external" href="mailto:norlandrhagen&#37;&#52;&#48;gmail&#46;com">norlandrhagen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;
+Date: 07-23-2021</p>
+<p>cmapdata - DB - database connections and CRUD operations.</p>
+<dl class="py function">
+<dt id="ingest.DB.DB_modify">
+<code class="sig-prename descclassname">ingest.DB.</code><code class="sig-name descname">DB_modify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cmnd</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.DB.DB_modify" title="Permalink to this definition">¶</a></dt>
+<dd><p>SQL modification function, use with caution!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cmnd</strong> (<em>str</em>) – SQL query. ex. UPDATE tblRegions SET Region = ‘North Pole’ WHERE ID = ‘54NTA’</p></li>
+<li><p><strong>server</strong> (<em>str</em>) – Valid CMAP server name. ex Rainier</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.DB.DB_query">
+<code class="sig-prename descclassname">ingest.DB.</code><code class="sig-name descname">DB_query</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.DB.DB_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>runs a SQL query using the pycmap query functionality</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.DB.dbConnect">
+<code class="sig-prename descclassname">ingest.DB.</code><code class="sig-name descname">dbConnect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.DB.dbConnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates connection with pyodbc</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>server</strong> (<em>str</em>) – Valid CMAP server name. ex Rainier</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns connection and cursor object for pyodbc connection</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>conn, cursor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.DB.dbRead">
+<code class="sig-prename descclassname">ingest.DB.</code><code class="sig-name descname">dbRead</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.DB.dbRead" title="Permalink to this definition">¶</a></dt>
+<dd><p>runs a SQL query using the pyodbc query functionality</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.DB.lineInsert">
+<code class="sig-prename descclassname">ingest.DB.</code><code class="sig-name descname">lineInsert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">columnList</span></em>, <em class="sig-param"><span class="n">query</span></em>, <em class="sig-param"><span class="n">ID_insert</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.DB.lineInsert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single line insert functionallity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>server</strong> (<em>str</em>) – Valid CMAP server name. ex Rainier</p></li>
+<li><p><strong>tableName</strong> (<em>str</em>) – Valid CMAP table name</p></li>
+<li><p><strong>columnList</strong> (<em>list</em>) – list of columns in table</p></li>
+<li><p><strong>query</strong> (<em>str</em>) – sql query values</p></li>
+<li><p><strong>ID_insert</strong> (<em>bool</em><em>, </em><em>optional</em>) – Identity_insert. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.DB.pyodbc_connection_string">
+<code class="sig-prename descclassname">ingest.DB.</code><code class="sig-name descname">pyodbc_connection_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.DB.pyodbc_connection_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns pyodbc connection string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>server</strong> (<em>str</em>) – Valid CMAP server name. ex Rainier</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>connection string</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.DB.server_select_credentials">
+<code class="sig-prename descclassname">ingest.DB.</code><code class="sig-name descname">server_select_credentials</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.DB.server_select_credentials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select and returns server credentials based on input server name. Add more servers if needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>server</strong> (<em>str</em>) – Valid CMAP server name. ex Rainier</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>usr,psw,ip,port,db_name,TDS_Version</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str(s)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.DB.toSQLbcp">
+<code class="sig-prename descclassname">ingest.DB.</code><code class="sig-name descname">toSQLbcp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">export_path</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.DB.toSQLbcp" title="Permalink to this definition">¶</a></dt>
+<dd><p>SQL ingestion option, uses bcp (BULK COPY PROGRAM) from MSSQL tools. See: <a class="reference external" href="https://docs.microsoft.com/en-us/sql/tools/bcp-utility?view=sql-server-ver15">https://docs.microsoft.com/en-us/sql/tools/bcp-utility?view=sql-server-ver15</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.DB.toSQLbcp_wrapper">
+<code class="sig-prename descclassname">ingest.DB.</code><code class="sig-name descname">toSQLbcp_wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.DB.toSQLbcp_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>wrapper func for toSQLbcp function. Simplifies arguments</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.DB.toSQLbcpandas">
+<code class="sig-prename descclassname">ingest.DB.</code><code class="sig-name descname">toSQLbcpandas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.DB.toSQLbcpandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>SQL ingestion option, exploritory, uses bcpandas</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.DB.toSQLpandas">
+<code class="sig-prename descclassname">ingest.DB.</code><code class="sig-name descname">toSQLpandas</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.DB.toSQLpandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>SQL ingestion option, uses padnas to_sql functionallity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Pandas DataFrame</em>) – Input Pandas DataFrame</p></li>
+<li><p><strong>tableName</strong> (<em>str</em>) – Valid CMAP table name</p></li>
+<li><p><strong>server</strong> (<em>str</em>) – Valid CMAP server. ex. Rainier</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.DB.urllib_pyodbc_format">
+<code class="sig-prename descclassname">ingest.DB.</code><code class="sig-name descname">urllib_pyodbc_format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">conn_str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.DB.urllib_pyodbc_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>formats pyodbc connection string with urllib</p>
+</dd></dl>
+
+<span class="target" id="module-ingest.ingest_test"></span><p>Author: Norland Raphael Hagen &lt;<a class="reference external" href="mailto:norlandrhagen&#37;&#52;&#48;gmail&#46;com">norlandrhagen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;
+Date: 07-23-2021</p>
+<p>cmapdata - ingest_test - fragment of post-ingestion testing functions</p>
+<span class="target" id="module-ingest.mapping"></span><p>Author: Norland Raphael Hagen &lt;<a class="reference external" href="mailto:norlandrhagen&#37;&#52;&#48;gmail&#46;com">norlandrhagen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;
+Date: 07-23-2021</p>
+<p>cmapdata - mapping - dataset mapping functionallity. Using folium, adapted from pycmap.</p>
+<dl class="py function">
+<dt id="ingest.mapping.addLayers">
+<code class="sig-prename descclassname">ingest.mapping.</code><code class="sig-name descname">addLayers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">m</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.mapping.addLayers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds webtiles to folium map</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.mapping.addMarkers">
+<code class="sig-prename descclassname">ingest.mapping.</code><code class="sig-name descname">addMarkers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">m</span></em>, <em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.mapping.addMarkers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds CircleMarker points to folium map</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.mapping.html_to_static">
+<code class="sig-prename descclassname">ingest.mapping.</code><code class="sig-name descname">html_to_static</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">m</span></em>, <em class="sig-param"><span class="n">tableName</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.mapping.html_to_static" title="Permalink to this definition">¶</a></dt>
+<dd><p>Outputs folium map to html and static map</p>
+</dd></dl>
+
+<span class="target" id="module-ingest.metadata"></span><p>Author: Norland Raphael Hagen &lt;<a class="reference external" href="mailto:norlandrhagen&#37;&#52;&#48;gmail&#46;com">norlandrhagen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;
+Date: 07-23-2021</p>
+<p>cmapdata - metadata - cmap metadata formatting for table insertion.</p>
+<dl class="py function">
+<dt id="ingest.metadata.classified_gdf_to_list">
+<code class="sig-prename descclassname">ingest.metadata.</code><code class="sig-name descname">classified_gdf_to_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">classified_gdf</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.metadata.classified_gdf_to_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a classified/joined geodataframe and returns a set of ocean regions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>classified_gdf</strong> (<em>geopandas geodataframe</em>) – The joined geodataframe that contains points as well as regions.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A unique list of regions belonging to that dataset.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>region_set</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.metadata.classify_gdf_with_gpkg_regions">
+<code class="sig-prename descclassname">ingest.metadata.</code><code class="sig-name descname">classify_gdf_with_gpkg_regions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_gdf</span></em>, <em class="sig-param"><span class="n">region_gdf</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.metadata.classify_gdf_with_gpkg_regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes sparse data geodataframe and classifies it to an ocean region</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_gdf</strong> (<em>geopandas geodataframe</em>) – A geodataframe created from the input CMAP dataframe.</p></li>
+<li><p><strong>region_gdf</strong> (<em>geopandas geodataframe</em>) – A geodataframe created from ocean region gpkg.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.metadata.geopandas_load_gpkg">
+<code class="sig-prename descclassname">ingest.metadata.</code><code class="sig-name descname">geopandas_load_gpkg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.metadata.geopandas_load_gpkg" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input_df</strong> (<em>Pandas DataFrame</em>) – CMAP formatted DataFrame</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Geopandas formatted DataFrame. ie. geometry column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>gdf (Geopandas GeoDataFrame)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.metadata.if_exists_dataset_region">
+<code class="sig-prename descclassname">ingest.metadata.</code><code class="sig-name descname">if_exists_dataset_region</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_name</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.metadata.if_exists_dataset_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if dataset ID is already in tblDatasets_Regions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset_name</strong> (<em>string</em>) – The short name of the dataset in CMAP tblDatasets.</p>
+</dd>
+</dl>
+<p>Returns: Boolean</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.metadata.load_gpkg_ocean_region">
+<code class="sig-prename descclassname">ingest.metadata.</code><code class="sig-name descname">load_gpkg_ocean_region</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_gpkg_fpath</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.metadata.load_gpkg_ocean_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses Geopandas to load input geopackage (gpkg)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input_gpkg_fpath</strong> (<em>Geopackage - .gpkg</em>) – Input Geopackage containing geometries used for ocean region classifcation.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Outputs geodataframe of ocean region geometries.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>gpkg_region (GeoDataFrame)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.metadata.ocean_region_classification">
+<code class="sig-prename descclassname">ingest.metadata.</code><code class="sig-name descname">ocean_region_classification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_df</span></em>, <em class="sig-param"><span class="n">dataset_name</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.metadata.ocean_region_classification" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function geographically classifies a sparse dataset into a specific ocean region</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Pandas DataFrame</em>) – Input CMAP formatted DataFrame (ST Index: time,lat,lon,&lt;depth&gt;)</p></li>
+<li><p><strong>dataset_name</strong> (<em>string</em>) – name of dataset in CMAP</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.metadata.ocean_region_classification_cruise">
+<code class="sig-prename descclassname">ingest.metadata.</code><code class="sig-name descname">ocean_region_classification_cruise</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trajectory_df</span></em>, <em class="sig-param"><span class="n">cruise_name</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.metadata.ocean_region_classification_cruise" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function geographically classifies a cruise trajectory into a specific ocean region</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>Pandas DataFrame</em>) – Input CMAP formatted cruise trajectory (ST Index: time,lat,lon)</p></li>
+<li><p><strong>cruise_name</strong> (<em>string</em>) – UNOLS name</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.metadata.removeKeywords">
+<code class="sig-prename descclassname">ingest.metadata.</code><code class="sig-name descname">removeKeywords</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">keywords_list</span></em>, <em class="sig-param"><span class="n">var_short_name_list</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.metadata.removeKeywords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a list of keywords for list of variables in a table</p>
+</dd></dl>
+
+<span class="target" id="module-ingest.region_classification"></span><p>Author: Norland Raphael Hagen &lt;<a class="reference external" href="mailto:norlandrhagen&#37;&#52;&#48;gmail&#46;com">norlandrhagen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;
+Date: 07-23-2021</p>
+<p>cmapdata - region_classification - region classification functionallity.</p>
+<dl class="py function">
+<dt id="ingest.region_classification.classified_gdf_to_list">
+<code class="sig-prename descclassname">ingest.region_classification.</code><code class="sig-name descname">classified_gdf_to_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">classified_gdf</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.region_classification.classified_gdf_to_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a classified/joined geodataframe and returns a set of ocean regions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>classified_gdf</strong> (<em>geopandas geodataframe</em>) – The joined geodataframe that contains points as well as regions.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A unique list of regions belonging to that dataset.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>region_set</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.region_classification.classify_gdf_with_gpkg_regions">
+<code class="sig-prename descclassname">ingest.region_classification.</code><code class="sig-name descname">classify_gdf_with_gpkg_regions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_gdf</span></em>, <em class="sig-param"><span class="n">region_gdf</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.region_classification.classify_gdf_with_gpkg_regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes sparse data geodataframe and classifies it to an ocean region</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_gdf</strong> (<em>geopandas geodataframe</em>) – A geodataframe created from the input CMAP dataframe.</p></li>
+<li><p><strong>region_gdf</strong> (<em>geopandas geodataframe</em>) – A geodataframe created from ocean region gpkg.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.region_classification.geopandas_load_gpkg">
+<code class="sig-prename descclassname">ingest.region_classification.</code><code class="sig-name descname">geopandas_load_gpkg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.region_classification.geopandas_load_gpkg" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input_df</strong> (<em>Pandas DataFrame</em>) – CMAP formatted DataFrame</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Geopandas formatted DataFrame. ie. geometry column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>gdf (Geopandas GeoDataFrame)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.region_classification.if_exists_dataset_region">
+<code class="sig-prename descclassname">ingest.region_classification.</code><code class="sig-name descname">if_exists_dataset_region</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_name</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.region_classification.if_exists_dataset_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if dataset ID is already in tblDatasets_Regions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_name</strong> (<em>string</em>) – The short name of the dataset in CMAP tblDatasets.</p></li>
+<li><p><strong>server</strong> (<em>string</em>) – Valid CMAP server name : ex. rainier</p></li>
+</ul>
+</dd>
+</dl>
+<p>Returns: Boolean</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.region_classification.load_gpkg_ocean_region">
+<code class="sig-prename descclassname">ingest.region_classification.</code><code class="sig-name descname">load_gpkg_ocean_region</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_gpkg_fpath</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.region_classification.load_gpkg_ocean_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses Geopandas to load input geopackage (gpkg)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input_gpkg_fpath</strong> (<em>Geopackage - .gpkg</em>) – Input Geopackage containing geometries used for ocean region classifcation.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Outputs geodataframe of ocean region geometries.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>gpkg_region (GeoDataFrame)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.region_classification.ocean_region_classification">
+<code class="sig-prename descclassname">ingest.region_classification.</code><code class="sig-name descname">ocean_region_classification</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.region_classification.ocean_region_classification" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function geographically classifes a sparse dataset into a specific ocean region</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>Pandas DataFrame</em>) – Input CMAP formatted DataFrame (ST Index: time,lat,lon,&lt;depth&gt;)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-ingest.SQL"></span><p>Author: Norland Raphael Hagen &lt;<a class="reference external" href="mailto:norlandrhagen&#37;&#52;&#48;gmail&#46;com">norlandrhagen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;
+Date: 07-23-2021</p>
+<p>cmapdata - SQL - SQL table/index suggestions and formatting</p>
+<dl class="py function">
+<dt id="ingest.SQL.build_SQL_suggestion_df">
+<code class="sig-prename descclassname">ingest.SQL.</code><code class="sig-name descname">build_SQL_suggestion_df</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.SQL.build_SQL_suggestion_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a dataframe of colulmn name and datatype for an input data specific dataframe</p>
+</dd></dl>
+
+<span class="target" id="module-ingest.stats"></span><p>Author: Norland Raphael Hagen &lt;<a class="reference external" href="mailto:norlandrhagen&#37;&#52;&#48;gmail&#46;com">norlandrhagen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;
+Date: 07-23-2021</p>
+<p>cmapdata - stats - cmap summary stats functionallity.</p>
+<dl class="py function">
+<dt id="ingest.stats.aggregate_large_stats">
+<code class="sig-prename descclassname">ingest.stats.</code><code class="sig-name descname">aggregate_large_stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">branch</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.stats.aggregate_large_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>aggregates summary stats files and computes stats of stats. Returns stats dataframe</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.stats.buildLarge_Stats">
+<code class="sig-prename descclassname">ingest.stats.</code><code class="sig-name descname">buildLarge_Stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">datetime_slice</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">branch</span></em>, <em class="sig-param"><span class="n">transfer_flag</span><span class="o">=</span><span class="default_value">'dropbox'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.stats.buildLarge_Stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input is dataframe slice (daily, 8 day, monthly etc.) of a dataset that is split into multiple files</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.stats.build_stats_df_from_db_calls">
+<code class="sig-prename descclassname">ingest.stats.</code><code class="sig-name descname">build_stats_df_from_db_calls</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.stats.build_stats_df_from_db_calls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds basic (min,max,count) summary stats from existing table in DB</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tableName</strong> (<em>string</em>) – CMAP table name</p></li>
+<li><p><strong>Server</strong> (<em>string</em>) – Valid CMAP server name</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-ingest.transfer"></span><p>Author: Norland Raphael Hagen &lt;<a class="reference external" href="mailto:norlandrhagen&#37;&#52;&#48;gmail&#46;com">norlandrhagen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;
+Date: 07-23-2021</p>
+<p>cmapdata - transfer - dataset template moveing and splitting.</p>
+<dl class="py function">
+<dt id="ingest.transfer.cruise_file_split">
+<code class="sig-prename descclassname">ingest.transfer.</code><code class="sig-name descname">cruise_file_split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">cruise_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.transfer.cruise_file_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits combined cruise template file into cruise metadata and cruise trajectory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>string</em>) – path name of file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.transfer.cruise_staging_to_vault">
+<code class="sig-prename descclassname">ingest.transfer.</code><code class="sig-name descname">cruise_staging_to_vault</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cruise_name</span></em>, <em class="sig-param"><span class="n">remove_file_flag</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.transfer.cruise_staging_to_vault" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transfer cruise files from staging to vault</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – string
+Filename and extension to be transfered.</p></li>
+<li><p><strong>cruise_name</strong> – string
+UNOLS cruise_name</p></li>
+<li><p><strong>remove_file_flag</strong> – bool, default True, optional
+Flag option for removing input file from staging</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.transfer.dropbox_file_transfer">
+<code class="sig-prename descclassname">ingest.transfer.</code><code class="sig-name descname">dropbox_file_transfer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_file_path</span></em>, <em class="sig-param"><span class="n">output_file_path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.transfer.dropbox_file_transfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transfers a file to dropbox using the dropbox v2 python api</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_file_path</strong> (<em>string</em>) – Input filepath, filename and extension to be transfered.</p></li>
+<li><p><strong>output_file_path</strong> (<em>string</em>) – Output filepath, filename and extension to be transfered.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.transfer.single_file_split">
+<code class="sig-prename descclassname">ingest.transfer.</code><code class="sig-name descname">single_file_split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">data_missing_flag</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.transfer.single_file_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits an excel file containing data, dataset_metadata and vars_metadata sheets
+into three seperate files in the staging file strucutre.
+If additional metadata filename is provided, data is split.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>string</em>) – Filename and extension to be split.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="ingest.transfer.staging_to_vault">
+<code class="sig-prename descclassname">ingest.transfer.</code><code class="sig-name descname">staging_to_vault</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">branch</span></em>, <em class="sig-param"><span class="n">tableName</span></em>, <em class="sig-param"><span class="n">remove_file_flag</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">skip_data_flag</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">process_level</span><span class="o">=</span><span class="default_value">'REP'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#ingest.transfer.staging_to_vault" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transfers a file from staging to vault rep or nrt.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>string</em>) – Filename and extension to be transfered.</p></li>
+<li><p><strong>branch</strong> (<em>string</em>) – Vault organization path: ex: vs.cruise</p></li>
+<li><p><strong>tableName</strong> (<em>string</em>) – SQL tableName</p></li>
+<li><p><strong>remove_file_flag</strong> (<em>bool</em><em>, </em><em>default True</em><em>, </em><em>optional</em>) – Flag option for removing input file from staging</p></li>
+<li><p><strong>process_level</strong> (<em>str</em><em>, </em><em>default REP</em><em>, </em><em>optional</em>) – Place the data in the REP or the NRT</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-ingest.vault_structure"></span><p>Author: Norland Raphael Hagen &lt;<a class="reference external" href="mailto:norlandrhagen&#37;&#52;&#48;gmail&#46;com">norlandrhagen<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;
+Date: 07-23-2021</p>
+<p>cmapdata - vault_structure - generalized vault structure. Adapted from opedia.</p>
 </div>
 
 
