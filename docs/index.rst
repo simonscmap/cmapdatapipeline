@@ -93,7 +93,19 @@ In DB structure explain:
     :hidden:
 
     API/API_common.rst
-    
+    API/API_cruise.rst
+    API/API_data.rst
+    API/API_DB.rst
+    API/API_general.rst
+    API/API_ingest_test.rst
+    API/API_mapping.rst
+    API/API_metadata.rst
+    API/API_region_classifcation.rst
+    API/API_SQL.rst
+    API/API_stats.rst
+    API/API_transfer.rst
+    API/API_vault_structure.rst
+
 
 
     
