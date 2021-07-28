@@ -97,7 +97,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../indexing_strategies.html">Indexing Strategies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Outside Large Dataset Walkthrough</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#argo-float-walkthrough">Argo Float Walkthrough</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#argo-data-collection">Argo Data Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#argo-data-processing">Argo Data Processing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#creating-tables-and-indicies">Creating Tables and Indicies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#subset-testing">Subset Testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#general-processing-steps">General Processing Steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ingesting-metadata">Ingesting Metadata</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Package Overview</span></p>
@@ -194,14 +207,111 @@
             
   <div class="section" id="outside-large-dataset-walkthrough">
 <h1>Outside Large Dataset Walkthrough<a class="headerlink" href="#outside-large-dataset-walkthrough" title="Permalink to this headline">¶</a></h1>
-<p>Wind, ARGO</p>
-<p>-Collection challenges
--processing challenges and timing
--i/o constraints</p>
-<p>-index design and space constraints
--ingestion into multi DB’s vs transfer with SSMS wizard</p>
-<p>-Building metadata
--Large stats challenges</p>
+<p>Outside large datasets require similar collecting/processing methods to outside small datasets, however the ingestion strategy can differ.
+In this section, we will outline examples of collecting, processing and ingesting two large outside datasets.</p>
+<div class="section" id="argo-float-walkthrough">
+<h2>Argo Float Walkthrough<a class="headerlink" href="#argo-float-walkthrough" title="Permalink to this headline">¶</a></h2>
+<p>The ARGO float array is a multi-country program to deploy profiling floats across the global ocean. These floats provide a 3D insitu ocean record.
+The CORE argo floats provide physical ocean parameters, while the BGC (Biogeochemical) specific floats provide Biogeochemical specific variables (nutrients, radiation etc.).</p>
+<div class="section" id="argo-data-collection">
+<h3>Argo Data Collection<a class="headerlink" href="#argo-data-collection" title="Permalink to this headline">¶</a></h3>
+<p>ARGO float data are distributed through two main DAAC’s. Individual files can be accessed directly from FTP servers from each DAAC.
+Alternatively, a zipped file of all float records updated monthly can be found at: <a class="reference external" href="https://www.seanoe.org/data/00311/42182/">https://www.seanoe.org/data/00311/42182/</a>. These are released on the 10th of every month.</p>
+<div class="figure align-default">
+<a class="reference internal image-reference" href="data_ingestion/gallery_examples/../../_static/seanoe_argo.png"><img alt="seanoe_argo" src="data_ingestion/gallery_examples/../../_static/seanoe_argo.png" /></a>
+</div>
+<p>To keep a record of the collection, we will create a collect_{dataset_name}.py file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">vault_structure</span> <span class="k">as</span> <span class="nn">vs</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">june_10_link</span> <span class="o">=</span> <span class="s2">&quot;https://www.seanoe.org/data/00311/42182/data/85023.tar.gz&quot;</span>
+
+<span class="n">output_dir</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">collected_data</span> <span class="o">+</span> <span class="s2">&quot;insitu/float/ARGO/&quot;</span>
+
+<span class="k">def</span> <span class="nf">wget_file</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;wget &quot;</span> <span class="o">+</span> <span class="n">fpath</span> <span class="o">+</span> <span class="s2">&quot; -P &quot;</span> <span class="o">+</span> <span class="n">output_dir</span><span class="p">)</span>
+
+<span class="n">wget_file</span><span class="p">(</span><span class="n">june_10_link</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This file will need to be unzipped, either using python or bash. The output files will be put in <strong>dropbox/../collected_data/insitu/float/ARGO/</strong></p>
+<p>Once the data has been unzipped, there are four subfolders:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── aux
+├── dac
+├── doc
+└── geo
+</pre></div>
+</div>
+<p><strong>dac</strong> contains the data. Descriptions for the rest can be found in the argo data handbook (<a class="reference external" href="http://dx.doi.org/10.13155/29825">http://dx.doi.org/10.13155/29825</a>).</p>
+<p>The <strong>dac</strong> subfolder contains 11 daacs/distributors.  Each of these contains zipped files.</p>
+<p>To unzip and organize these by BGC and Core. The following scripts were run as part of <strong>process_ARGO.py</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">unzip_and_organize_BGC</span><span class="p">():</span>
+    <span class="c1"># 1559 files</span>
+    <span class="n">vs</span><span class="o">.</span><span class="n">makedir</span><span class="p">(</span><span class="n">argo_base_path</span> <span class="o">+</span> <span class="s2">&quot;BGC/&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">argo_base_path</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">daac</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">daac_list</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&quot;&quot;tar -xvf </span><span class="si">{</span><span class="n">daac</span><span class="si">}</span><span class="s2">_bgc.tar.gz -C BGC/ --transform=&#39;s/.*\///&#39; --wildcards --no-anchored &#39;*_Sprof*&#39;&quot;&quot;&quot;</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+<p>A similar function was fun for Core files. Details can be found in <strong>process_ARGO.py</strong>.</p>
+</div>
+<div class="section" id="argo-data-processing">
+<h3>Argo Data Processing<a class="headerlink" href="#argo-data-processing" title="Permalink to this headline">¶</a></h3>
+<p>Once the data collection is complete, we can start processing each argo netcdf file. To keep a record, we will create a record in the <strong>process/</strong> submodule of cmapdata.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── insitu
+    ├── float
+        ├── ARGO
+            └── process_ARGO.py
+</pre></div>
+</div>
+<p>Since BGC specific floats and Core floats contain different sets of variables, the processing has been split into two functions.</p>
+<div class="section" id="creating-tables-and-indicies">
+<h4>Creating Tables and Indicies<a class="headerlink" href="#creating-tables-and-indicies" title="Permalink to this headline">¶</a></h4>
+<p>General SQL table creation and indexing strategies can be found in the <strong>table creation and indexing</strong> section of these docs.
+Tables and indexes have to be created on all databases before data ingestion.</p>
+</div>
+<div class="section" id="subset-testing">
+<h4>Subset Testing<a class="headerlink" href="#subset-testing" title="Permalink to this headline">¶</a></h4>
+<p>When ingesting large datasets such as models or satellite products, it can be helpful to ingest a small subset of the entire dataset, then ingest the metadata.
+This should allow you to test visualizing and retrieving the dataset before committing to GB to TB of database space.</p>
+</div>
+<div class="section" id="general-processing-steps">
+<h4>General Processing Steps<a class="headerlink" href="#general-processing-steps" title="Permalink to this headline">¶</a></h4>
+<p>Detailed processing steps for the argo core and bgc can be found in process_ARGO.py. The rough processing logic is outlined below:</p>
+<ol class="arabic simple">
+<li><p>Use the glob library to create a list of all netcdf files in the BGC directory.</p></li>
+<li><p>Iterate thorough list</p>
+<ul class="simple">
+<li><p>import netcdf with xarray</p></li>
+<li><p>decode binary xarray column data</p></li>
+<li><p>convert xarray to dataframe and reset index</p></li>
+<li><p>drop unneeded metadata cols</p></li>
+<li><p>add a depth specific column from decibars pressure column</p></li>
+<li><p>rename Space-Time columns</p></li>
+<li><p>format datetime</p></li>
+<li><p>drop any duplicates create by netcdf multilevel index</p></li>
+<li><p>drop any invalid ST rows (rows missing time/lat/lon/depth)</p></li>
+<li><p>sort by time/lat/lon/depth</p></li>
+<li><p>add climatology columns</p></li>
+<li><p>reorder columns and add any missing columns</p></li>
+<li><p>replace any inf or nan string values with np.nan (will go to NULL in SQL server)</p></li>
+<li><p>strips any whitespace from string col values</p></li>
+<li><p>downcasts data if possible</p></li>
+<li><p>builds summary stats (opt. can use db stats call functionality instead)</p></li>
+<li><p>uses the BCP utility to insert dataframe into database table</p></li>
+<li><p>exports df to csv in vault</p></li>
+</ul>
+</li>
+</ol>
+</div>
+<div class="section" id="ingesting-metadata">
+<h4>Ingesting Metadata<a class="headerlink" href="#ingesting-metadata" title="Permalink to this headline">¶</a></h4>
+<p>-general flags, spoofing data for validator</p>
+</div>
+</div>
+</div>
 </div>
 
 

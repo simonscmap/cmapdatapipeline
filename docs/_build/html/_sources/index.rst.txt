@@ -34,6 +34,28 @@ If there is a part of process we can highlight, give an example of this.
 
 
 
+Why argo_core in vault is missing metadata, wasn't split?
+
+
+remove any server default = eg rainer
+
+**Be very careful of pushing to Rainier! Not a good place to TEST**
+
+In future not that initial ingestion server should not be main/default server SOT
+
+
+
+
+explain the role of apps vs vault vs collected data. how data moves
+
+
+
+
+
+
+
+
+
 In DB structure explain:
 
 
