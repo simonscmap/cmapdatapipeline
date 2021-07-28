@@ -1,7 +1,7 @@
 Code Changes
 ============
 
-
+* Move collection data into a new leaf of vault/ perhaps raw or collected.
 * Improve test coverage
 * Update all .format() to fstring formatting
 * Rename dropbox pathing to remove any spacing

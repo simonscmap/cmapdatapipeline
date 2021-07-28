@@ -9,6 +9,10 @@ Database Design and Table Structure
 Simons CMAP currently has three servers that contain near replicates of the SQL Server database. The names of these three are: Rainier, Mariana and Rossby. 
 Rainier was the first dedicated server to host the database and currently serves as the main 'source of truth'. 
 
+.. warning::
+   Rainier is currently the production database and 'source of truth'. If you want to test features, use Mariana or Rossby. 
+
+
 Data tables along with metadata tables are stored in the same schema. Common queries live on the database as stored procedures. 
 Data tables are independent of one another. The dataset table name is stored as a column in the metadata table *tblVariables*. 
 This key links the data tables to the rest of the metadata.

@@ -1,6 +1,10 @@
 Workflow
 ========
 
+.. warning::
+   Rainier is currently the production database and 'source of truth'. If you want to test features, use Mariana or Rossby. 
+
+   
 The process for ingesting datasets into CMAP differs based on a few factors. 
 The three main categories are *User Submitted Datasets*, *Outside 'Small' Datasets* and *Outside 'Large' Datasets*.
 User submitted datasets that pass through the web validator must be <150MB. 
