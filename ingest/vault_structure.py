@@ -11,12 +11,14 @@ from pathlib import Path
 
 
 def makedir(directory):
+    """Creates directory if does not exist"""
     if not os.path.exists(directory):
         os.makedirs(directory)
     return
 
 
 def cruise_leaf_structure(base):
+    """Creates leaf level structure for cruises"""
     if base[-1] != "/":
         base = base + "/"
     traj = base + "trajectory/"
@@ -29,6 +31,8 @@ def cruise_leaf_structure(base):
 
 
 def leafStruc(base):
+    """Creates leaf level structure for datasets"""
+
     makedir(base)
     if base[-1] != "/":
         base = base + "/"
