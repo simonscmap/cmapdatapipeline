@@ -94,7 +94,12 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Table Creation and Indexing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Table Creation and Indexing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#space-time-index">Space-Time Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#climatology">Climatology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#file-groups">File Groups</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="gallery_examples/user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gallery_examples/outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gallery_examples/outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
@@ -194,7 +199,24 @@
             
   <div class="section" id="table-creation-and-indexing">
 <h1>Table Creation and Indexing<a class="headerlink" href="#table-creation-and-indexing" title="Permalink to this headline">¶</a></h1>
-<p>-Describe ST index, alternatives, climatology options, clustered vs non clustered, filegroups, stored procedure for FG size etc.</p>
+<div class="section" id="space-time-index">
+<h2>Space-Time Index<a class="headerlink" href="#space-time-index" title="Permalink to this headline">¶</a></h2>
+<p>All datasets in CMAP share a common data format that includes columns with space a time information (time, lat, lon depth &lt;opt.&gt;).
+With these, space-time indexes can be created on data tables. Creating clustered indicies on this ST index can speed up query performance on large datasets.
+Only include depth in the index if the dataset has a depth component.</p>
+</div>
+<div class="section" id="climatology">
+<h2>Climatology<a class="headerlink" href="#climatology" title="Permalink to this headline">¶</a></h2>
+<p>To quickly calculate climatology for large datasets, specific climatology indicies can be created. Examples of these can be found in the tblWind_NRT.sql or others.</p>
+</div>
+<div class="section" id="file-groups">
+<h2>File Groups<a class="headerlink" href="#file-groups" title="Permalink to this headline">¶</a></h2>
+<p>In each server, data in the database is split into File Groups. The available space can be queried with a SQL Server stored procedure.
+You can execute a stored procedure either in SSMS, Azure Data Studio or a pyodbc query.</p>
+<div class="highlight-SQL notranslate"><div class="highlight"><pre><span></span><span class="k">EXEC</span> <span class="n">uspFileGroup_Volume</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 

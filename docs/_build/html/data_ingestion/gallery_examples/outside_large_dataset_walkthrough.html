@@ -105,6 +105,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#subset-testing">Subset Testing</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#general-processing-steps">General Processing Steps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ingesting-metadata">Ingesting Metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transferring-large-datasets-between-servers">Transferring Large Datasets Between Servers</a></li>
 </ul>
 </li>
 </ul>
@@ -308,7 +309,29 @@ This should allow you to test visualizing and retrieving the dataset before comm
 </div>
 <div class="section" id="ingesting-metadata">
 <h4>Ingesting Metadata<a class="headerlink" href="#ingesting-metadata" title="Permalink to this headline">¶</a></h4>
-<p>-general flags, spoofing data for validator</p>
+<p>Once either a subset or the entire dataset has been ingested on a server, the metadata can be added. To do this, you can use ingest/general.py</p>
+<p>Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="p">{</span><span class="n">table_name</span><span class="p">}</span> <span class="p">{</span><span class="n">branch</span><span class="p">}</span> <span class="p">{</span><span class="n">filename</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">d</span><span class="p">}</span> <span class="p">{</span><span class="n">DOI</span> <span class="n">link</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">S</span><span class="p">}</span> <span class="p">{</span><span class="n">server</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">N</span><span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>{<strong>branch</strong>}: Branch where dataset should be placed in Vault. Ex’s: cruise, float, station, satellite, model, assimilation]</p></li>
+<li><p>{<strong>filename</strong>}: Base file name in vault/staging/combined/. Ex.: ‘global_diazotroph_nifH.xlsx’</p></li>
+<li><p>{<strong>-d</strong>}: Optional flag for including DOI with dataset in tblReferences. DOI link string follows flag arg.</p></li>
+<li><p>{<strong>DOI link</strong>}: String for full web address of CMAP specific DOI. Ex. “<a class="reference external" href="http://doi.org/10.5281/zenodo.4968554">http://doi.org/10.5281/zenodo.4968554</a>”</p></li>
+<li><p>{<strong>-S</strong>}: Required flag for specifying server choice. Server name string follows flag.</p></li>
+<li><p>{<strong>server</strong>}: Valid server name string.  Ex. “Rainier”, “Mariana” or “Rossby”</p></li>
+<li><p>{<strong>-N</strong>}: Optional flag for specifying a ‘dataless’ ingestion or a metadata only ingestion.</p></li>
+</ul>
+<p>An example string would be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="n">tblArgoBGC_REP</span> <span class="nb">float</span> <span class="s1">&#39;ARGO_BGC.xlsx&#39;</span> <span class="o">-</span><span class="n">S</span> <span class="s2">&quot;Rainier&quot;</span> <span class="o">-</span><span class="n">N</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="transferring-large-datasets-between-servers">
+<h4>Transferring Large Datasets Between Servers<a class="headerlink" href="#transferring-large-datasets-between-servers" title="Permalink to this headline">¶</a></h4>
+<p>Ingesting large datasets with the BCP utility can take a long time.
+Instead of using BCP to transfer the datasets between servers, you can use the data transfer wizard in SQL Server Management Studio.</p>
 </div>
 </div>
 </div>

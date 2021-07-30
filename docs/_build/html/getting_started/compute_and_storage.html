@@ -88,6 +88,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database_design.html">Database Design and Table Structure</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Compute Resources and Data Storage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-flow">Data Flow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-storage">Data Storage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#synology-nas-and-drobo-storage">Synology NAS and Drobo Storage</a></li>
 </ul>
@@ -206,6 +207,13 @@ To start a connection, click on the bottom left green icon.
 The ip address is for the workstation is 128.208.238.117</p>
 <div class="figure align-default">
 <a class="reference internal image-reference" href="../_images/ssh_connect.png"><img alt="VS code ssh" src="../_images/ssh_connect.png" style="width: 176.0px; height: 181.60000000000002px;" /></a>
+</div>
+<div class="section" id="data-flow">
+<h2>Data Flow<a class="headerlink" href="#data-flow" title="Permalink to this headline">¶</a></h2>
+<p>There is currently a disconnect between where the web validator stores validated datasets (<strong>Dropbox/Apps/&lt;dataset_short_name&gt;/&lt;dataset_short_name_timestamp.xlsx&gt;</strong>)
+vs where the data ingestion pipeline starts (<strong>Dropbox/staging/combined/&lt;dataset_name.xlsx&gt;</strong>).
+In addition, there is a directory <strong>Dropbox/Collected_Data/../&lt;table_name&gt;/</strong> that contains collected raw data from outside sources.</p>
+<p>Ideally, it would be good to integrate the <strong>collected_data/</strong> directory within the <strong>vault/</strong> directory in a ‘raw’ or ‘collected’ leaf level. Additionally, the disconnect between staging/combined and Apps should be sorted out.</p>
 </div>
 <div class="section" id="data-storage">
 <h2>Data Storage<a class="headerlink" href="#data-storage" title="Permalink to this headline">¶</a></h2>

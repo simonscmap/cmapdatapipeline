@@ -14,6 +14,16 @@ The ip address is for the workstation is 128.208.238.117
    :alt: VS code ssh 
 
 
+Data Flow 
+---------
+
+There is currently a disconnect between where the web validator stores validated datasets (**Dropbox/Apps/<dataset_short_name>/<dataset_short_name_timestamp.xlsx>**)
+vs where the data ingestion pipeline starts (**Dropbox/staging/combined/<dataset_name.xlsx>**). 
+In addition, there is a directory **Dropbox/Collected_Data/../<table_name>/** that contains collected raw data from outside sources.
+
+Ideally, it would be good to integrate the **collected_data/** directory within the **vault/** directory in a 'raw' or 'collected' leaf level. Additionally, the disconnect between staging/combined and Apps should be sorted out.
+
+
 Data Storage
 ------------
 

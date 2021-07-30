@@ -148,10 +148,33 @@ Detailed processing steps for the argo core and bgc can be found in process_ARGO
 Ingesting Metadata
 ^^^^^^^^^^^^^^^^^^
 
--general flags, spoofing data for validator
+Once either a subset or the entire dataset has been ingested on a server, the metadata can be added. To do this, you can use ingest/general.py 
 
 
+Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal. 
+
+.. code-block:: python
+
+   python general.py {table_name} {branch} {filename} {-d} {DOI link} {-S} {server} {-N}
+
+* {**branch**}: Branch where dataset should be placed in Vault. Ex's: cruise, float, station, satellite, model, assimilation]
+* {**filename**}: Base file name in vault/staging/combined/. Ex.: 'global_diazotroph_nifH.xlsx'
+* {**-d**}: Optional flag for including DOI with dataset in tblReferences. DOI link string follows flag arg. 
+* {**DOI link**}: String for full web address of CMAP specific DOI. Ex. "http://doi.org/10.5281/zenodo.4968554"
+* {**-S**}: Required flag for specifying server choice. Server name string follows flag. 
+* {**server**}: Valid server name string.  Ex. "Rainier", "Mariana" or "Rossby"
+* {**-N**}: Optional flag for specifying a 'dataless' ingestion or a metadata only ingestion. 
+
+An example string would be:
+
+.. code-block:: python
+
+    python general.py tblArgoBGC_REP float 'ARGO_BGC.xlsx' -S "Rainier" -N
 
 
+Transferring Large Datasets Between Servers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Ingesting large datasets with the BCP utility can take a long time. 
+Instead of using BCP to transfer the datasets between servers, you can use the data transfer wizard in SQL Server Management Studio. 
 
