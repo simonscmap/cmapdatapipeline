@@ -9,6 +9,7 @@ def download_KM0704_data(outputdir, download_link):
     wget_str = f"""wget -P '{outputdir}' -np -R "'index.html*" robots=off -nH --cut-dirs 8 -r  {download_link}"""
     os.system(wget_str)
 
+
 # #download ctd
 download_KM0704_data(
     odir + "CTD/", "https://hahana.soest.hawaii.edu/FTP/cmore/ctd/bula1/"
