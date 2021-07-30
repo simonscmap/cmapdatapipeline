@@ -476,7 +476,11 @@ def clean_Core(fil):
     )
     # ingests data
     DB.toSQLbcp_wrapper(df, "tblArgoCore_REP", "Rossby")
-
+    #transfers data to vault/
+    df.to_csv(
+        vs.float + "tblArgoCore_REP/rep/" + fil.strip(".nc") + ".csv",
+        sep=",",
+        index=False)
 
 def clean_bgc(fil, dtype):
     # open xarray
@@ -551,8 +555,12 @@ def clean_bgc(fil, dtype):
         df, df["float_id"].iloc[0], "tblArgoBGC_REP", "float", transfer_flag="na"
     )
     # #ingests data
-    # DB.toSQLbcp_wrapper(df, 'tblArgoBGC_REP', "Rossby")
-
+    DB.toSQLbcp_wrapper(df, 'tblArgoBGC_REP', "Rossby")
+    #transfers data to vault/
+    df.to_csv(
+        vs.float + "tblArgoBGC_REP/rep/" + fil.strip(".nc") + ".csv",
+        sep=",",
+        index=False)
 
 # missed = []
 # for fil in tqdm(BGC_flist):
@@ -569,4 +577,4 @@ def clean_bgc(fil, dtype):
 #         missed.append(fil)
 
 
-fil = BGC_flist[0]
+# fil = BGC_flist[0]

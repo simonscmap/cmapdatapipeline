@@ -77,7 +77,9 @@ def process_ctd():
                 "CHLPIG_flag",
                 "NITRATE_flag",
             ]
-        ] = (df["QUALT1"].astype(str).str.extractall("(.)")[0].unstack())
+        ] = (
+            df["QUALT1"].astype(str).str.extractall("(.)")[0].unstack()
+        )
         df.drop(
             ["NITRATE", "NITRATE", "LS6000", "LS6000_flag", "QUALT1"],
             axis=1,
@@ -348,7 +350,9 @@ def process_bottle():
             "sigma_flag",
             "bottle_oxygen_flag",
         ]
-    ] = (df["qual_1"].astype(str).str.extractall("(.)")[0].unstack())
+    ] = (
+        df["qual_1"].astype(str).str.extractall("(.)")[0].unstack()
+    )
     df[
         [
             "CTD_temp_flag",
@@ -359,7 +363,9 @@ def process_bottle():
             "sigma_flag",
             "bottle_oxygen_flag",
         ]
-    ] = (df["qual_1"].astype(str).str.extractall("(.)")[0].unstack())
+    ] = (
+        df["qual_1"].astype(str).str.extractall("(.)")[0].unstack()
+    )
     df[
         [
             "DIC_flag",
@@ -370,7 +376,9 @@ def process_bottle():
             "DOP_flag",
             "DON_flag",
         ]
-    ] = (df["qual_2"].astype(str).str.extractall("(.)")[0].unstack())
+    ] = (
+        df["qual_2"].astype(str).str.extractall("(.)")[0].unstack()
+    )
     df[["DOC_flag", "TDP_flag", "TDN_flag", "LLN_flag", "LLP_flag", "PC_flag"]] = (
         df["qual_3"].astype(str).str.extractall("(.)")[0].unstack()
     )
@@ -386,7 +394,9 @@ def process_bottle():
             "19_Hex_flag",
             "Prasino_flag",
         ]
-    ] = (df["qual_5"].astype(str).str.extractall("(.)")[0].unstack())
+    ] = (
+        df["qual_5"].astype(str).str.extractall("(.)")[0].unstack()
+    )
     df[
         [
             "Viol_flag",
@@ -396,7 +406,9 @@ def process_bottle():
             "Zeaxan_flag",
             "Chl_b_flag",
         ]
-    ] = (df["qual_6"].astype(str).str.extractall("(.)")[0].unstack())
+    ] = (
+        df["qual_6"].astype(str).str.extractall("(.)")[0].unstack()
+    )
     df[
         [
             "alpha_carotene_flag",
@@ -406,7 +418,9 @@ def process_bottle():
             "HPLC_chla_flag",
             "hetero_bact_flag",
         ]
-    ] = (df["qual_7"].astype(str).str.extractall("(.)")[0].unstack())
+    ] = (
+        df["qual_7"].astype(str).str.extractall("(.)")[0].unstack()
+    )
     df[
         [
             "prochloro_bact_flag",
@@ -416,7 +430,9 @@ def process_bottle():
             "CH4_flag",
             "N2O_flag",
         ]
-    ] = (df["qual_8"].astype(str).str.extractall("(.)")[0].unstack())
+    ] = (
+        df["qual_8"].astype(str).str.extractall("(.)")[0].unstack()
+    )
     df["station"] = df["station"].astype(str).str.zfill(3)
     # lons need to be negative
     df["lon"] = df["lon"] * -1.0

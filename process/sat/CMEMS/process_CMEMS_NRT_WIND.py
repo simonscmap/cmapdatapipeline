@@ -1,7 +1,7 @@
-from cmapingest import vault_structure as vs
-from cmapingest import common as cmn
-from cmapingest import DB
-from cmapingest import data
+import vault_structure as vs
+import common as cmn
+import DB
+import data
 
 import pandas as pd
 import xarray as xr
@@ -48,3 +48,7 @@ for fil in tqdm(flist):
         ]
     ]
     DB.toSQLbcp_wrapper(df, "tblWind_NRT", "Rossby")
+    df.to_csv(
+        vs.satellite + "tblWind_NRT/nrt/" + fil.strip(".nc") + ".csv",
+        sep=",",
+        index=False)
