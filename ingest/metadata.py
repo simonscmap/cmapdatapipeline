@@ -120,7 +120,7 @@ def tblDataset_References_Insert(dataset_metadata_df, server, DOI_link_append=No
         .str.replace("\xa0", " ")
         .replace("", np.nan)
         .dropna()
-        .to_list()
+        .tolist()
     )
     if DOI_link_append != None:
         reference_list.append(DOI_link_append)
@@ -165,16 +165,17 @@ def tblVariables_Insert(
         server,
     )
 
-    if data_df.empty:
-        Temporal_Coverage_Begin_list, Temporal_Coverage_End_list = cmn.getColBounds(
-            data_df, "time", list_multiplier=len(variable_metadata_df)
-        )
-        Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds(
-            data_df, "lat", list_multiplier=len(variable_metadata_df)
-        )
-        Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds(
-            data_df, "lon", list_multiplier=len(variable_metadata_df)
-        )
+    if type(data_df) != bool:
+        if data_df.empty:
+            Temporal_Coverage_Begin_list, Temporal_Coverage_End_list = cmn.getColBounds(
+                data_df, "time", list_multiplier=len(variable_metadata_df)
+            )
+            Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds(
+                data_df, "lat", list_multiplier=len(variable_metadata_df)
+            )
+            Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds(
+                data_df, "lon", list_multiplier=len(variable_metadata_df)
+            )
     else:
         (
             Temporal_Coverage_Begin_list,
@@ -210,7 +211,7 @@ def tblVariables_Insert(
         "tblStudy_Domains",
         server,
     )
-    Comment_list = cmn.nanToNA(variable_metadata_df["var_comment"]).to_list()
+    Comment_list = cmn.nanToNA(variable_metadata_df["var_comment"]).tolist()
     Visualize_list = cmn.nanToNA(variable_metadata_df["visualize"]).tolist()
     Data_Type_list = cmn.getTableName_Dtypes(Table_Name, server)["DATA_TYPE"].tolist()
     columnList = "(ID,DB, Dataset_ID, Table_Name, Short_Name, Long_Name, Unit, Temporal_Res_ID, Spatial_Res_ID, Temporal_Coverage_Begin, Temporal_Coverage_End, Lat_Coverage_Begin, Lat_Coverage_End, Lon_Coverage_Begin, Lon_Coverage_End, Grid_Mapping, Make_ID, Sensor_ID, Process_ID, Study_Domain_ID, Comment, Visualize, Data_Type)"

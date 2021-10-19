@@ -233,7 +233,7 @@ def getKeywordIDsTableNameVarName(tableName, var_short_name_list, server):
     if len(var_short_name_list) == 1:
         cur_str = cur_str.replace(",)", ")")
 
-    query_return = DB.dbRead(cur_str, server=server)["ID"].to_list()
+    query_return = DB.dbRead(cur_str, server=server)["ID"].tolist()
     return query_return
 
 
@@ -241,7 +241,7 @@ def getKeywordsIDDataset(dataset_ID, server):
     """Get list of keyword ID's from input dataset ID"""
     dataset_ID = str(dataset_ID)
     cur_str = f"""select [ID] from tblVariables where Dataset_ID = '{dataset_ID}'"""
-    query_return = DB.dbRead(cur_str, server=server)["ID"].to_list()
+    query_return = DB.dbRead(cur_str, server=server)["ID"].tolist()
     return query_return
 
 
