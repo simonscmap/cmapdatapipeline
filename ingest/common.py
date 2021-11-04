@@ -201,10 +201,12 @@ def get_last_ID(tableName, server):
     return last_ID
 
 
-def getDatasetID_DS_Name(datasetName, server):
+def getDatasetID_DS_Name(datasetName, db_name, server):
     """Get DatasetID from input dataset name"""
     cur_str = (
-        """select [ID] FROM [Opedia].[dbo].[tblDatasets] WHERE [Dataset_Name] = '"""
+        """select [ID] FROM """
+        + db_name
+        + """.[dbo].[tblDatasets] WHERE [Dataset_Name] = '"""
         + datasetName
         + """'"""
     )
@@ -213,10 +215,12 @@ def getDatasetID_DS_Name(datasetName, server):
     return dsID
 
 
-def getDatasetID_Tbl_Name(tableName, server):
+def getDatasetID_Tbl_Name(tableName, db_name, server):
     """Get DatasetID from input table name"""
     cur_str = (
-        """select distinct [Dataset_ID] FROM [Opedia].[dbo].[tblVariables] WHERE [Table_Name] = '"""
+        """select distinct [Dataset_ID] FROM """
+        + db_name
+        + """.[dbo].[tblVariables] WHERE [Table_Name] = '"""
         + tableName
         + """'"""
     )
@@ -271,10 +275,12 @@ def getListCruises(server):
     return query_return
 
 
-def findVarID(datasetID, Short_Name, server):
+def findVarID(datasetID, Short_Name, db_name, server):
     """Get ID value from tblVariables for specific variable"""
     cur_str = (
-        """select [ID] FROM [Opedia].[dbo].[tblVariables] WHERE [Dataset_ID] = '"""
+        """select [ID] FROM """
+        + db_name
+        + """.[dbo].[tblVariables] WHERE [Dataset_ID] = '"""
         + str(datasetID)
         + """' AND [Short_Name] = '"""
         + Short_Name

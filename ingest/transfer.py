@@ -99,7 +99,7 @@ def staging_to_vault(
 
 
     """
-    nrt_tree, rep_tree, metadata_tree, stats_tree, doc_tree, code_tree = vs.leafStruc(
+    nrt_tree, rep_tree, metadata_tree, stats_tree, doc_tree, code_tree, raw_tree = vs.leafStruc(
         branch + tableName
     )
     base_filename = os.path.splitext(os.path.basename(filename))[0]

@@ -48,7 +48,9 @@ def leafStruc(base):
     makedir(doc)
     code = base + "code/"
     makedir(code)
-    return nrt, rep, metadata, stats, doc, code
+    raw = base + "raw/"
+    makedir(raw)
+    return nrt, rep, metadata, stats, doc, code, raw
 
 
 vault = r"/data/CMAP Data Submission Dropbox/Simons CMAP/vault/"

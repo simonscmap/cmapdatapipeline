@@ -7,14 +7,15 @@ cmapdata - metadata - cmap metadata formatting for table insertion.
 
 
 import sys
-import credentials as cr
+import os
 import glob
 import geopandas
 from geopandas.tools import sjoin
 import pandas as pd
 import numpy as np
+import xarray as xr
 
-
+import credentials as cr
 import common as cmn
 import cruise
 import data
@@ -48,7 +49,7 @@ def import_metadata(branch, tableName):
     return dataset_metadata_df, vars_metadata_df
 
 
-def tblDatasets_Insert(dataset_metadata_df, tableName, server):
+def tblDatasets_Insert(dataset_metadata_df, tableName, server, db_name):
     last_dataset_ID = cmn.get_last_ID("tblDatasets", server) + 1
     dataset_metadata_df = cmn.nanToNA(dataset_metadata_df)
     dataset_metadata_df.replace({"'": "''"}, regex=True, inplace=True)
@@ -74,7 +75,7 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, server):
         .replace("\xa0", "")
     )
     Climatology = dataset_metadata_df["climatology"].iloc[0]
-    Db = "Opedia"
+    Db = db_name
     # Temps
     Variables = ""
     Doc_URL = ""
@@ -101,19 +102,19 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, server):
     columnList = "(ID,DB,Dataset_Name,Dataset_Long_Name,Variables,Data_Source,Distributor,Description,Climatology,Acknowledgement,Doc_URL,Icon_URL,Contact_Email,Dataset_Version,Dataset_Release_Date,Dataset_History)"
     try:
         DB.lineInsert(
-            server, "[opedia].[dbo].[tblDatasets]", columnList, query, ID_insert=True
+            server, db_name +".[dbo].[tblDatasets]", columnList, query, ID_insert=True
         )
     except:
         DB.lineInsert(
-            server, "[opedia].[dbo].[tblDatasets]", columnList, query, ID_insert=False
+            server, db_name +".[dbo].[tblDatasets]", columnList, query, ID_insert=False
         )
     print("Metadata inserted into tblDatasets.")
 
 
-def tblDataset_References_Insert(dataset_metadata_df, server, DOI_link_append=None):
+def tblDataset_References_Insert(dataset_metadata_df, server, db_name, DOI_link_append=None):
 
     Dataset_Name = dataset_metadata_df["dataset_short_name"].iloc[0]
-    IDvar = cmn.getDatasetID_DS_Name(Dataset_Name, server)
+    IDvar = cmn.getDatasetID_DS_Name(Dataset_Name, db_name, server)
     columnList = "(Dataset_ID, Reference)"
     reference_list = (
         dataset_metadata_df["dataset_references"]
@@ -128,7 +129,7 @@ def tblDataset_References_Insert(dataset_metadata_df, server, DOI_link_append=No
     for ref in reference_list:
         query = (IDvar, ref)
         DB.lineInsert(
-            server, "[opedia].[dbo].[tblDataset_References]", columnList, query
+            server, db_name +".[dbo].[tblDataset_References]", columnList, query
         )
     print("Inserting data into tblDataset_References.")
 
@@ -139,13 +140,14 @@ def tblVariables_Insert(
     variable_metadata_df,
     Table_Name,
     server,
+    db_name,
     process_level,
     CRS="CRS",
 ):
-    Db_list = len(variable_metadata_df) * ["Opedia"]
+    Db_list = len(variable_metadata_df) * [db_name]
     IDvar_list = len(variable_metadata_df) * [
         cmn.getDatasetID_DS_Name(
-            dataset_metadata_df["dataset_short_name"].iloc[0], server
+            dataset_metadata_df["dataset_short_name"].iloc[0], db_name, server
         )
     ]
     Table_Name_list = len(variable_metadata_df) * [Table_Name]
@@ -177,12 +179,20 @@ def tblVariables_Insert(
                 data_df, "lon", list_multiplier=len(variable_metadata_df)
             )
     else:
-        (
+        if "_Climatology" in Table_Name:
+            (
+                Temporal_Coverage_Begin_list,
+                Temporal_Coverage_End_list,
+            ) = cmn.getColBounds_from_DB(
+                Table_Name, "month", server, list_multiplier=len(variable_metadata_df)
+            )
+        else:
+            (
             Temporal_Coverage_Begin_list,
             Temporal_Coverage_End_list,
-        ) = cmn.getColBounds_from_DB(
+            ) = cmn.getColBounds_from_DB(
             Table_Name, "time", server, list_multiplier=len(variable_metadata_df)
-        )
+            )
         Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds_from_DB(
             Table_Name, "lat", server, list_multiplier=len(variable_metadata_df)
         )
@@ -293,7 +303,7 @@ def tblVariables_Insert(
         try:
             DB.lineInsert(
                 server,
-                "[opedia].[dbo].[tblVariables]",
+                db_name +".[dbo].[tblVariables]",
                 columnList,
                 query,
                 ID_insert=True,
@@ -301,7 +311,7 @@ def tblVariables_Insert(
         except:
             DB.lineInsert(
                 server,
-                "[opedia].[dbo].[tblVariables]",
+                db_name +".[dbo].[tblVariables]",
                 columnList,
                 query,
                 ID_insert=False,
@@ -309,13 +319,13 @@ def tblVariables_Insert(
     print("Inserting data into tblVariables")
 
 
-def tblKeywords_Insert(variable_metadata_df, dataset_metadata_df, Table_Name, server):
+def tblKeywords_Insert(variable_metadata_df, dataset_metadata_df, Table_Name, db_name, server):
     IDvar = cmn.getDatasetID_DS_Name(
-        dataset_metadata_df["dataset_short_name"].iloc[0], server
+        dataset_metadata_df["dataset_short_name"].iloc[0], db_name, server
     )
     for index, row in variable_metadata_df.iterrows():
         VarID = cmn.findVarID(
-            IDvar, variable_metadata_df.loc[index, "var_short_name"], server
+            IDvar, variable_metadata_df.loc[index, "var_short_name"], db_name, server
         )
         keyword_list = (variable_metadata_df.loc[index, "var_keywords"]).split(",")
         for keyword in keyword_list:
@@ -326,7 +336,7 @@ def tblKeywords_Insert(variable_metadata_df, dataset_metadata_df, Table_Name, se
                 try:  # Cannot insert duplicate entries, so skips if duplicate
                     DB.lineInsert(
                         server,
-                        "[opedia].[dbo].[tblKeywords]",
+                        db_name +".[dbo].[tblKeywords]",
                         "(var_ID, keywords)",
                         query,
                     )
@@ -362,7 +372,7 @@ def user_input_build_cruise(df, dataset_metadata_df, server):
     )
 
 
-def tblDataset_Cruises_Insert(data_df, dataset_metadata_df, server):
+def tblDataset_Cruises_Insert(data_df, dataset_metadata_df, db_name, server):
 
     matched_cruises, unmatched_cruises = cmn.verify_cruise_lists(
         dataset_metadata_df, server
@@ -386,24 +396,26 @@ def tblDataset_Cruises_Insert(data_df, dataset_metadata_df, server):
             )
     cruise_ID_list = cmn.get_cruise_IDS(matched_cruises, server)
     dataset_ID = cmn.getDatasetID_DS_Name(
-        dataset_metadata_df["dataset_short_name"].iloc[0], server
+        dataset_metadata_df["dataset_short_name"].iloc[0], db_name, server
     )
     for cruise_ID in cruise_ID_list:
         query = (dataset_ID, cruise_ID)
         DB.lineInsert(
             server,
-            "[opedia].[dbo].[tblDataset_Cruises]",
+            db_name + ".[dbo].[tblDataset_Cruises]",
             "(Dataset_ID, Cruise_ID)",
             query,
         )
     print("Dataset matched to cruises")
 
 
-def deleteFromtblKeywords(Dataset_ID, server):
+def deleteFromtblKeywords(Dataset_ID, db_name, server):
     Keyword_ID_list = cmn.getKeywordsIDDataset(Dataset_ID, server)
     Keyword_ID_str = "','".join(str(key) for key in Keyword_ID_list)
     cur_str = (
-        """DELETE FROM [Opedia].[dbo].[tblKeywords] WHERE [var_ID] IN ('"""
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblKeywords] WHERE [var_ID] IN ('"""
         + Keyword_ID_str
         + """')"""
     )
@@ -411,55 +423,68 @@ def deleteFromtblKeywords(Dataset_ID, server):
     print("tblKeyword entries deleted for Dataset_ID: ", Dataset_ID)
 
 
-def deleteFromtblDataset_Stats(Dataset_ID, server):
+def deleteFromtblDataset_Stats(Dataset_ID, db_name, server):
     cur_str = (
-        """DELETE FROM [Opedia].[dbo].[tblDataset_Stats] WHERE [Dataset_ID] = """
+        """DELETE FROM """
+        + db_name 
+        + """.[dbo].[tblDataset_Stats] WHERE [Dataset_ID] = """
         + str(Dataset_ID)
     )
     DB.DB_modify(cur_str, server)
     print("tblDataset_Stats entries deleted for Dataset_ID: ", Dataset_ID)
 
 
-def deleteFromtblDataset_Cruises(Dataset_ID, server):
+def deleteFromtblDataset_Cruises(Dataset_ID, db_name, server):
     cur_str = (
-        """DELETE FROM [Opedia].[dbo].[tblDataset_Cruises] WHERE [Dataset_ID] = """
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblDataset_Cruises] WHERE [Dataset_ID] = """
         + str(Dataset_ID)
     )
     DB.DB_modify(cur_str, server)
     print("tblDataset_Cruises entries deleted for Dataset_ID: ", Dataset_ID)
 
 
-def deleteFromtblDataset_Regions(Dataset_ID, server):
+def deleteFromtblDataset_Regions(Dataset_ID, db_name, server):
     cur_str = (
-        """DELETE FROM [Opedia].[dbo].[tblDataset_Regions] WHERE [Dataset_ID] = """
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblDataset_Regions] WHERE [Dataset_ID] = """
         + str(Dataset_ID)
     )
     DB.DB_modify(cur_str, server)
     print("tblDataset_Regions entries deleted for Dataset_ID: ", Dataset_ID)
 
 
-def deleteFromtblDataset_References(Dataset_ID, server):
+def deleteFromtblDataset_References(Dataset_ID, db_name, server):
     cur_str = (
-        """DELETE FROM [Opedia].[dbo].[tblDataset_References] WHERE [Dataset_ID] = """
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblDataset_References] WHERE [Dataset_ID] = """
         + str(Dataset_ID)
     )
     DB.DB_modify(cur_str, server)
     print("tblDataset_References entries deleted for Dataset_ID: ", Dataset_ID)
 
 
-def deleteFromtblVariables(Dataset_ID, server):
+def deleteFromtblVariables(Dataset_ID, db_name, server):
     cur_str = (
-        """DELETE FROM [Opedia].[dbo].[tblVariables] WHERE [Dataset_ID] = """
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblVariables] WHERE [Dataset_ID] = """
         + str(Dataset_ID)
     )
     DB.DB_modify(cur_str, server)
     print("tblVariables entries deleted for Dataset_ID: ", Dataset_ID)
 
 
-def deleteFromtblDatasets(Dataset_ID, server):
-    cur_str = """DELETE FROM [Opedia].[dbo].[tblDatasets] WHERE [ID] = """ + str(
+def deleteFromtblDatasets(Dataset_ID, db_name, server):
+    cur_str = (
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblDatasets] WHERE [ID] = """ + str(
         Dataset_ID
-    )
+    ))
     DB.DB_modify(cur_str, server)
     print("tblDataset entries deleted for Dataset_ID: ", Dataset_ID)
 
@@ -470,36 +495,56 @@ def dropTable(tableName, server):
     print(tableName, " Removed from DB")
 
 
-def deleteCatalogTables(tableName, server):
+def deleteCatalogTables(tableName, db_name, server):
     contYN = input(
         "Are you sure you want to delete all of the catalog tables for "
         + tableName
         + " ?  [yes/no]: "
     )
-    Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, server)
+    Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
     if contYN == "yes":
-        deleteFromtblKeywords(Dataset_ID, server)
-        deleteFromtblDataset_Stats(Dataset_ID, server)
-        deleteFromtblDataset_Cruises(Dataset_ID, server)
-        deleteFromtblDataset_Regions(Dataset_ID, server)
-        deleteFromtblDataset_References(Dataset_ID, server)
-        deleteFromtblVariables(Dataset_ID, server)
-        deleteFromtblDatasets(Dataset_ID, server)
+        deleteFromtblKeywords(Dataset_ID, db_name, server)
+        deleteFromtblDataset_Stats(Dataset_ID, db_name, server)
+        deleteFromtblDataset_Cruises(Dataset_ID, db_name, server)
+        deleteFromtblDataset_Regions(Dataset_ID, db_name, server)
+        deleteFromtblDataset_References(Dataset_ID, db_name, server)
+        deleteFromtblVariables(Dataset_ID, db_name, server)
+        deleteFromtblDatasets(Dataset_ID, db_name, server)
         dropTable(tableName, server)
     else:
         print("Catalog tables for ID" + Dataset_ID + " not deleted")
 
+def deleteTableMetadata(tableName, db_name, server):
+    contYN = input(
+        "Are you sure you want to delete all metadata for "
+        + tableName
+        + " ?  [yes/no]: "
+    )
+    Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
+    if contYN == "yes":
+        deleteFromtblKeywords(Dataset_ID, db_name, server)
+        deleteFromtblDataset_Stats(Dataset_ID, db_name, server)
+        deleteFromtblDataset_Cruises(Dataset_ID, db_name, server)
+        deleteFromtblDataset_Regions(Dataset_ID, db_name, server)
+        deleteFromtblDataset_References(Dataset_ID, db_name, server)
+        deleteFromtblVariables(Dataset_ID, db_name, server)
+        deleteFromtblDatasets(Dataset_ID, db_name, server)
+    else:
+        print("Metadata for dataset ID" + Dataset_ID + " not deleted")        
 
-def removeKeywords(keywords_list, var_short_name_list, tableName, server):
+
+def removeKeywords(keywords_list, var_short_name_list, tableName, db_name, server):
     """Removes a list of keywords for list of variables in a table"""
 
     keywords_list = cmn.lowercase_List(keywords_list)
     """Removes keyword from specific variable in table"""
     keyword_IDs = str(
-        tuple(cmn.getKeywordIDsTableNameVarName(tableName, var_short_name_list))
+        tuple(cmn.getKeywordIDsTableNameVarName(tableName, var_short_name_list, server))
     )
     cur_str = (
-        """DELETE FROM [Opedia].[dbo].[tblKeywords] WHERE [var_ID] IN """
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblKeywords] WHERE [var_ID] IN """
         + keyword_IDs
         + """ AND LOWER([keywords]) IN """
         + str(tuple(keywords_list))
@@ -513,28 +558,59 @@ def removeKeywords(keywords_list, var_short_name_list, tableName, server):
     )
 
 
-def addKeywords(keywords_list, tableName, server, var_short_name_list="*"):
+def addKeywords(keywords_list, tableName, db_name, server, var_short_name_list="*"):
     if var_short_name_list == "*":
-        var_short_name_list = cmn.get_var_list_dataset(tableName)
+        var_short_name_list = cmn.get_var_list_dataset(tableName, server)
     """Inserts list of keywords for list of variables in a table"""
     keywords_list = cmn.lowercase_List(keywords_list)
     """Removes keyword from specific variable in table"""
-    keyword_IDs = cmn.getKeywordIDsTableNameVarName(tableName, var_short_name_list)
+    keyword_IDs = cmn.getKeywordIDsTableNameVarName(tableName, var_short_name_list, server)
     columnList = "(var_ID, keywords)"
     for var_ID in keyword_IDs:
         for keyword in keywords_list:
             query = """('{var_ID}', '{keyword}')""".format(
                 var_ID=var_ID, keyword=keyword
             )
-            cur_str = """INSERT INTO [Opedia].[dbo].[tblKeywords] {columnList} VALUES {query}""".format(
-                columnList=columnList, query=query
+            cur_str = """INSERT INTO {db_name}.[dbo].[tblKeywords] {columnList} VALUES {query}""".format(
+                db_name=db_name, columnList=columnList, query=query
             )
             try:
-                DB.lineInsert(server, "[opedia].[dbo].[tblKeywords]", columnList, query)
+                DB.lineInsert(server, db_name+".[dbo].[tblKeywords]", columnList, query)
                 print("Added keyword: " + keyword)
             except Exception as e:
                 print(e)
 
+
+def pullNetCDFMetadata(ncdf_path,meta_csv):
+    """Pulls out metadata for all variables in a NetCDF file and saves as csv in staging/combined
+
+    Args:
+        ncdf_path (string): Folder structure for location of NetCDF (ex. model/ARGO_MLD_Climatology/ )
+        meta_csv (string): File name for csv (ex. Argo_MLD_meta)
+    Returns:
+        csv: Saved in staging/combined
+    """   
+    nc_dir = vs.collected_data + ncdf_path
+    flist_all = np.sort(glob.glob(os.path.join(nc_dir, '*.nc')))
+    nc = sorted(flist_all, reverse=True)[:1][0]
+    xdf = xr.open_dataset(nc)
+
+    cols = []
+    for varname, da in xdf.data_vars.items():
+        cols = cols + list(da.attrs.keys())
+    
+    col_list = list(set(cols + ['var_name']))
+
+    df_meta = pd.DataFrame(columns=col_list)
+    for varname, da in xdf.data_vars.items():
+        s = pd.DataFrame(da.attrs, index=[0])
+        s['var_name'] = varname     
+        df_meta = df_meta.append(s)
+
+    df_meta.to_csv(
+        vs.staging + 'combined/' + meta_csv + '.csv',
+        sep=",",
+        index=False)
 
 """
 ###############################################
@@ -596,35 +672,35 @@ def classified_gdf_to_list(classified_gdf):
     return region_set
 
 
-def ocean_region_insert(region_id_list, dataset_name, server):
-    dataset_ID = cmn.getDatasetID_DS_Name(dataset_name, server)
+def ocean_region_insert(region_id_list, dataset_name, db_name, server):
+    dataset_ID = cmn.getDatasetID_DS_Name(dataset_name, db_name, server)
     region_ID_list = cmn.get_region_IDS(region_id_list, server)
 
     for region_ID in region_ID_list:
         query = (dataset_ID, region_ID)
         DB.lineInsert(
             server,
-            "[opedia].[dbo].[tblDataset_Regions]",
+            db_name+".[dbo].[tblDataset_Regions]",
             "(Dataset_ID, Region_ID)",
             query,
         )
 
 
-def ocean_region_cruise_insert(region_id_list, cruise_name, server):
+def ocean_region_cruise_insert(region_id_list, cruise_name, db_name, server):
     cruise_ID = cmn.get_cruise_IDS([cruise_name], server)[0]
     region_ID_list = cmn.get_region_IDS(region_id_list, server)
     for region_ID in region_ID_list:
         query = (cruise_ID, region_ID)
         DB.lineInsert(
             server,
-            "[opedia].[dbo].[tblCruise_Regions]",
+            db_name+".[dbo].[tblCruise_Regions]",
             "(Cruise_ID, Region_ID)",
             query,
         )
     print("cruises classified by ocean region.")
 
 
-def ocean_region_classification_cruise(trajectory_df, cruise_name, server):
+def ocean_region_classification_cruise(trajectory_df, cruise_name, db_name, server):
     """This function geographically classifies a cruise trajectory into a specific ocean region
 
     Args:
@@ -637,10 +713,10 @@ def ocean_region_classification_cruise(trajectory_df, cruise_name, server):
     )
     classified_gdf = classify_gdf_with_gpkg_regions(data_gdf, region_gdf)
     region_set = classified_gdf_to_list(classified_gdf)
-    ocean_region_cruise_insert(region_set, cruise_name, server)
+    ocean_region_cruise_insert(region_set, cruise_name, db_name, server)
 
 
-def ocean_region_classification(data_df, dataset_name, server):
+def ocean_region_classification(data_df, dataset_name, db_name, server):
     """This function geographically classifies a sparse dataset into a specific ocean region
 
     Args:
@@ -654,12 +730,12 @@ def ocean_region_classification(data_df, dataset_name, server):
     )
     classified_gdf = classify_gdf_with_gpkg_regions(data_gdf, region_gdf)
     region_set = classified_gdf_to_list(classified_gdf)
-    ocean_region_insert(region_set, dataset_name, server)
+    ocean_region_insert(region_set, dataset_name, db_name, server)
 
     print("Dataset matched to the following Regions: ", region_set)
 
 
-def if_exists_dataset_region(dataset_name, server):
+def if_exists_dataset_region(dataset_name, db_name, server):
     """Checks if dataset ID is already in tblDatasets_Regions
 
     Args:
@@ -667,8 +743,8 @@ def if_exists_dataset_region(dataset_name, server):
     Returns: Boolean
     """
     ds_ID = cmn.getDatasetID_DS_Name(dataset_name, server)
-    cur_str = """SELECT * FROM [Opedia].[dbo].[tblDataset_Regions] WHERE [Dataset_ID] = {Dataset_ID}""".format(
-        Dataset_ID=ds_ID
+    cur_str = """SELECT * FROM {db_name}.[dbo].[tblDataset_Regions] WHERE [Dataset_ID] = {Dataset_ID}""".format(
+        db_name=db_name,Dataset_ID=ds_ID
     )
     query_return = DB.dbRead(cur_str, server)
     if query_return.empty:

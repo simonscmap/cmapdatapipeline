@@ -49,7 +49,7 @@ def build_SQL_suggestion_df(df):
 
 
 def SQL_index_suggestion_formatter(
-    data_df, tableName, server, FG="Primary", DB="Opedia"
+    data_df, tableName, server, db_name, FG="Primary"
 ):
     """Creates SQL index suggestion from input data DF"""
     if "depth" in cmn.lowercase_List(list(data_df)):
@@ -71,7 +71,7 @@ def SQL_index_suggestion_formatter(
         UNIQUE_flag = "UNIQUE"
     # if any are True, there are duplicates in subset
     SQL_index_str = f"""
-    USE [{DB}]
+    USE [{db_name}]
 
 
     CREATE {UNIQUE_flag} NONCLUSTERED INDEX [IX_{tableName}_time_lat_lon_{depth_str}] ON [dbo].[{tableName}]
@@ -86,7 +86,7 @@ def SQL_index_suggestion_formatter(
     return SQL_index_dir
 
 
-def SQL_tbl_suggestion_formatter(sdf, tableName, server, FG="Primary", DB="Opedia"):
+def SQL_tbl_suggestion_formatter(sdf, tableName, server, db_name, FG="Primary"):
     """Creates SQL table suggestion from input dataframe"""
 
     sdf["null_status"] = "NULL,"
@@ -106,7 +106,7 @@ def SQL_tbl_suggestion_formatter(sdf, tableName, server, FG="Primary", DB="Opedi
 
     """ Print table as SQL format """
     SQL_tbl = f"""
-    USE [{DB}]
+    USE [{db_name}]
 
     SET ANSI_NULLS ON
 

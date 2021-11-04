@@ -7,12 +7,13 @@ Date: 07-23-2021
 cmapdata - general - main ingestion wrapper functions
 """
 
-
 import sys
 import os
 import glob
 import pandas as pd
 import numpy as np
+
+sys.path.append("..")
 
 import credentials as cr
 
@@ -116,7 +117,7 @@ def importDataMemory(branch, tableName, process_level):
     return data_dict
 
 
-def SQL_suggestion(data_dict, tableName, branch, server):
+def SQL_suggestion(data_dict, tableName, branch, server, db_name):
     """Creates suggested SQL table based on data types of input dataframe.
 
     Args:
@@ -130,9 +131,9 @@ def SQL_suggestion(data_dict, tableName, branch, server):
     else:
         make = branch
     cdt = SQL.build_SQL_suggestion_df(data_dict["data_df"])
-    sql_tbl = SQL.SQL_tbl_suggestion_formatter(cdt, tableName, server)
+    sql_tbl = SQL.SQL_tbl_suggestion_formatter(cdt, tableName, server, db_name)
     sql_index = SQL.SQL_index_suggestion_formatter(
-        data_dict["data_df"], tableName, server
+        data_dict["data_df"], tableName, server, db_name
     )
     sql_combined_str = sql_tbl["sql_tbl"] + sql_index["sql_index"]
     print(sql_combined_str)
@@ -152,7 +153,7 @@ def add_ST_cols_cruise(metadata_df, traj_df):
     return metadata_df
 
 
-def insertCruise(metadata_df, trajectory_df, cruise_name, server):
+def insertCruise(metadata_df, trajectory_df, cruise_name, db_name, server):
     """Inserts metadata_df, trajectory_df into server as well as ocean region classifcation into tblCruise_Regions. If you want to add more to the template such as keywords etc, they could be included here.
 
 
@@ -174,7 +175,7 @@ def insertCruise(metadata_df, trajectory_df, cruise_name, server):
     data.data_df_to_db(
         trajectory_df, "tblCruise_Trajectory", server, clean_data_df_flag=False
     )
-    metadata.ocean_region_classification_cruise(trajectory_df, cruise_name, server)
+    metadata.ocean_region_classification_cruise(trajectory_df, cruise_name, db_name, server)
 
 
 def insertData(data_dict, tableName, server):
@@ -183,7 +184,7 @@ def insertData(data_dict, tableName, server):
 
 
 def insertMetadata_no_data(
-    data_dict, tableName, DOI_link_append, server, process_level
+    data_dict, tableName, DOI_link_append, server, db_name, process_level
 ):
     """Main argparse wrapper function for inserting metadata for large datasets that do not have a single data sheet (ex. ARGO, sat etc.)
 
@@ -194,9 +195,9 @@ def insertMetadata_no_data(
         server (str): Valid CMAP server
         process_level (str): rep or nrt
     """
-    metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server)
+    metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server, db_name)
     metadata.tblDataset_References_Insert(
-        data_dict["dataset_metadata_df"], server, DOI_link_append
+        data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
     )
 
     metadata.tblVariables_Insert(
@@ -205,6 +206,7 @@ def insertMetadata_no_data(
         data_dict["variable_metadata_df"],
         tableName,
         server,
+        db_name,
         process_level,
         CRS="CRS",
     )
@@ -212,12 +214,13 @@ def insertMetadata_no_data(
         data_dict["variable_metadata_df"],
         data_dict["dataset_metadata_df"],
         tableName,
+        db_name,
         server,
     )
 
     # region id 114 is global
     metadata.ocean_region_insert(
-        ["114"], data_dict["dataset_metadata_df"]["dataset_short_name"].iloc[0], server
+        ["114"], data_dict["dataset_metadata_df"]["dataset_short_name"].iloc[0], db_name, server
     )
 
     # if data_dict["dataset_metadata_df"]["cruise_names"].dropna().empty == False:
@@ -226,7 +229,7 @@ def insertMetadata_no_data(
     #     )
 
 
-def insertMetadata(data_dict, tableName, DOI_link_append, server, process_level):
+def insertMetadata(data_dict, tableName, DOI_link_append, server, db_name, process_level):
     """Wrapper function for metadata ingestion. Used for datasets that can fit in memory and can pass through the validator.
 
     Args:
@@ -236,9 +239,9 @@ def insertMetadata(data_dict, tableName, DOI_link_append, server, process_level)
         server (str): Valid CMAP server
         process_level (str): rep or nrt
     """
-    metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server)
+    metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server, db_name)
     metadata.tblDataset_References_Insert(
-        data_dict["dataset_metadata_df"], server, DOI_link_append
+        data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
     )
     metadata.tblVariables_Insert(
         data_dict["data_df"],
@@ -246,6 +249,7 @@ def insertMetadata(data_dict, tableName, DOI_link_append, server, process_level)
         data_dict["variable_metadata_df"],
         tableName,
         server,
+        db_name,
         process_level,
         CRS="CRS",
     )
@@ -253,28 +257,30 @@ def insertMetadata(data_dict, tableName, DOI_link_append, server, process_level)
         data_dict["variable_metadata_df"],
         data_dict["dataset_metadata_df"],
         tableName,
+        db_name,
         server,
     )
     metadata.ocean_region_classification(
         data_dict["data_df"],
         data_dict["dataset_metadata_df"]["dataset_short_name"].iloc[0],
+        db_name,
         server,
     )
     if data_dict["dataset_metadata_df"]["cruise_names"].dropna().empty == False:
         metadata.tblDataset_Cruises_Insert(
-            data_dict["data_df"], data_dict["dataset_metadata_df"], server
+            data_dict["data_df"], data_dict["dataset_metadata_df"], db_name, server
         )
 
 
-def insert_small_stats(data_dict, tableName, server):
+def insert_small_stats(data_dict, tableName, db_name, server):
     """Wrapper function for stats.updateStats_Small"""
-    stats.updateStats_Small(tableName, server, data_dict["data_df"])
+    stats.updateStats_Small(tableName, db_name, server, data_dict["data_df"])
 
 
-def insert_large_stats(tableName, server):
+def insert_large_stats(tableName, db_name, server):
     """Wrapper function for stats.build_stats_df_from_db_calls and stats.update_stats_large"""
     stats_df = stats.build_stats_df_from_db_calls(tableName, server)
-    stats.update_stats_large(tableName, stats_df, server)
+    stats.update_stats_large(tableName, stats_df, db_name, server)
 
 
 def createIcon(data_dict, tableName):
@@ -301,6 +307,7 @@ def cruise_ingestion(args):
         data_dict["metadata_df"],
         data_dict["trajectory_df"],
         args.cruise_name,
+        args.Database,
         args.Server,
     )
 
@@ -321,12 +328,12 @@ def full_ingestion(args):
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=True
     )
-    SQL_suggestion(data_dict, args.tableName, args.branch, args.Server)
+    SQL_suggestion(data_dict, args.tableName, args.branch, args.Server, args.Database)
     insertData(data_dict, args.tableName, args.Server)
     insertMetadata(
-        data_dict, args.tableName, args.DOI_link_append, args.Server, args.process_level
+        data_dict, args.tableName, args.DOI_link_append, args.Server, args.Database, args.process_level
     )
-    insert_small_stats(data_dict, args.tableName, args.Server)
+    insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
     if args.Server == "Rainier":
         createIcon(data_dict, args.tableName)
         push_icon()
@@ -347,9 +354,9 @@ def dataless_ingestion(args):
         args.branch, args.tableName, args.process_level, import_data=False
     )
     insertMetadata_no_data(
-        data_dict, args.tableName, args.DOI_link_append, args.Server, args.process_level
+        data_dict, args.tableName, args.DOI_link_append, args.Server, args.Database, args.process_level
     )
-    insert_large_stats(args.tableName, args.Server)
+    insert_large_stats(args.tableName, args.Database, args.Server)
 
 
 def main():
@@ -385,6 +392,9 @@ def main():
     parser.add_argument("-C", "--cruise_name", help="UNOLS Name", nargs="?")
     parser.add_argument(
         "-S", "--Server", help="Server choice: Rainier, Mariana", nargs="?"
+    )
+    parser.add_argument(
+        "-D", "--Database", help="Database name: Opedia, Opedia_Sandbox", nargs="?", default="Opedia"
     )
 
     args = parser.parse_args()

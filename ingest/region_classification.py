@@ -18,7 +18,7 @@ import DB
 import common as cmn
 
 
-def if_exists_dataset_region(dataset_name, server):
+def if_exists_dataset_region(dataset_name, db_name, server):
     """Checks if dataset ID is already in tblDatasets_Regions
 
     Args:
@@ -27,8 +27,8 @@ def if_exists_dataset_region(dataset_name, server):
     Returns: Boolean
     """
     ds_ID = cmn.getDatasetID_DS_Name(dataset_name)
-    cur_str = """SELECT * FROM [Opedia].[dbo].[tblDataset_Regions] WHERE [Dataset_ID] = {Dataset_ID}""".format(
-        Dataset_ID=ds_ID
+    cur_str = """SELECT * FROM {db_name}.[dbo].[tblDataset_Regions] WHERE [Dataset_ID] = {Dataset_ID}""".format(
+        db_name=db_name, Dataset_ID=ds_ID
     )
     query_return = DB.dbRead(cur_str, server)
     if query_return.empty:
@@ -106,7 +106,7 @@ def ocean_region_classification(data_df):
     return region_set
 
 
-def insert_into_tblDataset_Regions(region_set, dataset_name, server):
+def insert_into_tblDataset_Regions(region_set, dataset_name, db_name, server):
     """Inserts region set into tblDataset_Regions
 
     Args:
@@ -120,13 +120,13 @@ def insert_into_tblDataset_Regions(region_set, dataset_name, server):
         query = (dataset_ID, region_ID)
         DB.lineInsert(
             server,
-            "[opedia].[dbo].[tblDataset_Regions]",
+            db_name+".[dbo].[tblDataset_Regions]",
             "(Dataset_ID, Region_ID)",
             query,
         )
 
 
-def insert_into_tblCruise_Regions(region_set, server):
+def insert_into_tblCruise_Regions(region_set, db_name, server):
     """Inserts region set into tblCruise_Regions
 
     Args:
@@ -138,7 +138,7 @@ def insert_into_tblCruise_Regions(region_set, server):
         query = (cruise_ID, region_ID)
         DB.lineInsert(
             server,
-            "[opedia].[dbo].[tblCruise_Regions]",
+            db_name+".[dbo].[tblCruise_Regions]",
             "(Cruise_ID, Region_ID)",
             query,
         )

@@ -7,12 +7,12 @@ cmapdata - stats - cmap summary stats functionallity.
 
 
 import os
-import credentials as cr
 from tqdm import tqdm
 import dask.dataframe as dd
 import pandas as pd
 import numpy as np
 
+import credentials as cr
 import common as cmn
 import DB
 import transfer
@@ -38,7 +38,7 @@ def updateStatsTable(ID, json_str, server):
         print(e)
 
 
-def updateStats_Small(tableName, server, data_df=None):
+def updateStats_Small(tableName, db_name, server, data_df=None):
     """Updates entry for tblDataset_Stats, wraps around updateStatsTable, but with common inputs.
 
     Args:
@@ -46,16 +46,22 @@ def updateStats_Small(tableName, server, data_df=None):
         Server (str): Valid CMAP server name
         data_df (Pandas DataFrame, optional): datframe to build stats from, if not provided table is queried from database. Defaults to None.
     """
+
     if data_df is not None:
         data_df = data_df
     else:
         query = "SELECT * FROM {tableName}".format(tableName=tableName)
         data_df = DB.dbRead(query, server)
-    Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, server)
+    Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
     stats_df = data_df.describe()
-    min_max_df = pd.DataFrame(
+    if "_Climatology" in tableName:
+            min_max_df = pd.DataFrame(
+        {"time": [data_df["month"].min(), data_df["month"].max()]}, index=["min", "max"]
+        )
+    else:
+        min_max_df = pd.DataFrame(
         {"time": [data_df["time"].min(), data_df["time"].max()]}, index=["min", "max"]
-    )
+        )
     df = pd.concat([stats_df, min_max_df], axis=1, sort=True)
     json_str = df.to_json(date_format="iso")
     sql_df = pd.DataFrame({"Dataset_ID": [Dataset_ID], "JSON": [json_str]})
@@ -74,11 +80,17 @@ def buildLarge_Stats(df, datetime_slice, tableName, branch, transfer_flag="dropb
         transfer_flag (str, optional): Way to transfer data, either dropbox or sshfs. Defaults to "dropbox".
     """
     """Input is dataframe slice (daily, 8 day, monthly etc.) of a dataset that is split into multiple files"""
+    
     df_stats = df.describe()
     df_stats.insert(loc=0, column="time", value="")
-    df_stats.at["count", "time"] = len(df["time"])
-    df_stats.at["min", "time"] = min(df["time"])
-    df_stats.at["max", "time"] = max(df["time"])
+    if "_Climatology" in tableName:
+        df_stats.at["count", "time"] = len(df["month"])
+        df_stats.at["min", "time"] = min(df["month"])
+        df_stats.at["max", "time"] = max(df["month"])
+    else:
+        df_stats.at["count", "time"] = len(df["time"])
+        df_stats.at["min", "time"] = min(df["time"])
+        df_stats.at["max", "time"] = max(df["time"])
     branch_path = cmn.vault_struct_retrieval(branch)
 
     if transfer_flag == "dropbox":
@@ -123,6 +135,9 @@ def aggregate_large_stats(branch, tableName, server):
     df = df.compute().set_index(df.columns[0])
     df.index.name = "Stats"
     st_cols = data.ST_columns(df)
+    ## ST_columns hard codes column names and order. if climatology, replace 'time' with 'month'
+    if "_Climatology" in tableName:
+        st_cols[0] = "month"
     var_list = list(set(list(df)) - set(st_cols))
     var_max_list, var_min_list, var_mean_list, var_std_list = [], [], [], []
     max_var_count_list = [cmn.getLatCount(tableName, server)] * len(list(df))
@@ -166,9 +181,15 @@ def build_stats_df_from_db_calls(tableName, server):
     Returns:
         Pandas DataFrame: stats dataframe
     """
-    col_list = ["time"] + cmn.get_numeric_cols_in_table_excluding_climatology(
+    if "_Climatology" in tableName:
+        ## Don't add month for clim?
+        col_list = ["month"] + cmn.get_numeric_cols_in_table_excluding_climatology(
         tableName, server
-    )
+        )
+    else:
+        col_list = ["time"] + cmn.get_numeric_cols_in_table_excluding_climatology(
+        tableName, server
+        )
     stats_DF = pd.DataFrame(index=["count", "max", "mean", "min", "std"])
     for var in tqdm(col_list):
         print(var)
@@ -190,7 +211,7 @@ def build_stats_df_from_db_calls(tableName, server):
     return stats_DF
 
 
-def update_stats_large(tableName, stats_df, server):
+def update_stats_large(tableName, stats_df, db_name, server):
     """Updates tblDataset_Stats entry with new stats
 
     Args:
@@ -198,7 +219,7 @@ def update_stats_large(tableName, stats_df, server):
         stats_df (Pandas DataFrame): Input stats dataframe
         Server (str): Valid CMAP server name
     """
-    Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, server)
+    Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
     json_str = stats_df.to_json(date_format="iso")
     sql_df = pd.DataFrame({"Dataset_ID": [Dataset_ID], "JSON": [json_str]})
     updateStatsTable(Dataset_ID, json_str, server)

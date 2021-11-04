@@ -83,6 +83,7 @@ def server_select_credentials(server):
         ip = cr.ip_rossby
         port = cr.port_rossby
     elif server.lower() == "beast":
+        db_name = 'Opedia_Sandbox'
         usr = cr.usr_beast
         psw = cr.psw_beast
         ip = cr.ip_beast
@@ -172,7 +173,7 @@ def urllib_pyodbc_format(conn_str):
 
 
 def toSQLpandas(df, tableName, server):
-    """SQL ingestion option, uses padnas to_sql functionallity.
+    """SQL ingestion option, uses pandas to_sql functionality.
 
     Args:
         df (Pandas DataFrame): Input Pandas DataFrame
@@ -210,7 +211,9 @@ def toSQLbcp(export_path, tableName, server):
 
     usr, psw, ip, port, db_name, TDS_Version = server_select_credentials(server)
     bcp_str = (
-        """bcp Opedia.dbo."""
+        """bcp """
+        + db_name
+        + """.dbo."""
         + tableName
         + """ in """
         + """'"""
