@@ -55,13 +55,11 @@ def updateStats_Small(tableName, db_name, server, data_df=None):
     Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
     stats_df = data_df.describe()
     if "_Climatology" in tableName:
-            min_max_df = pd.DataFrame(
-        {"time": [data_df["month"].min(), data_df["month"].max()]}, index=["min", "max"]
-        )
-    else:
-        min_max_df = pd.DataFrame(
+        return
+
+    min_max_df = pd.DataFrame(
         {"time": [data_df["time"].min(), data_df["time"].max()]}, index=["min", "max"]
-        )
+    )
     df = pd.concat([stats_df, min_max_df], axis=1, sort=True)
     json_str = df.to_json(date_format="iso")
     sql_df = pd.DataFrame({"Dataset_ID": [Dataset_ID], "JSON": [json_str]})
@@ -82,12 +80,8 @@ def buildLarge_Stats(df, datetime_slice, tableName, branch, transfer_flag="dropb
     """Input is dataframe slice (daily, 8 day, monthly etc.) of a dataset that is split into multiple files"""
     
     df_stats = df.describe()
-    df_stats.insert(loc=0, column="time", value="")
-    if "_Climatology" in tableName:
-        df_stats.at["count", "time"] = len(df["month"])
-        df_stats.at["min", "time"] = min(df["month"])
-        df_stats.at["max", "time"] = max(df["month"])
-    else:
+    if "_Climatology" not in tableName:
+        df_stats.insert(loc=0, column="time", value="")
         df_stats.at["count", "time"] = len(df["time"])
         df_stats.at["min", "time"] = min(df["time"])
         df_stats.at["max", "time"] = max(df["time"])
@@ -182,8 +176,7 @@ def build_stats_df_from_db_calls(tableName, server):
         Pandas DataFrame: stats dataframe
     """
     if "_Climatology" in tableName:
-        ## Don't add month for clim?
-        col_list = ["month"] + cmn.get_numeric_cols_in_table_excluding_climatology(
+        col_list = cmn.get_numeric_cols_in_table_excluding_climatology(
         tableName, server
         )
     else:
@@ -195,19 +188,24 @@ def build_stats_df_from_db_calls(tableName, server):
         print(var)
         try:
             stats_qry = (
-                f"""SELECT count_big({var}),MAX({var}),MIN({var}) FROM {tableName}"""
+                f"""SELECT count_big({var}),MAX({var}),MIN({var}),AVG({var}),STDEV({var}) FROM {tableName}"""
             )
             var_df = DB.dbRead(stats_qry, server)
         except:
-            stats_qry = f"""SELECT count_big({var}),MAX(cast({var} as numeric(12, 0))),MIN(cast({var} as numeric(12, 0))) FROM {tableName}"""
+            stats_qry = f"""SELECT count_big({var}),MAX(cast({var} as numeric(12, 0))),MIN(cast({var} as numeric(12, 0))),AVG(cast({var} as numeric(12, 0))),STDEV(cast({var} as numeric(12, 0))) FROM {tableName}"""
             var_df = DB.dbRead(stats_qry, server)
 
         stats_DF[var] = ""
+        if (var == 'lat' or var == 'lon'):
+            stats_DF.at["mean", var] = ""
+            stats_DF.at["std", var] = ""
+        else:
+            stats_DF.at["mean", var] = var_df.iloc[:, 3][0]
+            stats_DF.at["std", var] = var_df.iloc[:, 4][0]
         stats_DF.at["count", var] = var_df.iloc[:, 0][0]
         stats_DF.at["max", var] = var_df.iloc[:, 1][0]
-        stats_DF.at["mean", var] = ""
         stats_DF.at["min", var] = var_df.iloc[:, 2][0]
-        stats_DF.at["std", var] = ""
+
     return stats_DF
 
 

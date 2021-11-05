@@ -26,7 +26,7 @@ for fil in tqdm(fsort):
     df = xdf.to_dataframe().reset_index()
     df = df[['month','lat','lon','mld_da_mean', 'mld_dt_mean', 'mld_da_median', 'mld_dt_median', 'mld_da_std', 'mld_dt_std', 'mld_da_max', 'mld_dt_max', 'mlpd_da', 'mlpd_dt', 'mlt_da', 'mlt_dt', 'mls_da', 'mls_dt', 'num']]
     # df = df[['month','lat','lon','mld_da_mean', 'mld_dt_mean', 'mld_da_median', 'mld_dt_median', 'mld_da_std', 'mld_dt_std', 'mld_da_max', 'mld_dt_max', 'mlpd_da', 'mlpd_dt', 'mlt_da', 'mlt_dt', 'mls_da', 'mls_dt', 'num_profiles']]
-    DB.toSQLbcp_wrapper(df, 'tblArgo_MLD_Climatology', "Beast")
+    DB.toSQLbcp_wrapper(df, 'tblArgo_MLD_Climatology', "Mariana")
     print(fil)
     
     ## Export copy of data ingested to DB as parquet file into vault
