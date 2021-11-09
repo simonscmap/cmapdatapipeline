@@ -184,7 +184,7 @@ def insertData(data_dict, tableName, server):
 
 
 def insertMetadata_no_data(
-    data_dict, tableName, DOI_link_append, server, db_name, process_level
+    data_dict, tableName, DOI_link_append, icon_filename, server, db_name, process_level
 ):
     """Main argparse wrapper function for inserting metadata for large datasets that do not have a single data sheet (ex. ARGO, sat etc.)
 
@@ -195,7 +195,7 @@ def insertMetadata_no_data(
         server (str): Valid CMAP server
         process_level (str): rep or nrt
     """
-    metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server, db_name)
+    metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, icon_filename, server, db_name)
     metadata.tblDataset_References_Insert(
         data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
     )
@@ -354,7 +354,7 @@ def dataless_ingestion(args):
         args.branch, args.tableName, args.process_level, import_data=False
     )
     insertMetadata_no_data(
-        data_dict, args.tableName, args.DOI_link_append, args.Server, args.Database, args.process_level
+        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level
     )
     insert_large_stats(args.tableName, args.Database, args.Server)
 
@@ -396,7 +396,12 @@ def main():
     parser.add_argument(
         "-D", "--Database", help="Database name: Opedia, Opedia_Sandbox", nargs="?", default="Opedia"
     )
-
+    parser.add_argument(
+        "-i", 
+        "--icon_filename", 
+        help="Filename for icon in Github instead of creating a map thumbnail of data. Ex: argo_small.jpg", 
+        nargs="?"
+    )
     args = parser.parse_args()
 
     if args.cruise_name:

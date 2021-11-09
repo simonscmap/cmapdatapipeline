@@ -9,3 +9,4 @@ ingest/error
 ingest/geckodriver.log
 *geckodriver.log*
 *__pycache__
+*error

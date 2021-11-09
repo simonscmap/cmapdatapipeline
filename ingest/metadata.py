@@ -49,7 +49,7 @@ def import_metadata(branch, tableName):
     return dataset_metadata_df, vars_metadata_df
 
 
-def tblDatasets_Insert(dataset_metadata_df, tableName, server, db_name):
+def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db_name):
     last_dataset_ID = cmn.get_last_ID("tblDatasets", server) + 1
     dataset_metadata_df = cmn.nanToNA(dataset_metadata_df)
     dataset_metadata_df.replace({"'": "''"}, regex=True, inplace=True)
@@ -79,7 +79,10 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, server, db_name):
     # Temps
     Variables = ""
     Doc_URL = ""
-    Icon_URL = f"""https://raw.githubusercontent.com/simonscmap/static/master/mission_icons/{tableName}.png"""
+    if len(icon_filename) > 3:
+        Icon_URL = f"""https://raw.githubusercontent.com/simonscmap/static/master/mission_icons/{icon_filename}"""    
+    else:
+        Icon_URL = f"""https://raw.githubusercontent.com/simonscmap/static/master/mission_icons/{tableName}.png"""
 
     query = (
         last_dataset_ID,

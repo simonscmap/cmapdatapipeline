@@ -137,6 +137,7 @@ def ensureST_numeric(df):
     ST_cols = ST_columns(df)
     ST_cols.remove("time")
     for col in ST_cols:
+        df[col] = df[col].map(lambda x: x.strip() if isinstance(x, str) else x)
         df[col] = pd.to_numeric(df[col], errors="coerce")
     return df
 

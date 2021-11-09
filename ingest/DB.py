@@ -8,6 +8,7 @@ cmapdata - DB - database connections and CRUD operations.
 
 import sys
 import os
+sys.path.append("../../ingest") 
 
 import credentials as cr
 import pyodbc
