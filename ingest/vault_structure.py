@@ -59,6 +59,7 @@ collected_data = r"/data/CMAP Data Submission Dropbox/Simons CMAP/collected_data
 spatial_data = r"/data/CMAP Data Submission Dropbox/Simons CMAP/spatial_data/"
 dataset_audit = r"/data/CMAP Data Submission Dropbox/Simons CMAP/dataset_audit/"
 download_transfer = r"/data/CMAP Data Submission Dropbox/Simons CMAP/download_transfer/"
+app_data = r"/data/CMAP Data Submission Dropbox/Simons CMAP/Apps/Simons CMAP Web Data Submission/"
 
 
 ################# Static Mission Icon Directory ##################

@@ -334,7 +334,7 @@ def full_ingestion(args):
         data_dict, args.tableName, args.DOI_link_append, args.Server, args.Database, args.process_level
     )
     insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
-    if args.Server == "Rainier":
+    if args.Server == "Rainier" and args.icon_filename is None:
         createIcon(data_dict, args.tableName)
         push_icon()
 

@@ -26,18 +26,18 @@ for fil in tqdm(fsort):
     df = xdf.to_dataframe().reset_index()
     df = df[['month','lat','lon','mld_da_mean', 'mld_dt_mean', 'mld_da_median', 'mld_dt_median', 'mld_da_std', 'mld_dt_std', 'mld_da_max', 'mld_dt_max', 'mlpd_da', 'mlpd_dt', 'mlt_da', 'mlt_dt', 'mls_da', 'mls_dt', 'num']]
 
-    DB.toSQLbcp_wrapper(df, 'tblArgo_MLD_Climatology', "Beast")
+    DB.toSQLbcp_wrapper(df, 'tblArgo_MLD_Climatology', "Rainier")
     print(fil)
     
-    ## Export copy of data ingested to DB as parquet file into vault
-    df.to_parquet(
-        vs.model
-        + "tblArgo_MLD_Climatology/rep/"
-        + "tblArgo_MLD_Climatology.parquet"
-    )
-    print('Parquet saved')
-    ## Copy (or move?) original downloaded file into vault
-    shutil.copy(
-        fil, vs.model + "tblArgo_MLD_Climatology/raw"
-    )
-    print('NetCDF copied')
+    # ## Export copy of data ingested to DB as parquet file into vault
+    # df.to_parquet(
+    #     vs.model
+    #     + "tblArgo_MLD_Climatology/rep/"
+    #     + "tblArgo_MLD_Climatology.parquet"
+    # )
+    # print('Parquet saved')
+    # ## Copy (or move?) original downloaded file into vault
+    # shutil.copy(
+    #     fil, vs.model + "tblArgo_MLD_Climatology/raw"
+    # )
+    # print('NetCDF copied')
