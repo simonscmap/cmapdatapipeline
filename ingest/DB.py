@@ -166,6 +166,18 @@ def lineInsert(server, tableName, columnList, query, ID_insert=False):
     cursor.execute(insertQuery)
     conn.commit()
 
+def queryExecute(server, query):
+    """Execute query directly in SQL, not through pycmap query functionality: DB_query(query)
+
+    Args:
+        server (str): Valid CMAP server name. ex Rainier
+        query (str): sql query values
+        ID_insert (bool, optional): Identity_insert. Defaults to False.
+    """
+    conn, cursor = dbConnect(server)
+    cursor.execute(query)
+    conn.commit()
+
 
 def urllib_pyodbc_format(conn_str):
     """formats pyodbc connection string with urllib"""
@@ -173,7 +185,7 @@ def urllib_pyodbc_format(conn_str):
     return quoted_conn_str
 
 
-def toSQLpandas(df, tableName, server):
+def toSQLpandas(df, tableName, server, ch=1000):
     """SQL ingestion option, uses pandas to_sql functionality.
 
     Args:
@@ -189,7 +201,7 @@ def toSQLpandas(df, tableName, server):
     engine = sqlalchemy.create_engine(
         "mssql+pyodbc:///?odbc_connect={}".format(quoted_conn_str)
     )
-    df.to_sql(tableName, con=engine, if_exists="append", method="multi", index=False)
+    df.to_sql(tableName, con=engine, if_exists="append", method="multi", index=False, chunksize=ch)
 
 
 def toSQLbcpandas(df, tableName, server):
@@ -212,21 +224,21 @@ def toSQLbcp(export_path, tableName, server):
 
     usr, psw, ip, port, db_name, TDS_Version = server_select_credentials(server)
     bcp_str = (
-        """bcp """
-        + db_name
-        + """.dbo."""
-        + tableName
-        + """ in """
-        + """'"""
-        + export_path
-        + """'"""
-        + """ -e error -F 2 -c -t, -U  """
-        + usr
-        + """ -P """
-        + psw
-        + """ -S """
-        + ip
-        + ""","""
-        + port
-    )
+            """bcp """
+            + db_name
+            + """.dbo."""
+            + tableName
+            + """ in """
+            + """'"""
+            + export_path
+            + """'"""
+            + """ -e error -F 2 -c -t, -b 10000 -h'TABLOCK' -U """
+            + usr
+            + """ -P """
+            + psw
+            + """ -S """
+            + ip
+            + ""","""
+            + port
+        )
     os.system(bcp_str)
