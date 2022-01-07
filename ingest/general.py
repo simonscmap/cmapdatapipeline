@@ -164,13 +164,37 @@ def insertCruise(metadata_df, trajectory_df, cruise_name, db_name, server):
         Server (str): Valid CMAP server name
     """
     metadata_df = cmn.nanToNA(metadata_df)
+    print(metadata_df['Cruise_Series'][0])
+    
+    if metadata_df['Cruise_Series'][0] == ' ':
+        metadata_df.at[0, 'Cruise_Series'] = None
 
-    DB.lineInsert(
-        server,
-        "tblCruise",
-        "(Nickname,Name,Ship_Name,Start_Time,End_Time,Lat_Min,Lat_Max,Lon_Min,Lon_Max,Chief_Name,Cruise_Series)",
-        tuple(metadata_df.iloc[0].astype(str).to_list()),
-    )
+    print(tuple(metadata_df.iloc[0].astype(str).to_list()))
+    
+    query = 'SELECT MAX(ID) FROM tblCruise'
+    max_id = DB.dbRead(query, server)
+    
+    metadata_df.at[0, 'Cruise_Series'] = ''
+    print(max_id)
+
+    if server.lower() == 'mariana':  
+        insert_id = max_id.iloc[0,0] + 1
+        metadata_df.insert(0,'ID',insert_id)
+        print(metadata_df)       
+
+        DB.lineInsert(
+            server,
+            "tblCruise",
+            "(ID,Nickname,Name,Ship_Name,Start_Time,End_Time,Lat_Min,Lat_Max,Lon_Min,Lon_Max,Chief_Name,Cruise_Series)",
+            tuple(metadata_df.iloc[0].astype(str).to_list()),
+        )    
+    else:
+        DB.lineInsert(
+            server,
+            "tblCruise",
+            "(Nickname,Name,Ship_Name,Start_Time,End_Time,Lat_Min,Lat_Max,Lon_Min,Lon_Max,Chief_Name,Cruise_Series)",
+            tuple(metadata_df.iloc[0].astype(str).to_list()),
+        )
     trajectory_df = cruise.add_ID_trajectory_df(trajectory_df, cruise_name, server)
     data.data_df_to_db(
         trajectory_df, "tblCruise_Trajectory", server, clean_data_df_flag=False
@@ -195,7 +219,12 @@ def insertMetadata_no_data(
         server (str): Valid CMAP server
         process_level (str): rep or nrt
     """
+
     metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, icon_filename, server, db_name)
+
+    if len(data_dict["dataset_metadata_df"]["cruise_names"].iloc[0]) >0:
+        metadata.tblMetadata_Cruises_Insert(data_dict["dataset_metadata_df"], db_name, server)
+    
     metadata.tblDataset_References_Insert(
         data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
     )
@@ -359,6 +388,27 @@ def dataless_ingestion(args):
     insert_large_stats(args.tableName, args.Database, args.Server)
 
 
+def update_metadata(args):
+    """This wrapper function deletes existing metadata, then adds metadata into the database for datasets that already exist in the database"""
+    splitExcel(args.staging_filename, data_missing_flag=True)
+    staging_to_vault(
+        args.staging_filename,
+        getBranch_Path(args),
+        args.tableName,
+        remove_file_flag=False,
+        skip_data_flag=True,
+        process_level=args.process_level,
+    )
+    data_dict = data.importDataMemory(
+        args.branch, args.tableName, args.process_level, import_data=False
+    )
+    metadata.deleteTableMetadata(args.tableName, args.Database, args.Server)
+    insertMetadata_no_data(
+        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level
+    )
+    insert_large_stats(args.tableName, args.Database, args.Server)
+
+
 def main():
     """Main function that parses arguments and determines which data ingestion path depending on args"""
     parser = argparse.ArgumentParser(description="Ingestion datasets into CMAP")
@@ -389,6 +439,7 @@ def main():
     )
 
     parser.add_argument("-N", "--Dataless_Ingestion", nargs="?", const=True)
+    parser.add_argument("-U", "--Update_Metadata", nargs="?", const=True)
     parser.add_argument("-C", "--cruise_name", help="UNOLS Name", nargs="?")
     parser.add_argument(
         "-S", "--Server", help="Server choice: Rainier, Mariana", nargs="?"
@@ -400,7 +451,8 @@ def main():
         "-i", 
         "--icon_filename", 
         help="Filename for icon in Github instead of creating a map thumbnail of data. Ex: argo_small.jpg", 
-        nargs="?"
+        nargs="?",
+        default=""
     )
     args = parser.parse_args()
 
@@ -409,6 +461,9 @@ def main():
 
     elif args.Dataless_Ingestion:
         dataless_ingestion(args)
+    
+    elif args.Update_Metadata:
+        update_metadata(args)
 
     else:
         full_ingestion(args)

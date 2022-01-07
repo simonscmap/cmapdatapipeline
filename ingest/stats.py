@@ -61,6 +61,7 @@ def updateStats_Small(tableName, db_name, server, data_df=None):
         {"time": [data_df["time"].min(), data_df["time"].max()]}, index=["min", "max"]
     )
     df = pd.concat([stats_df, min_max_df], axis=1, sort=True)
+    df['time'] =  df['time'].dt.date
     json_str = df.to_json(date_format="iso")
     sql_df = pd.DataFrame({"Dataset_ID": [Dataset_ID], "JSON": [json_str]})
     updateStatsTable(Dataset_ID, json_str, server)
@@ -180,29 +181,37 @@ def build_stats_df_from_db_calls(tableName, server):
         tableName, server
         )
     else:
-        col_list = ["time"] + cmn.get_numeric_cols_in_table_excluding_climatology(
+        col_list =  ["time"] + cmn.get_numeric_cols_in_table_excluding_climatology(
         tableName, server
-        )
+        ) 
     stats_DF = pd.DataFrame(index=["count", "max", "mean", "min", "std"])
     for var in tqdm(col_list):
         print(var)
-        try:
-            stats_qry = (
-                f"""SELECT count_big({var}),MAX({var}),MIN({var}),AVG({var}),STDEV({var}) FROM {tableName}"""
-            )
-            var_df = DB.dbRead(stats_qry, server)
-        except:
-            stats_qry = f"""SELECT count_big({var}),MAX(cast({var} as numeric(12, 0))),MIN(cast({var} as numeric(12, 0))),AVG(cast({var} as numeric(12, 0))),STDEV(cast({var} as numeric(12, 0))) FROM {tableName}"""
-            var_df = DB.dbRead(stats_qry, server)
-
         stats_DF[var] = ""
+        if var == 'time':
+            stats_qry = (
+                f"""SELECT count_big({var}),MAX(cast({var} as date)),MIN(cast({var} as date)),'','' FROM {tableName}"""
+            )     
+            stats_qry = (
+                f"""SELECT count_big({var}),cast(MAX(cast({var} as date)) as nvarchar(10)),cast(MIN(cast({var} as date)) as nvarchar(10)),'','' FROM {tableName}"""
+            )         
+            var_df = DB.dbRead(stats_qry, server)    
+        else:
+            try:
+                stats_qry = (
+                    f"""SELECT count_big({var}),MAX({var}),MIN({var}),AVG({var}),STDEV({var}) FROM {tableName}"""
+                )
+                var_df = DB.dbRead(stats_qry, server)
+            except:
+                stats_qry = f"""SELECT count_big({var}),MAX(cast({var} as numeric(12, 0))),MIN(cast({var} as numeric(12, 0))),AVG(cast({var} as numeric(12, 0))),STDEV(cast({var} as numeric(12, 0))) FROM {tableName}"""
+                var_df = DB.dbRead(stats_qry, server)            
         if (var == 'lat' or var == 'lon'):
             stats_DF.at["mean", var] = ""
             stats_DF.at["std", var] = ""
         else:
             stats_DF.at["mean", var] = var_df.iloc[:, 3][0]
             stats_DF.at["std", var] = var_df.iloc[:, 4][0]
-        stats_DF.at["count", var] = var_df.iloc[:, 0][0]
+        stats_DF.at["count", var] = var_df.iloc[:, 0][0] 
         stats_DF.at["max", var] = var_df.iloc[:, 1][0]
         stats_DF.at["min", var] = var_df.iloc[:, 2][0]
 

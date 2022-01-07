@@ -15,6 +15,7 @@ import pandas as pd
 import numpy as np
 import xarray as xr
 
+
 import credentials as cr
 import common as cmn
 import cruise
@@ -130,10 +131,12 @@ def tblDataset_References_Insert(dataset_metadata_df, server, db_name, DOI_link_
         reference_list.append(DOI_link_append)
 
     for ref in reference_list:
-        query = (IDvar, ref)
-        DB.lineInsert(
-            server, db_name +".[dbo].[tblDataset_References]", columnList, query
-        )
+        if ref != " ":
+            query = (IDvar, ref)
+            
+            DB.lineInsert(
+                server, db_name +".[dbo].[tblDataset_References]", columnList, query
+            )
     print("Inserting data into tblDataset_References.")
 
 
@@ -411,6 +414,31 @@ def tblDataset_Cruises_Insert(data_df, dataset_metadata_df, db_name, server):
         )
     print("Dataset matched to cruises")
 
+
+def tblMetadata_Cruises_Insert(dataset_metadata_df, db_name, server):
+
+    matched_cruises, unmatched_cruises = cmn.verify_cruise_lists(
+        dataset_metadata_df, server
+    )
+    print("matched: ")
+    print(matched_cruises)
+    print("\n")
+    print("umatched: ")
+    print(unmatched_cruises)
+
+    cruise_ID_list = cmn.get_cruise_IDS(matched_cruises, server)
+    dataset_ID = cmn.getDatasetID_DS_Name(
+        dataset_metadata_df["dataset_short_name"].iloc[0], db_name, server
+    )
+    for cruise_ID in cruise_ID_list:
+        query = (dataset_ID, cruise_ID)
+        DB.lineInsert(
+            server,
+            db_name + ".[dbo].[tblDataset_Cruises]",
+            "(Dataset_ID, Cruise_ID)",
+            query,
+        )
+    print("Dataset matched to cruises")
 
 def deleteFromtblKeywords(Dataset_ID, db_name, server):
     Keyword_ID_list = cmn.getKeywordsIDDataset(Dataset_ID, server)
