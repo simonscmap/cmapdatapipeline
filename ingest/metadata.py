@@ -230,7 +230,16 @@ def tblVariables_Insert(
     Comment_list = cmn.nanToNA(variable_metadata_df["var_comment"]).tolist()
     Visualize_list = cmn.nanToNA(variable_metadata_df["visualize"]).tolist()
     Data_Type_list = cmn.getTableName_Dtypes(Table_Name, server)["DATA_TYPE"].tolist()
-    columnList = "(ID,DB, Dataset_ID, Table_Name, Short_Name, Long_Name, Unit, Temporal_Res_ID, Spatial_Res_ID, Temporal_Coverage_Begin, Temporal_Coverage_End, Lat_Coverage_Begin, Lat_Coverage_End, Lon_Coverage_Begin, Lon_Coverage_End, Grid_Mapping, Make_ID, Sensor_ID, Process_ID, Study_Domain_ID, Comment, Visualize, Data_Type)"
+    if 'var_organism' in variable_metadata_df.columns.tolist():
+        variable_metadata_df["var_organism"]
+        Org_ID_list = cmn.nanToNA(variable_metadata_df["var_organism"]).tolist()
+    else:
+        Org_ID_list = [None]
+    if 'var_conversion_coefficient' in variable_metadata_df.columns.tolist():
+        Conversion_Coefficient_list = cmn.nanToNA(variable_metadata_df["var_conversion_coefficient"]).tolist()
+    else:
+        Conversion_Coefficient_list = [None]
+    columnList = "(ID,DB, Dataset_ID, Table_Name, Short_Name, Long_Name, Unit, Temporal_Res_ID, Spatial_Res_ID, Temporal_Coverage_Begin, Temporal_Coverage_End, Lat_Coverage_Begin, Lat_Coverage_End, Lon_Coverage_Begin, Lon_Coverage_End, Grid_Mapping, Make_ID, Sensor_ID, Process_ID, Study_Domain_ID, Comment, Visualize, Data_Type, Org_ID, Conversion_Coefficient)"
 
     for (
         Db,
@@ -255,6 +264,8 @@ def tblVariables_Insert(
         Comment,
         Visualize,
         Data_Type,
+        Org_ID, 
+        Conversion_Coefficient,
     ) in zip(
         Db_list,
         IDvar_list,
@@ -278,6 +289,8 @@ def tblVariables_Insert(
         Comment_list,
         Visualize_list,
         Data_Type_list,
+        Org_ID_list, 
+        Conversion_Coefficient_list,
     ):
         last_var_ID = cmn.get_last_ID("tblVariables", server) + 1
         query = (
@@ -304,6 +317,8 @@ def tblVariables_Insert(
             Comment,
             Visualize,
             Data_Type,
+            Org_ID, 
+            Conversion_Coefficient,
         )
 
         try:

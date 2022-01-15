@@ -13,6 +13,8 @@ import numpy as np
 import glob
 import xarray as xr
 
+sys.path.append("/ingest")
+
 import vault_structure as vs
 import DB
 import common as cmn

@@ -33,6 +33,7 @@ import mapping
 import stats
 import common as cmn
 import cruise
+import data_checks as dc
 
 
 def getBranch_Path(args):
@@ -156,7 +157,6 @@ def add_ST_cols_cruise(metadata_df, traj_df):
 def insertCruise(metadata_df, trajectory_df, cruise_name, db_name, server):
     """Inserts metadata_df, trajectory_df into server as well as ocean region classifcation into tblCruise_Regions. If you want to add more to the template such as keywords etc, they could be included here.
 
-
     Args:
         metadata_df (Pandas DataFrame): cruise metadata dataframe
         trajectory_df (Pandas DataFrame): cruise trajectory dataframe
@@ -219,39 +219,44 @@ def insertMetadata_no_data(
         server (str): Valid CMAP server
         process_level (str): rep or nrt
     """
+    org_check_passed = dc.validate_organism_ingest(data_dict["variable_metadata_df"], server)
+    if not org_check_passed:
+        contYN = input(
+        "Stop ingest to check organism data?  [yes/no]: "
+        )
+    if contYN == 'no':
+        metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, icon_filename, server, db_name)
 
-    metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, icon_filename, server, db_name)
-
-    if len(data_dict["dataset_metadata_df"]["cruise_names"].iloc[0]) >0:
-        metadata.tblMetadata_Cruises_Insert(data_dict["dataset_metadata_df"], db_name, server)
-    
-    metadata.tblDataset_References_Insert(
-        data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
-    )
-
-    metadata.tblVariables_Insert(
-        False,
-        data_dict["dataset_metadata_df"],
-        data_dict["variable_metadata_df"],
-        tableName,
-        server,
-        db_name,
-        process_level,
-        CRS="CRS",
-    )
-    metadata.tblKeywords_Insert(
-        data_dict["variable_metadata_df"],
-        data_dict["dataset_metadata_df"],
-        tableName,
-        db_name,
-        server,
-    )
-
-    # region id 114 is global
-    metadata.ocean_region_insert(
-        ["114"], data_dict["dataset_metadata_df"]["dataset_short_name"].iloc[0], db_name, server
-    )
-
+        if len(data_dict["dataset_metadata_df"]["cruise_names"].iloc[0]) >0:
+            metadata.tblMetadata_Cruises_Insert(data_dict["dataset_metadata_df"], db_name, server)
+        
+        metadata.tblDataset_References_Insert(
+            data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
+        )
+        
+        metadata.tblVariables_Insert(
+            False,
+            data_dict["dataset_metadata_df"],
+            data_dict["variable_metadata_df"],
+            tableName,
+            server,
+            db_name,
+            process_level,
+            CRS="CRS",
+        )
+        metadata.tblKeywords_Insert(
+            data_dict["variable_metadata_df"],
+            data_dict["dataset_metadata_df"],
+            tableName,
+            db_name,
+            server,
+        )
+        # region id 114 is global
+        metadata.ocean_region_insert(
+            ["114"], data_dict["dataset_metadata_df"]["dataset_short_name"].iloc[0], db_name, server
+        )
+    else:
+        print('insertMetadata_no_data stopped to check organism data')
     # if data_dict["dataset_metadata_df"]["cruise_names"].dropna().empty == False:
     #     metadata.tblDataset_Cruises_Insert(
     #         data_dict["data_df"], data_dict["dataset_metadata_df"], server
@@ -268,38 +273,46 @@ def insertMetadata(data_dict, tableName, DOI_link_append, server, db_name, proce
         server (str): Valid CMAP server
         process_level (str): rep or nrt
     """
-    metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server, db_name)
-    metadata.tblDataset_References_Insert(
-        data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
-    )
-    metadata.tblVariables_Insert(
-        data_dict["data_df"],
-        data_dict["dataset_metadata_df"],
-        data_dict["variable_metadata_df"],
-        tableName,
-        server,
-        db_name,
-        process_level,
-        CRS="CRS",
-    )
-    metadata.tblKeywords_Insert(
-        data_dict["variable_metadata_df"],
-        data_dict["dataset_metadata_df"],
-        tableName,
-        db_name,
-        server,
-    )
-    metadata.ocean_region_classification(
-        data_dict["data_df"],
-        data_dict["dataset_metadata_df"]["dataset_short_name"].iloc[0],
-        db_name,
-        server,
-    )
-    if data_dict["dataset_metadata_df"]["cruise_names"].dropna().empty == False:
-        metadata.tblDataset_Cruises_Insert(
-            data_dict["data_df"], data_dict["dataset_metadata_df"], db_name, server
+    
+    org_check_passed = dc.validate_organism_ingest(data_dict["variable_metadata_df"], server)
+    if not org_check_passed:
+        contYN = input(
+        "Stop ingest to check organism data?  [yes/no]: "
         )
-
+    if contYN == 'no':
+        metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server, db_name)
+        metadata.tblDataset_References_Insert(
+            data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
+        )
+        metadata.tblVariables_Insert(
+            data_dict["data_df"],
+            data_dict["dataset_metadata_df"],
+            data_dict["variable_metadata_df"],
+            tableName,
+            server,
+            db_name,
+            process_level,
+            CRS="CRS",
+        )
+        metadata.tblKeywords_Insert(
+            data_dict["variable_metadata_df"],
+            data_dict["dataset_metadata_df"],
+            tableName,
+            db_name,
+            server,
+        )
+        metadata.ocean_region_classification(
+            data_dict["data_df"],
+            data_dict["dataset_metadata_df"]["dataset_short_name"].iloc[0],
+            db_name,
+            server,
+        )
+        if data_dict["dataset_metadata_df"]["cruise_names"].dropna().empty == False:
+            metadata.tblDataset_Cruises_Insert(
+                data_dict["data_df"], data_dict["dataset_metadata_df"], db_name, server
+            )
+    else:
+        print('insertMetadata stopped to check organism data')
 
 def insert_small_stats(data_dict, tableName, db_name, server):
     """Wrapper function for stats.updateStats_Small"""

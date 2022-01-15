@@ -8,6 +8,7 @@ cmapdata - data - data cleaning and reformatting functions.
 
 import sys
 import os
+from this import s
 import pandas as pd
 import numpy as np
 
@@ -140,17 +141,28 @@ def NaNtoNone(df):
 
 def check_df_ingest(df, table_name, server):
     """Runs checks on a pandas df before ingest"""
+
+    query_not_null = f'''
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = 'dbo'
+        AND TABLE_NAME = '{table_name}'
+        AND IS_NULLABLE = 'NO'
+    '''
+    df_not_null = DB.dbRead(query_not_null, server)
     i = 0
-    if sum(df['lon']>180) > 0 or sum(df['lon']<-180) > 0:
-        print('#############Run dc.mapTo180180(df)')
-        i +=1
-    if sum(df['lat']>90) > 0 or sum(df['lat']<-90) > 0:
-        print('#############Lat out of range') 
-        i +=1
-    var_list = ['lat', 'lon']
+    if 'lon' in df.columns.tolist():
+        if sum(df['lon']>180) > 0 or sum(df['lon']<-180) > 0:
+            print('#############Run dc.mapTo180180(df)')
+            i +=1
+    if 'lat' in df.columns.tolist():
+        if sum(df['lat']>90) > 0 or sum(df['lat']<-90) > 0:
+            print('#############Lat out of range') 
+            i +=1
+        var_list = ['lat', 'lon']
     if 'month' in df.columns.tolist():
         var_list.append('month')
-    else:
+    elif 'time' in df.columns.tolist():
         var_list.append('time')
     if 'depth'in df.columns.tolist():
         var_list.append('depth')
@@ -170,6 +182,9 @@ def check_df_ingest(df, table_name, server):
     if 'xml' in df_sql.DATA_TYPE.values:
         df_sql.drop(df_sql[df_sql.DATA_TYPE == 'xml'].index, inplace=True)
         df_sql.reset_index(inplace=True)
+    if 'ID' in df_sql.columns.tolist():
+        df_sql.drop(columns='ID', inplace=True)
+        df_sql.reset_index(inplace=True)        
     df_check = df.dtypes.to_frame('dtypes').reset_index()
 
     for i, row in df_sql.iterrows():
@@ -251,4 +266,62 @@ def add_day_week_month_year_clim(df):
     df["dayofyear"] = pd.to_datetime(df["time"]).dt.dayofyear
     return df
 
+def validate_organism_ingest(df, server):
+    """Checks for Organism ID, if null checks variable name and units to flag for review
 
+    Args:
+        df (Pandas DataFrame): Input Pandas DataFrame (ie variable_metadata).
+        server (str): Valid CMAP server name. ex Rainier
+    Returns:
+        org_check_passed (bool): If all variable checks passed
+    """
+    unit_list = ['cell','number','#']
+    var_list = ['abundance', 'ecotype', 'enumeration', 'cells', 'heterotrophic', 'genus']
+    blank_check_list = ['', ' ', None, np.nan, 0]
+    qry = 'SELECT Name FROM tblOrganism'
+    org_df = DB.dbRead(qry, server)
+    org_list = org_df['Name'].tolist()
+    i = 0
+    if 'var_organism' in df.columns.tolist() and 'var_conversion_coefficient' in df.columns.tolist():
+        for row in df.itertuples(index=True, name='Pandas'):
+            ## If org and coeff are blank, check that they should be blank
+            if row.var_organism in blank_check_list and row.var_conversion_coefficient in blank_check_list:
+                match_unit = [v for v in unit_list if v in row.var_unit]
+                if len(match_unit)>0:
+                    print(f'Index: {str(row.Index)}, unit {row.var_unit} matches {", ".join(match_unit)}')
+                    i +=1
+                match_short_var = [v for v in var_list if v in row.var_short_name]
+                if len(match_short_var)>0:
+                    print(f'Index: {str(row.Index)}, short name --{row.var_short_name}-- matches {", ".join(match_short_var)}')
+                    i +=1
+                match_long_var = [v for v in var_list if v in row.var_long_name]
+                if len(match_long_var)>0:
+                    print(f'Index: {str(row.Index)}, long name --{row.var_long_name}-- matches {", ".join(match_long_var)}')
+                    i +=1
+                match_short_org = [v for v in org_list if v in row.var_short_name]
+                if len(match_short_org)>0:
+                    print(f'Index: {str(row.Index)}, short name --{row.var_short_name}-- matches {", ".join(match_short_org)}')
+                    i +=1
+                match_long_org = [v for v in org_list if v in row.var_long_name]
+                if len(match_long_org)>0:
+                    print(f'Index: {str(row.Index)}, long name --{row.var_long_name}-- matches {", ".join(match_long_org)}')
+                    i +=1
+            if row.var_organism not in blank_check_list and pd.isnull(row.var_conversion_coefficient):
+                print(f'Index: {str(row.Index)}, Organism ID {row.var_organism} missing coefficient')
+                i +=1
+            if pd.isnull(row.var_organism) and row.var_conversion_coefficient not in blank_check_list:
+                print(f'Index: {str(row.Index)}, Coefficient {row.var_conversion_coefficient} Missing organism ID')
+                i +=1
+            if row.var_conversion_coefficient not in blank_check_list:
+                if (row.var_conversion_coefficient > 1 and ('^' not in row.var_unit or 'micro' not in row.var_unit)) \
+                or (row.var_conversion_coefficient <= 1 and '^' in row.var_unit):
+                    print(f'Index: {str(row.Index)}, Check coefficient {row.var_conversion_coefficient} and unit {row.var_unit}')
+                    i +=1
+        if i == 0:
+            print('All organism checks passed')
+            org_check_passed = True
+        else:
+            org_check_passed = True
+    else:
+        print('No organism or coefficient columns present')
+    return org_check_passed

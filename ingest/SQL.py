@@ -87,7 +87,7 @@ def SQL_index_suggestion_formatter(
 
 
 def SQL_tbl_suggestion_formatter(sdf, tableName, server, db_name, FG="Primary"):
-    """Creates SQL table suggestion from input dataframe"""
+    """Creates SQL table suggestion from input dataframe. Default FG is Primary"""
 
     sdf["null_status"] = "NULL,"
     sdf.loc[sdf["column_name"] == "time", "dtype"] = "[datetime]"
