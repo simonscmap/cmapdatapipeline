@@ -8,7 +8,7 @@ cmapdata - data - data cleaning and reformatting functions.
 
 import sys
 import os
-from this import s
+# from this import s
 import pandas as pd
 import numpy as np
 
@@ -282,6 +282,7 @@ def validate_organism_ingest(df, server):
     org_df = DB.dbRead(qry, server)
     org_list = org_df['Name'].tolist()
     i = 0
+    org_check_passed = True
     if 'var_organism' in df.columns.tolist() and 'var_conversion_coefficient' in df.columns.tolist():
         for row in df.itertuples(index=True, name='Pandas'):
             ## If org and coeff are blank, check that they should be blank
@@ -312,16 +313,15 @@ def validate_organism_ingest(df, server):
             if pd.isnull(row.var_organism) and row.var_conversion_coefficient not in blank_check_list:
                 print(f'Index: {str(row.Index)}, Coefficient {row.var_conversion_coefficient} Missing organism ID')
                 i +=1
-            if row.var_conversion_coefficient not in blank_check_list:
+            if row.var_conversion_coefficient not in blank_check_list and isinstance(row.var_conversion_coefficient, (int, float)):
                 if (row.var_conversion_coefficient > 1 and ('^' not in row.var_unit or 'micro' not in row.var_unit)) \
                 or (row.var_conversion_coefficient <= 1 and '^' in row.var_unit):
                     print(f'Index: {str(row.Index)}, Check coefficient {row.var_conversion_coefficient} and unit {row.var_unit}')
                     i +=1
         if i == 0:
             print('All organism checks passed')
-            org_check_passed = True
         else:
-            org_check_passed = True
+            org_check_passed = False
     else:
         print('No organism or coefficient columns present')
     return org_check_passed

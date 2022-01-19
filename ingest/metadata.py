@@ -234,11 +234,11 @@ def tblVariables_Insert(
         variable_metadata_df["var_organism"]
         Org_ID_list = cmn.nanToNA(variable_metadata_df["var_organism"]).tolist()
     else:
-        Org_ID_list = [None]
+        Org_ID_list = ['NULL'] * len(variable_metadata_df)
     if 'var_conversion_coefficient' in variable_metadata_df.columns.tolist():
         Conversion_Coefficient_list = cmn.nanToNA(variable_metadata_df["var_conversion_coefficient"]).tolist()
     else:
-        Conversion_Coefficient_list = [None]
+        Conversion_Coefficient_list = ['NULL'] * len(variable_metadata_df)
     columnList = "(ID,DB, Dataset_ID, Table_Name, Short_Name, Long_Name, Unit, Temporal_Res_ID, Spatial_Res_ID, Temporal_Coverage_Begin, Temporal_Coverage_End, Lat_Coverage_Begin, Lat_Coverage_End, Lon_Coverage_Begin, Lon_Coverage_End, Grid_Mapping, Make_ID, Sensor_ID, Process_ID, Study_Domain_ID, Comment, Visualize, Data_Type, Org_ID, Conversion_Coefficient)"
 
     for (

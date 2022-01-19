@@ -166,16 +166,11 @@ def insertCruise(metadata_df, trajectory_df, cruise_name, db_name, server):
     metadata_df = cmn.nanToNA(metadata_df)
     print(metadata_df['Cruise_Series'][0])
     
-    if metadata_df['Cruise_Series'][0] == ' ':
-        metadata_df.at[0, 'Cruise_Series'] = None
-
-    print(tuple(metadata_df.iloc[0].astype(str).to_list()))
+    if metadata_df['Cruise_Series'][0] == ' ' or metadata_df['Cruise_Series'][0] == '':
+        metadata_df.at[0, 'Cruise_Series'] = 'NULL'
     
     query = 'SELECT MAX(ID) FROM tblCruise'
     max_id = DB.dbRead(query, server)
-    
-    metadata_df.at[0, 'Cruise_Series'] = ''
-    print(max_id)
 
     if server.lower() == 'mariana':  
         insert_id = max_id.iloc[0,0] + 1
@@ -218,13 +213,17 @@ def insertMetadata_no_data(
         DOI_link_append (str): DOI link to append to tblDataset_References
         server (str): Valid CMAP server
         process_level (str): rep or nrt
+
+    Returns:
+        org_check_passed (bool): True if passed organism table checks
     """
     org_check_passed = dc.validate_organism_ingest(data_dict["variable_metadata_df"], server)
+    contYN = ''
     if not org_check_passed:
         contYN = input(
         "Stop ingest to check organism data?  [yes/no]: "
         )
-    if contYN == 'no':
+    if contYN != 'yes':
         metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, icon_filename, server, db_name)
 
         if len(data_dict["dataset_metadata_df"]["cruise_names"].iloc[0]) >0:
@@ -261,6 +260,7 @@ def insertMetadata_no_data(
     #     metadata.tblDataset_Cruises_Insert(
     #         data_dict["data_df"], data_dict["dataset_metadata_df"], server
     #     )
+    return org_check_passed
 
 
 def insertMetadata(data_dict, tableName, DOI_link_append, server, db_name, process_level):
@@ -273,13 +273,13 @@ def insertMetadata(data_dict, tableName, DOI_link_append, server, db_name, proce
         server (str): Valid CMAP server
         process_level (str): rep or nrt
     """
-    
+    contYN = ''
     org_check_passed = dc.validate_organism_ingest(data_dict["variable_metadata_df"], server)
     if not org_check_passed:
         contYN = input(
         "Stop ingest to check organism data?  [yes/no]: "
         )
-    if contYN == 'no':
+    if contYN != 'yes':
         metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server, db_name)
         metadata.tblDataset_References_Insert(
             data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
@@ -313,6 +313,8 @@ def insertMetadata(data_dict, tableName, DOI_link_append, server, db_name, proce
             )
     else:
         print('insertMetadata stopped to check organism data')
+    return org_check_passed
+    
 
 def insert_small_stats(data_dict, tableName, db_name, server):
     """Wrapper function for stats.updateStats_Small"""
@@ -372,13 +374,14 @@ def full_ingestion(args):
     )
     SQL_suggestion(data_dict, args.tableName, args.branch, args.Server, args.Database)
     insertData(data_dict, args.tableName, args.Server)
-    insertMetadata(
+    org_check_pass = insertMetadata(
         data_dict, args.tableName, args.DOI_link_append, args.Server, args.Database, args.process_level
     )
-    insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
-    if args.Server == "Rainier" and args.icon_filename is None:
-        createIcon(data_dict, args.tableName)
-        push_icon()
+    if org_check_pass:
+        insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
+        if args.Server == "Rainier" and args.icon_filename is None:
+            createIcon(data_dict, args.tableName)
+            push_icon()
 
 
 def dataless_ingestion(args):
@@ -395,10 +398,11 @@ def dataless_ingestion(args):
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=False
     )
-    insertMetadata_no_data(
+    org_check_passed = insertMetadata_no_data(
         data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level
     )
-    insert_large_stats(args.tableName, args.Database, args.Server)
+    if org_check_passed:
+        insert_large_stats(args.tableName, args.Database, args.Server)
 
 
 def update_metadata(args):
@@ -416,10 +420,11 @@ def update_metadata(args):
         args.branch, args.tableName, args.process_level, import_data=False
     )
     metadata.deleteTableMetadata(args.tableName, args.Database, args.Server)
-    insertMetadata_no_data(
+    org_check_pass = insertMetadata_no_data(
         data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level
     )
-    insert_large_stats(args.tableName, args.Database, args.Server)
+    if org_check_pass:
+        insert_large_stats(args.tableName, args.Database, args.Server)
 
 
 def main():
