@@ -15,6 +15,7 @@ from tqdm import tqdm
 import dropbox
 import credentials as cr
 import vault_structure as vs
+import common as cm
 
 
 def requests_Download(download_str, filename, path):
@@ -70,6 +71,29 @@ def cruise_staging_to_vault(cruise_name, remove_file_flag):
         os.remove(traj_fname)
 
     print("cruise trajectory and metadata transferred from staging to vault.")
+
+
+def validator_to_vault(filename, branch, tableName):
+    """
+    Transfers a file from validator submission to vault.
+
+    Parameters
+    ----------
+    filename : string
+        Filename and extension to be transfered.
+    branch : string
+        Vault organization path: ex: vs.cruise
+    tableName : string
+        SQL tableName
+    """
+    vs.leafStruc(branch + tableName)
+    base_filename = os.path.splitext(os.path.basename(filename))[0]
+    ## If edits are made in validator, additional copies of excel file are saved in Apps directory
+    validator_file = cm.getLast_file_download(base_filename, 'app_data', False)
+    # vault_path = getattr(vs,branch)+tableName+'/raw/'
+    vault_path = branch+tableName+'/raw/'
+    shutil.copyfile(validator_file, vault_path + base_filename +'.xlsx')
+
 
 
 def staging_to_vault(
@@ -188,6 +212,38 @@ def single_file_split(filename, data_missing_flag):
     if data_missing_flag == False:
         data_df = pd.read_excel(vs.combined + filename, sheet_name="data")
         data_df.to_csv(vs.data + base_filename + "_data.csv", sep=",", index=False)
+
+def single_file_vault_split(filename, branch, tableName, data_missing_flag):
+    """
+
+    Splits an excel file containing data, dataset_metadata and vars_metadata sheets
+    into three seperate files in the staging file strucutre.
+    If additional metadata filename is provided, data is split.
+
+    Parameters
+    ----------
+    filename : string
+        Filename and extension to be split.
+    """
+
+    base_filename = os.path.splitext(os.path.basename(filename))[0]
+    vault_path = getattr(vs,branch)+tableName
+    dataset_metadata_df = pd.read_excel(
+        vault_path +'/raw/' + filename, sheet_name="dataset_meta_data"
+    )
+    vars_metadata_df = pd.read_excel(
+        vault_path +'/raw/'+ filename, sheet_name="vars_meta_data"
+    )
+
+    dataset_metadata_df.to_csv(
+        vault_path +'/metadata/'+ base_filename + "_dataset_metadata.csv", sep=",", index=False
+    )
+    vars_metadata_df.to_csv(
+        vault_path +'/metadata/' + base_filename + "_vars_metadata.csv", sep=",", index=False
+    )
+    if data_missing_flag == False:
+        data_df = pd.read_excel(vs.combined + filename, sheet_name="data")
+        data_df.to_csv(vault_path +'/rep/' + base_filename + "_data.csv", sep=",", index=False)        
 
 
 def remove_data_metadata_fnames_staging(staging_sep_flag="combined"):

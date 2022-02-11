@@ -10,8 +10,43 @@ import sys
 import os
 import pandas as pd
 import numpy as np
+import glob
 import DB
 import vault_structure as vs
+
+
+def getMax_SQL_date(table, server):
+    """Returns the max date in a SQL table
+
+    Args:
+        table (str): CMAP table name
+        server (str): Valid CMAP server name
+
+    Returns:
+        sql_date (datetime): Datetime object of max date in table
+    """
+    query = 'select max(time) from [Opedia].[dbo].' + table
+    server = 'Rainier'
+    sql_read = DB.dbRead(query, server)
+    sql_date = sql_read.iloc[0][0]
+    return sql_date
+
+def getLast_file_download(table, vault_type, raw=True):
+    """Returns .....
+    Args:
+        table (str): CMAP table name
+        vault_raw (str): Vault folder type (ie cruise, station, satellite)
+    Returns:
+        last_download (str): Full filepath of the latest file downloaded
+    """
+    ## Pass string as attribute to get full vault path
+    if raw:
+        base_folder = f'{getattr(vs,vault_type)}{table}/raw/'
+    else:
+        base_folder = f'{getattr(vs,vault_type)}{table}/'
+    ## getctime gives create time, getmtime gets modified time
+    last_download =  max(glob.glob(base_folder+'*'), key=os.path.getctime)
+    return last_download
 
 
 def decode_xarray_bytes(xdf):

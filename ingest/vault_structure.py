@@ -14,6 +14,8 @@ def makedir(directory):
     """Creates directory if does not exist"""
     if not os.path.exists(directory):
         os.makedirs(directory)
+    if os.path.exists(directory) and not os.path.exists(directory+'/raw'):
+        os.makedirs(directory+'/raw')
     return
 
 
@@ -27,7 +29,6 @@ def cruise_leaf_structure(base):
     makedir(meta)
     return meta, traj
 
-    makedir(rep)
 
 
 def leafStruc(base):

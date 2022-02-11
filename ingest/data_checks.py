@@ -191,7 +191,7 @@ def check_df_ingest(df, table_name, server):
         if row.DATA_TYPE in df_check.iloc[i,1].name or ('varchar' in row.DATA_TYPE and df_check.iloc[i,1].name == 'object'):
             continue
         else:
-            print('##########SQL dtype: ' + row.DATA_TYPE + '. DF dtype: ' + df_check.iloc[i,1].name)
+            print('##########SQL dtype: ' + row.DATA_TYPE + '. DF dtype: ' + df_check.iloc[i,1].name + ' var: ' + row.Columns)
             i +=1
   
     if i == 0:

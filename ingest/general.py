@@ -46,6 +46,10 @@ def splitExcel(staging_filename, data_missing_flag):
     """Wrapper function for transfer.single_file_split."""
     transfer.single_file_split(staging_filename, data_missing_flag)
 
+def splitVaultExcel(staging_filename, branch, tableName, data_missing_flag):
+    """Wrapper function for transfer.single_file_split."""
+    transfer.single_file_vault_split(staging_filename, branch, tableName, data_missing_flag)
+
 
 def splitCruiseExcel(staging_filename, cruise_name):
     """Wrapper function for transfer.cruise_file_split"""
@@ -65,6 +69,15 @@ def staging_to_vault(
         process_level,
     )
 
+def validator_to_vault(
+    staging_filename, branch, tableName
+):
+    """Wrapper function for transfer.validator_to_vault"""
+    transfer.validator_to_vault(
+        staging_filename,
+        branch,
+        tableName
+    )
 
 def cruise_staging_to_vault(cruise_name, remove_file_flag):
     """Wrapper function for transfer.cruise_staging_to_vault"""
@@ -406,15 +419,13 @@ def dataless_ingestion(args):
 
 
 def update_metadata(args):
-    """This wrapper function deletes existing metadata, then adds metadata into the database for datasets that already exist in the database"""
-    splitExcel(args.staging_filename, data_missing_flag=True)
-    staging_to_vault(
+    """This wrapper function deletes existing metadata, then adds updated metadata into the database"""
+    ## Excel file name, 
+    splitVaultExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=True)
+    validator_to_vault(
         args.staging_filename,
         getBranch_Path(args),
-        args.tableName,
-        remove_file_flag=False,
-        skip_data_flag=True,
-        process_level=args.process_level,
+        args.tableName
     )
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=False
