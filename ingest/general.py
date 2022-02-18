@@ -239,8 +239,10 @@ def insertMetadata_no_data(
     if contYN != 'yes':
         metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, icon_filename, server, db_name)
 
-        if len(data_dict["dataset_metadata_df"]["cruise_names"].iloc[0]) >0:
-            metadata.tblMetadata_Cruises_Insert(data_dict["dataset_metadata_df"], db_name, server)
+        ## spaces in cruise field
+        df_clean_cruise = cmn.strip_leading_trailing_whitespace_column(data_dict["dataset_metadata_df"],"cruise_names").replace('',np.nan,regex=True)
+        if df_clean_cruise["cruise_names"].dropna().empty == False:
+            metadata.tblMetadata_Cruises_Insert(data_dict["dataset_metadata_df"], db_name, server)    
         
         metadata.tblDataset_References_Insert(
             data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
@@ -267,6 +269,8 @@ def insertMetadata_no_data(
         metadata.ocean_region_insert(
             ["114"], data_dict["dataset_metadata_df"]["dataset_short_name"].iloc[0], db_name, server
         )
+
+        
     else:
         print('insertMetadata_no_data stopped to check organism data')
     # if data_dict["dataset_metadata_df"]["cruise_names"].dropna().empty == False:
@@ -414,6 +418,7 @@ def dataless_ingestion(args):
     org_check_passed = insertMetadata_no_data(
         data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level
     )
+   
     if org_check_passed:
         insert_large_stats(args.tableName, args.Database, args.Server)
 
@@ -436,6 +441,8 @@ def update_metadata(args):
     )
     if org_check_pass:
         insert_large_stats(args.tableName, args.Database, args.Server)
+    #     transfer.df_to_parquet(data_dict["variable_metadata_df"],'variable_metadata',args.branch, args.tableName,'metadata')
+    #     transfer.df_to_parquet(data_dict["dataset_metadata_df"],'dataset_metadata',args.branch, args.tableName,'metadata')
 
 
 def main():

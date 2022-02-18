@@ -138,19 +138,25 @@ def NaNtoNone(df):
     df = df.replace(np.nan, '', regex=True)
     return df
 
-
-def check_df_ingest(df, table_name, server):
-    """Runs checks on a pandas df before ingest"""
-
-    query_not_null = f'''
-        SELECT COLUMN_NAME
-        FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_SCHEMA = 'dbo'
-        AND TABLE_NAME = '{table_name}'
-        AND IS_NULLABLE = 'NO'
-    '''
-    df_not_null = DB.dbRead(query_not_null, server)
+def check_df_values(df):
+    """Data checks on a dataframe before import
+    Checks lat, lon, and depth
+    Checks all numeric variables for min or max < or > 5 times standard deviation of dataset
+    Returns 0 if all checks pass
+    Returns 1 or more for each test with values out of expected range
+    
+    """
     i = 0
+    ## Check data values
+    for d in df.columns:
+        if d not in ['time','lat','lon','depth'] and df[d].dtype != 'O':
+            std = df.describe()[d]['std']
+            mn = df.describe()[d]['min']
+            mx = df.describe()[d]['max']
+            if 1 > std >=0:
+                continue
+            if (mn <= std *-5 or mx >= std *5):
+                print(f'#############Check data values for {d}. Min: {mn}, Max: {mx}, Stdv: {std}')
     if 'lon' in df.columns.tolist():
         if sum(df['lon']>180) > 0 or sum(df['lon']<-180) > 0:
             print('#############Run dc.mapTo180180(df)')
@@ -159,21 +165,70 @@ def check_df_ingest(df, table_name, server):
         if sum(df['lat']>90) > 0 or sum(df['lat']<-90) > 0:
             print('#############Lat out of range') 
             i +=1
-        var_list = ['lat', 'lon']
-    if 'month' in df.columns.tolist():
-        var_list.append('month')
-    elif 'time' in df.columns.tolist():
-        var_list.append('time')
     if 'depth'in df.columns.tolist():
-        var_list.append('depth')
         if sum(df['depth']<0):
             print('###########Depth values below zero')
             i +=1
-    for v in var_list:
+    return i
+
+def check_df_nulls(df, table_name, server):
+    """Check dataframe against SQL table for SQL not null columns
+    Returns 0 if all checks pass
+    Returns 1 or more for each df variable with nulls where SQL column is not null
+    
+    """
+    i = 0
+    query_not_null = f'''
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = 'dbo'
+        AND TABLE_NAME = '{table_name}'
+        AND IS_NULLABLE = 'NO'
+    '''
+    df_not_null = DB.dbRead(query_not_null, server)
+    for v in df_not_null['COLUMN_NAME'].tolist():
         if df[v].isna().sum() > 0:
             print('##########Null in ' + v)
             i +=1
-    ## Check against SQL table
+    return i
+
+def check_df_constraint(df, table_name, server):
+    """Check dataframe against SQL table for SQL unique indicies
+    Returns 0 if all checks pass
+    Returns 1 if duplicates in df where should be unique
+    
+    """
+    i = 0
+    query_unique_indices = f'''
+        SELECT TableName = t.name,
+            IndexId = ind.index_id,
+            ic.key_ordinal,
+            ColumnName = col.name,
+            col.is_nullable
+        FROM sys.indexes ind 
+            INNER JOIN sys.index_columns ic ON ind.object_id = ic.object_id and ind.index_id = ic.index_id 
+            INNER JOIN sys.columns col ON ic.object_id = col.object_id and ic.column_id = col.column_id 
+            INNER JOIN sys.tables t ON ind.object_id = t.object_id 
+        WHERE ind.is_primary_key = 0 
+            AND ic.is_included_column = 0
+            AND ind.is_unique = 1 
+            AND t.name = '{table_name}'
+        ORDER BY t.name, ind.name, ind.index_id, ic.key_ordinal
+    '''
+    df_unique_indicies = DB.dbRead(query_unique_indices, server)
+    len_check = len(df.groupby(df_unique_indicies['ColumnName'].tolist()).count())
+    if len(df) != len_check:
+        print(f'#############Check unique constraints. Unique len: {len_check}. DF len: {len(df)}') 
+        i +=1
+    return i
+
+def check_df_dtypes(df, table_name, server):
+    """Check dataframe data types against SQL table
+    Returns 0 if all checks pass
+    Returns 1 or more for each column with different data types
+    
+    """
+    i=0
     query = f'''
     SELECT COLUMN_NAME [Columns], DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{table_name}'
     '''
@@ -193,8 +248,16 @@ def check_df_ingest(df, table_name, server):
         else:
             print('##########SQL dtype: ' + row.DATA_TYPE + '. DF dtype: ' + df_check.iloc[i,1].name + ' var: ' + row.Columns)
             i +=1
+    return i
   
-    if i == 0:
+def check_df_ingest(df, table_name, server):
+    """Runs checks on a pandas df before ingest"""
+    v = check_df_values(df, table_name, server)
+    n = check_df_nulls(df, table_name, server)
+    d = check_df_dtypes(df, table_name, server)
+    c = check_df_constraint(df, table_name, server)
+
+    if v + n + d + c == 0:
         print('All checks passed')
 
 

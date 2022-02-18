@@ -14,8 +14,6 @@ def makedir(directory):
     """Creates directory if does not exist"""
     if not os.path.exists(directory):
         os.makedirs(directory)
-    if os.path.exists(directory) and not os.path.exists(directory+'/raw'):
-        os.makedirs(directory+'/raw')
     return
 
 
@@ -35,6 +33,9 @@ def leafStruc(base):
     """Creates leaf level structure for datasets"""
 
     makedir(base)
+    ## Add raw directory to pre existing datasets in vault
+    if not os.path.exists(base+'/raw'):
+        os.makedirs(base+'/raw')
     if base[-1] != "/":
         base = base + "/"
     nrt = base + "nrt/"

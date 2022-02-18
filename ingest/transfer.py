@@ -273,6 +273,26 @@ def remove_data_metadata_fnames_staging(staging_sep_flag="combined"):
             )
 
 
+# def df_to_parquet(df, filename, branch, tableName, vault_level):
+#     """
+#     Transfers dataframe as parquet file to vault backup
+    
+#     Parameters
+#     ----------
+#     df (DataFrame
+#     filename : string
+#         Filename and extension to be split.
+#     """
+#      ## Export copy of data ingested to DB as parquet file into vault
+#     vault_path = getattr(vs,branch)+tableName
+#     df.to_parquet(
+#         vault_path
+#         + "/" + vault_level + "/"
+#         + filename
+#         + ".parquet"
+#     )
+#     print('Parquet saved')
+
 def dropbox_file_transfer(input_file_path, output_file_path):
 
     """
