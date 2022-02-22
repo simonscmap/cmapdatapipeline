@@ -216,10 +216,11 @@ def check_df_constraint(df, table_name, server):
         ORDER BY t.name, ind.name, ind.index_id, ic.key_ordinal
     '''
     df_unique_indicies = DB.dbRead(query_unique_indices, server)
-    len_check = len(df.groupby(df_unique_indicies['ColumnName'].tolist()).count())
-    if len(df) != len_check:
-        print(f'#############Check unique constraints. Unique len: {len_check}. DF len: {len(df)}') 
-        i +=1
+    if len(df_unique_indicies) > 0:
+        len_check = len(df.groupby(df_unique_indicies['ColumnName'].tolist()).count())
+        if len(df) != len_check:
+            print(f'#############Check unique constraints. Unique len: {len_check}. DF len: {len(df)}') 
+            i +=1
     return i
 
 def check_df_dtypes(df, table_name, server):
@@ -246,13 +247,13 @@ def check_df_dtypes(df, table_name, server):
         if row.DATA_TYPE in df_check.iloc[i,1].name or ('varchar' in row.DATA_TYPE and df_check.iloc[i,1].name == 'object'):
             continue
         else:
-            print('##########SQL dtype: ' + row.DATA_TYPE + '. DF dtype: ' + df_check.iloc[i,1].name + ' var: ' + row.Columns)
+            print('##########SQL dtype: ' + row.DATA_TYPE + ' var: ' + row.Columns +'. DF dtype: ' + df_check.iloc[i,1].name + ' var: ' + df_check.iloc[i,0])
             i +=1
     return i
   
 def check_df_ingest(df, table_name, server):
     """Runs checks on a pandas df before ingest"""
-    v = check_df_values(df, table_name, server)
+    v = check_df_values(df)
     n = check_df_nulls(df, table_name, server)
     d = check_df_dtypes(df, table_name, server)
     c = check_df_constraint(df, table_name, server)
