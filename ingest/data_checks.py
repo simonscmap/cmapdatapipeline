@@ -8,6 +8,7 @@ cmapdata - data - data cleaning and reformatting functions.
 
 import sys
 import os
+from matplotlib.pyplot import axis
 # from this import s
 import pandas as pd
 import numpy as np
@@ -35,6 +36,33 @@ def removeMissings(df, cols):
     for col in cols:
         df[col].replace(r"^\s*$", np.nan, regex=True, inplace=True)
         df.dropna(subset=[col], inplace=True)
+    return df
+
+def remove_blank_columns(df):
+    """Removes all blank columns
+
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        The dataframe to be modified
+
+    Returns
+    -------
+    df
+        Pandas DataFrame with blank columns removed
+    """
+    empty_cols = [col for col in df.columns if df[col].isnull().all()]
+    for c in empty_cols:
+        contYN = input(
+        "Are you sure you want to delete column "
+        + c
+        + " ?  [yes/no]: "
+        )
+        if contYN == 'yes':
+            df.drop(c, axis=1, inplace=True)
+        else:
+            continue
+
     return df
 
 
@@ -268,6 +296,7 @@ def clean_data_df(df, clim=False):
     # df = NaNtoNone(df)
     # df = removeMissings(df, ST_columns(df))
     df = ensureST_numeric(df, clim)
+    df = remove_blank_columns(df)
     if clim:
         df = sort_values(df, ST_columns_clim(df))
     else:    
