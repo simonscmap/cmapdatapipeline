@@ -43,6 +43,7 @@ def updateStats_Small(tableName, db_name, server, data_df=None):
 
     Args:
         tableName (str): CMAP table name
+        db_name (str): CMAP database name (Opedia)
         Server (str): Valid CMAP server name
         data_df (Pandas DataFrame, optional): datframe to build stats from, if not provided table is queried from database. Defaults to None.
     """

@@ -403,15 +403,19 @@ def full_ingestion(args):
 
 def dataless_ingestion(args):
     """This wrapper function adds metadata into the database for large datasets that already exist in the database. ex. satellite, model, argo etc."""
-    splitExcel(args.staging_filename, data_missing_flag=True)
-    staging_to_vault(
-        args.staging_filename,
-        getBranch_Path(args),
-        args.tableName,
-        remove_file_flag=False,
-        skip_data_flag=True,
-        process_level=args.process_level,
-    )
+    if args.in_vault:
+        splitVaultExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=True)
+    else:
+        splitExcel(args.staging_filename, data_missing_flag=True)
+    if not args.in_vault:
+        staging_to_vault(
+            args.staging_filename,
+            getBranch_Path(args),
+            args.tableName,
+            remove_file_flag=False,
+            skip_data_flag=True,
+            process_level=args.process_level,
+        )
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=False
     )
@@ -483,6 +487,7 @@ def main():
     parser.add_argument(
         "-D", "--Database", help="Database name: Opedia, Opedia_Sandbox", nargs="?", default="Opedia"
     )
+    parser.add_argument("-v", "--in_vault", help="Boolean if excel is in vault", nargs="?", default=False)
     parser.add_argument(
         "-i", 
         "--icon_filename", 
