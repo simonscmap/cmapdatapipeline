@@ -230,13 +230,16 @@ def tblVariables_Insert(
     Comment_list = cmn.nanToNA(variable_metadata_df["var_comment"]).tolist()
     Visualize_list = cmn.nanToNA(variable_metadata_df["visualize"]).tolist()
     Data_Type_list = cmn.getTableName_Dtypes(Table_Name, server)["DATA_TYPE"].tolist()
-    if 'Org_ID' in variable_metadata_df.columns.tolist():
-        variable_metadata_df["Org_ID"]
-        Org_ID_list = cmn.nanToNA(variable_metadata_df["Org_ID"]).tolist()
+    if 'org_id' in variable_metadata_df.columns.tolist():
+        Org_list = cmn.nanToNA(variable_metadata_df["org_id"]).tolist()
+        ## Replace naToNA result ' ' with NULL due to FK on org table
+        Org_ID_list = [x if ' ' not in str(x) else 'NULL' for x in Org_list]
     else:
         Org_ID_list = ['NULL'] * len(variable_metadata_df)
-    if 'Conversion_Coefficient' in variable_metadata_df.columns.tolist():
-        Conversion_Coefficient_list = cmn.nanToNA(variable_metadata_df["Conversion_Coefficient"]).tolist()
+        
+    if 'conversion_coefficient' in variable_metadata_df.columns.tolist():
+        Conversion_Coefficient = cmn.nanToNA(variable_metadata_df["conversion_coefficient"]).tolist()
+        Conversion_Coefficient_list = [x if ' ' not in str(x) else 'NULL' for x in Conversion_Coefficient]
     else:
         Conversion_Coefficient_list = ['NULL'] * len(variable_metadata_df)
     columnList = "(ID,DB, Dataset_ID, Table_Name, Short_Name, Long_Name, Unit, Temporal_Res_ID, Spatial_Res_ID, Temporal_Coverage_Begin, Temporal_Coverage_End, Lat_Coverage_Begin, Lat_Coverage_End, Lon_Coverage_Begin, Lon_Coverage_End, Grid_Mapping, Make_ID, Sensor_ID, Process_ID, Study_Domain_ID, Comment, Visualize, Data_Type, Org_ID, Conversion_Coefficient)"

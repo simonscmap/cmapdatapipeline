@@ -199,10 +199,11 @@ def single_file_split(filename, data_missing_flag):
     dataset_metadata_df = pd.read_excel(
         vs.combined + filename, sheet_name="dataset_meta_data"
     )
+    dataset_metadata_df.columns = dataset_metadata_df.columns.str.lower()
     vars_metadata_df = pd.read_excel(
         vs.combined + filename, sheet_name="vars_meta_data"
     )
-
+    vars_metadata_df.columns = vars_metadata_df.columns.str.lower()
     dataset_metadata_df.to_csv(
         vs.metadata + base_filename + "_dataset_metadata.csv", sep=",", index=False
     )
@@ -211,6 +212,7 @@ def single_file_split(filename, data_missing_flag):
     )
     if data_missing_flag == False:
         data_df = pd.read_excel(vs.combined + filename, sheet_name="data")
+        data_df.columns = data_df.columns.str.lower()
         data_df.to_csv(vs.data + base_filename + "_data.csv", sep=",", index=False)
 
 def single_file_vault_split(filename, branch, tableName, data_missing_flag):
@@ -231,10 +233,11 @@ def single_file_vault_split(filename, branch, tableName, data_missing_flag):
     dataset_metadata_df = pd.read_excel(
         vault_path +'/raw/' + filename, sheet_name="dataset_meta_data"
     )
+    dataset_metadata_df.columns = dataset_metadata_df.columns.str.lower()
     vars_metadata_df = pd.read_excel(
         vault_path +'/raw/'+ filename, sheet_name="vars_meta_data"
     )
-
+    vars_metadata_df.columns = vars_metadata_df.columns.str.lower()
     dataset_metadata_df.to_csv(
         vault_path +'/metadata/'+ base_filename + "_dataset_metadata.csv", sep=",", index=False
     )
@@ -243,6 +246,7 @@ def single_file_vault_split(filename, branch, tableName, data_missing_flag):
     )
     if data_missing_flag == False:
         data_df = pd.read_excel(vs.combined + filename, sheet_name="data")
+        data_df.columns = data_df.columns.str.lower()
         data_df.to_csv(vault_path +'/rep/' + base_filename + "_data.csv", sep=",", index=False)        
 
 

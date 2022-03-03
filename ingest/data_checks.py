@@ -377,11 +377,11 @@ def validate_organism_ingest(df, server):
     org_list = org_df['Name'].tolist()
     i = 0
     org_check_passed = True
-    if 'Org_ID' in df.columns.tolist() and 'Conversion_Coefficient' in df.columns.tolist():
+    if 'org_id' in df.columns.tolist() and 'conversion_coefficient' in df.columns.tolist():
         print('Org columns present')
         for row in df.itertuples(index=True, name='Pandas'):
             ## If org and coeff are blank, check that they should be blank
-            if row.Org_ID in blank_check_list and row.Conversion_Coefficient in blank_check_list:
+            if row.org_id in blank_check_list and row.conversion_coefficient in blank_check_list:
                 match_unit = [v for v in unit_list if v in row.var_unit]
                 if len(match_unit)>0:
                     print(f'Index: {str(row.Index)}, unit {row.var_unit} matches {", ".join(match_unit)}')
@@ -402,16 +402,16 @@ def validate_organism_ingest(df, server):
                 if len(match_long_org)>0:
                     print(f'Index: {str(row.Index)}, long name --{row.var_long_name}-- matches {", ".join(match_long_org)}')
                     i +=1
-            if row.Org_ID not in blank_check_list and pd.isnull(row.Conversion_Coefficient):
-                print(f'Index: {str(row.Index)}, Organism ID {row.Org_ID} missing coefficient')
+            if row.org_id not in blank_check_list and pd.isnull(row.conversion_coefficient):
+                print(f'Index: {str(row.Index)}, Organism ID {row.org_id} missing coefficient')
                 i +=1
-            if pd.isnull(row.Org_ID) and row.Conversion_Coefficient not in blank_check_list:
-                print(f'Index: {str(row.Index)}, Coefficient {row.Conversion_Coefficient} Missing organism ID')
+            if pd.isnull(row.org_id) and row.conversion_coefficient not in blank_check_list:
+                print(f'Index: {str(row.Index)}, Coefficient {row.conversion_coefficient} Missing organism ID')
                 i +=1
-            if row.Conversion_Coefficient not in blank_check_list and isinstance(row.Conversion_Coefficient, (int, float)):
-                if (row.Conversion_Coefficient > 1 and ('^' not in row.var_unit or 'micro' not in row.var_unit)) \
-                or (row.Conversion_Coefficient <= 1 and '^' in row.var_unit):
-                    print(f'Index: {str(row.Index)}, Check coefficient {row.Conversion_Coefficient} and unit {row.var_unit}')
+            if row.conversion_coefficient not in blank_check_list and isinstance(row.conversion_coefficient, (int, float)):
+                if (row.conversion_coefficient > 1 and ('^' not in row.var_unit or 'micro' not in row.var_unit)) \
+                or (row.conversion_coefficient <= 1 and '^' in row.var_unit):
+                    print(f'Index: {str(row.Index)}, Check coefficient {row.conversion_coefficient} and unit {row.var_unit}')
                     i +=1
         if i == 0:
             print('All organism checks passed')

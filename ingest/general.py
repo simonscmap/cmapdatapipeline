@@ -429,13 +429,18 @@ def dataless_ingestion(args):
 
 def update_metadata(args):
     """This wrapper function deletes existing metadata, then adds updated metadata into the database"""
-    ## Excel file name, 
-    splitVaultExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=True)
-    validator_to_vault(
-        args.staging_filename,
-        getBranch_Path(args),
-        args.tableName
-    )
+    if args.in_vault:
+        splitVaultExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=True)
+    else:
+        splitExcel(args.staging_filename, data_missing_flag=True)
+    if not args.in_vault:
+        validator_to_vault(
+            args.staging_filename,
+            getBranch_Path(args),
+            args.tableName,
+            skip_data_flag=True,
+            process_level=args.process_level
+        )
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=False
     )
