@@ -181,11 +181,11 @@ def cruise_file_split(filename, cruise_name):
     )
 
 
-def single_file_split(filename, data_missing_flag):
+def single_file_split(filename, branch, tableName, data_missing_flag):
     """
 
     Splits an excel file containing data, dataset_metadata and vars_metadata sheets
-    into three seperate files in the staging file strucutre.
+    into three separate files in the staging file strucutre.
     If additional metadata filename is provided, data is split.
 
     Parameters
@@ -193,61 +193,27 @@ def single_file_split(filename, data_missing_flag):
     filename : string
         Filename and extension to be split.
     """
-
     base_filename = os.path.splitext(os.path.basename(filename))[0]
+    base_path = cm.vault_struct_retrieval(branch)+tableName
 
     dataset_metadata_df = pd.read_excel(
-        vs.combined + filename, sheet_name="dataset_meta_data"
+        base_path +'/raw/'+ filename, sheet_name="dataset_meta_data"
     )
     dataset_metadata_df.columns = dataset_metadata_df.columns.str.lower()
     vars_metadata_df = pd.read_excel(
-        vs.combined + filename, sheet_name="vars_meta_data"
+        base_path +'/raw/'+ filename, sheet_name="vars_meta_data"
     )
     vars_metadata_df.columns = vars_metadata_df.columns.str.lower()
     dataset_metadata_df.to_csv(
-        vs.metadata + base_filename + "_dataset_metadata.csv", sep=",", index=False
+         base_path +'/metadata/' + base_filename + "_dataset_metadata.csv", sep=",", index=False
     )
     vars_metadata_df.to_csv(
-        vs.metadata + base_filename + "_vars_metadata.csv", sep=",", index=False
+         base_path +'/metadata/' + base_filename + "_vars_metadata.csv", sep=",", index=False
     )
     if data_missing_flag == False:
-        data_df = pd.read_excel(vs.combined + filename, sheet_name="data")
+        data_df = pd.read_excel(base_path +'/raw/' + filename, sheet_name="data")
         data_df.columns = data_df.columns.str.lower()
-        data_df.to_csv(vs.data + base_filename + "_data.csv", sep=",", index=False)
-
-def single_file_vault_split(filename, branch, tableName, data_missing_flag):
-    """
-
-    Splits an excel file containing data, dataset_metadata and vars_metadata sheets
-    into three seperate files in the staging file strucutre.
-    If additional metadata filename is provided, data is split.
-
-    Parameters
-    ----------
-    filename : string
-        Filename and extension to be split.
-    """
-
-    base_filename = os.path.splitext(os.path.basename(filename))[0]
-    vault_path = getattr(vs,branch)+tableName
-    dataset_metadata_df = pd.read_excel(
-        vault_path +'/raw/' + filename, sheet_name="dataset_meta_data"
-    )
-    dataset_metadata_df.columns = dataset_metadata_df.columns.str.lower()
-    vars_metadata_df = pd.read_excel(
-        vault_path +'/raw/'+ filename, sheet_name="vars_meta_data"
-    )
-    vars_metadata_df.columns = vars_metadata_df.columns.str.lower()
-    dataset_metadata_df.to_csv(
-        vault_path +'/metadata/'+ base_filename + "_dataset_metadata.csv", sep=",", index=False
-    )
-    vars_metadata_df.to_csv(
-        vault_path +'/metadata/' + base_filename + "_vars_metadata.csv", sep=",", index=False
-    )
-    if data_missing_flag == False:
-        data_df = pd.read_excel(vs.combined + filename, sheet_name="data")
-        data_df.columns = data_df.columns.str.lower()
-        data_df.to_csv(vault_path +'/rep/' + base_filename + "_data.csv", sep=",", index=False)        
+        data_df.to_csv(base_path+'/raw/' + base_filename + "_data.csv", sep=",", index=False)
 
 
 def remove_data_metadata_fnames_staging(staging_sep_flag="combined"):

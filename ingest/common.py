@@ -48,6 +48,24 @@ def getLast_file_download(table, vault_type, raw=True):
     last_download =  max(glob.glob(base_folder+'*'), key=os.path.getctime)
     return last_download
 
+def check_file_download(file_name, table, vault_type, raw=True):
+    """Returns .....
+    Args:
+        table (str): CMAP table name
+        vault_raw (str): Vault folder type (ie cruise, station, satellite)
+    Returns:
+        last_download (str): Full filepath of the latest file downloaded
+    """
+    ## Pass string as attribute to get full vault path
+    if raw:
+        base_folder = f'{getattr(vs,vault_type)}{table}/raw/'
+    else:
+        base_folder = f'{getattr(vs,vault_type)}{table}/'
+    ## getctime gives create time, getmtime gets modified time
+    file_exists =  os.path.isfile(base_folder + file_name) 
+    return file_exists
+
+
 
 def decode_xarray_bytes(xdf):
     """Decode any byte strings in any columns of an xarray dataset

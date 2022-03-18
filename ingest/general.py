@@ -42,32 +42,15 @@ def getBranch_Path(args):
     return branch_path
 
 
-def splitExcel(staging_filename, data_missing_flag):
+def splitExcel(staging_filename, branch, tableName, data_missing_flag):
     """Wrapper function for transfer.single_file_split."""
-    transfer.single_file_split(staging_filename, data_missing_flag)
-
-def splitVaultExcel(staging_filename, branch, tableName, data_missing_flag):
-    """Wrapper function for transfer.single_file_split."""
-    transfer.single_file_vault_split(staging_filename, branch, tableName, data_missing_flag)
+    transfer.single_file_split(staging_filename, branch, tableName, data_missing_flag)
 
 
 def splitCruiseExcel(staging_filename, cruise_name):
     """Wrapper function for transfer.cruise_file_split"""
     transfer.cruise_file_split(staging_filename, cruise_name)
 
-
-def staging_to_vault(
-    staging_filename, branch, tableName, remove_file_flag, skip_data_flag, process_level
-):
-    """Wrapper function for transfer.staging_to_vault"""
-    transfer.staging_to_vault(
-        staging_filename,
-        branch,
-        tableName,
-        remove_file_flag,
-        skip_data_flag,
-        process_level,
-    )
 
 def validator_to_vault(
     staging_filename, branch, tableName
@@ -377,15 +360,14 @@ def full_ingestion(args):
     """Main argparse function for small dataset ingestion. Used for datasets that can fit in memory and can pass through the validator."""
 
     print("Full Ingestion")
-    splitExcel(args.staging_filename, data_missing_flag=False)
-    staging_to_vault(
-        args.staging_filename,
-        getBranch_Path(args),
-        args.tableName,
-        remove_file_flag=False,
-        skip_data_flag=False,
-        process_level=args.process_level,
-    )
+    if not args.in_vault:
+        validator_to_vault(
+            args.staging_filename,
+            getBranch_Path(args),
+            args.tableName
+        )   
+    splitExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=True)
+
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=True
     )
@@ -399,23 +381,26 @@ def full_ingestion(args):
         if args.Server == "Rainier" and args.icon_filename is None:
             createIcon(data_dict, args.tableName)
             push_icon()
+    else:
+        contYN = input(
+        "Add stats without reviewing organism data?  [yes/no]: "
+        )
+        if contYN == 'yes':
+            insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
+            if args.Server == "Rainier" and args.icon_filename is None:
+                createIcon(data_dict, args.tableName)
+                push_icon()
 
 
 def dataless_ingestion(args):
     """This wrapper function adds metadata into the database for large datasets that already exist in the database. ex. satellite, model, argo etc."""
-    if args.in_vault:
-        splitVaultExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=True)
-    else:
-        splitExcel(args.staging_filename, data_missing_flag=True)
     if not args.in_vault:
-        staging_to_vault(
+        validator_to_vault(
             args.staging_filename,
             getBranch_Path(args),
-            args.tableName,
-            remove_file_flag=False,
-            skip_data_flag=True,
-            process_level=args.process_level,
+            args.tableName
         )
+    splitExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=True)        
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=False
     )
@@ -425,22 +410,23 @@ def dataless_ingestion(args):
    
     if org_check_passed:
         insert_large_stats(args.tableName, args.Database, args.Server)
+    else:
+        contYN = input(
+        "Add stats without reviewing organism data?  [yes/no]: "
+        )
+        if contYN == 'yes':
+            insert_large_stats(args.tableName, args.Database, args.Server)
 
 
 def update_metadata(args):
     """This wrapper function deletes existing metadata, then adds updated metadata into the database"""
-    if args.in_vault:
-        splitVaultExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=True)
-    else:
-        splitExcel(args.staging_filename, data_missing_flag=True)
     if not args.in_vault:
         validator_to_vault(
             args.staging_filename,
             getBranch_Path(args),
             args.tableName,
-            skip_data_flag=True,
-            process_level=args.process_level
         )
+    splitExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=True)
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=False
     )
@@ -450,6 +436,12 @@ def update_metadata(args):
     )
     if org_check_pass:
         insert_large_stats(args.tableName, args.Database, args.Server)
+    else:
+        contYN = input(
+        "Add stats without reviewing organism data?  [yes/no]: "
+        )
+        if contYN == 'yes':
+            insert_large_stats(args.tableName, args.Database, args.Server)
     #     transfer.df_to_parquet(data_dict["variable_metadata_df"],'variable_metadata',args.branch, args.tableName,'metadata')
     #     transfer.df_to_parquet(data_dict["dataset_metadata_df"],'dataset_metadata',args.branch, args.tableName,'metadata')
 
