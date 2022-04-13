@@ -212,7 +212,6 @@ def single_file_split(filename, branch, tableName, data_missing_flag):
     )
     if data_missing_flag == False:
         data_df = pd.read_excel(base_path +'/raw/' + filename, sheet_name="data")
-        data_df.columns = data_df.columns.str.lower()
         data_df.to_csv(base_path+'/raw/' + base_filename + "_data.csv", sep=",", index=False)
 
 

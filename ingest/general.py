@@ -90,30 +90,6 @@ def import_cruise_data_dict(cruise_name):
     return data_dict
 
 
-def importDataMemory(branch, tableName, process_level):
-    """Given a branch, tablename and process level, imports data, dataset_metadata and vars_metadata into pandas DataFrames, wrapped in a dictionary.
-
-    Args:
-        branch (str): vault branch path, ex float.
-        tableName (str): CMAP table name
-        process_level (str): rep or nrt
-
-    Returns:
-        dictionary: dictionary containing data, dataset_metadata and vars_metadata dataframes.
-    """
-    data_file_name = data.fetch_single_datafile(branch, tableName, process_level)
-    data_df = data.read_csv(data_file_name)
-    dataset_metadata_df, variable_metadata_df = metadata.import_metadata(
-        branch, tableName
-    )
-    data_dict = {
-        "data_df": data_df,
-        "dataset_metadata_df": dataset_metadata_df,
-        "variable_metadata_df": variable_metadata_df,
-    }
-    return data_dict
-
-
 def SQL_suggestion(data_dict, tableName, branch, server, db_name):
     """Creates suggested SQL table based on data types of input dataframe.
 
@@ -128,9 +104,10 @@ def SQL_suggestion(data_dict, tableName, branch, server, db_name):
     else:
         make = branch
     cdt = SQL.build_SQL_suggestion_df(data_dict["data_df"])
-    sql_tbl = SQL.SQL_tbl_suggestion_formatter(cdt, tableName, server, db_name)
+    fg_input = input("Filegroup to use (ie FG3, FG4):")
+    sql_tbl = SQL.SQL_tbl_suggestion_formatter(cdt, tableName, server, db_name, fg_input)
     sql_index = SQL.SQL_index_suggestion_formatter(
-        data_dict["data_df"], tableName, server, db_name
+        data_dict["data_df"], tableName, server, db_name, fg_input
     )
     sql_combined_str = sql_tbl["sql_tbl"] + sql_index["sql_index"]
     print(sql_combined_str)
@@ -263,7 +240,7 @@ def insertMetadata_no_data(
     return org_check_passed
 
 
-def insertMetadata(data_dict, tableName, DOI_link_append, server, db_name, process_level):
+def insertMetadata(data_dict, tableName, DOI_link_append, icon_filename, server, db_name, process_level):
     """Wrapper function for metadata ingestion. Used for datasets that can fit in memory and can pass through the validator.
 
     Args:
@@ -271,6 +248,7 @@ def insertMetadata(data_dict, tableName, DOI_link_append, server, db_name, proce
         tableName (str): CMAP table name
         DOI_link_append (str): DOI link to append to tblDataset_References
         server (str): Valid CMAP server
+        db_name (str): Database name
         process_level (str): rep or nrt
     """
     contYN = ''
@@ -280,7 +258,7 @@ def insertMetadata(data_dict, tableName, DOI_link_append, server, db_name, proce
         "Stop ingest to check organism data?  [yes/no]: "
         )
     if contYN != 'yes':
-        metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, server, db_name)
+        metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, icon_filename, server, db_name)
         metadata.tblDataset_References_Insert(
             data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
         )
@@ -361,12 +339,13 @@ def full_ingestion(args):
 
     print("Full Ingestion")
     if not args.in_vault:
+        print("Transfer from validator to vault")
         validator_to_vault(
             args.staging_filename,
             getBranch_Path(args),
             args.tableName
         )   
-    splitExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=True)
+    splitExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=False)
 
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=True
@@ -374,11 +353,11 @@ def full_ingestion(args):
     SQL_suggestion(data_dict, args.tableName, args.branch, args.Server, args.Database)
     insertData(data_dict, args.tableName, args.Server)
     org_check_pass = insertMetadata(
-        data_dict, args.tableName, args.DOI_link_append, args.Server, args.Database, args.process_level
+        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level
     )
     if org_check_pass:
         insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
-        if args.Server == "Rainier" and args.icon_filename is None:
+        if args.Server == "Rainier" and args.icon_filename =="":
             createIcon(data_dict, args.tableName)
             push_icon()
     else:
@@ -387,7 +366,7 @@ def full_ingestion(args):
         )
         if contYN == 'yes':
             insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
-            if args.Server == "Rainier" and args.icon_filename is None:
+            if args.Server == "Rainier" and args.icon_filename =="":
                 createIcon(data_dict, args.tableName)
                 push_icon()
 

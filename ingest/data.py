@@ -193,6 +193,15 @@ def fetch_single_datafile(branch, tableName, process_level="REP", file_ext=".csv
     )[0]
     return flist
 
+def import_single_datafile(branch, tableName):
+    branch_path = cmn.vault_struct_retrieval(branch)
+    ds_data_list = glob.glob(
+        branch_path + tableName + "/raw/" + "*_data.csv"
+    )
+    data_df = pd.read_csv(ds_data_list[0], sep=",")
+    data_df = cmn.nanToNA(cmn.strip_whitespace_headers(data_df))
+    return data_df
+
 
 def importDataMemory(branch, tableName, process_level, import_data=True):
     """Imports csv from vault into pandas DataFrame
@@ -210,8 +219,7 @@ def importDataMemory(branch, tableName, process_level, import_data=True):
         branch, tableName
     )
     if import_data == True:
-        data_file_name = fetch_single_datafile(branch, tableName, process_level)
-        data_df = read_csv(data_file_name)
+        data_df = import_single_datafile(branch, tableName)
         data_df = clean_data_df(data_df)
         data_df.rename(columns={"latitude": "lat", "longitude": "lon"}, inplace=True)
         data_dict = {

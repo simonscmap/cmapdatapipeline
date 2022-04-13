@@ -547,3 +547,48 @@ def get_numeric_cols_in_table_excluding_climatology(tableName, server):
     df = DB.dbRead(qry, server)
     col_list = df["COLUMN_NAME"].to_list()
     return col_list
+
+
+def built_meta_DataFrame():
+    """Returns two empty dataframes for metadata excel template """
+    dataset_meta = pd.DataFrame(
+        columns=[
+            "dataset_short_name",
+            "dataset_long_name",
+            "dataset_version",
+            "dataset_release_date",
+            "dataset_make",
+            "dataset_source",
+            "dataset_distributor",
+            "dataset_acknowledgement",
+            "dataset_history",
+            "dataset_description",
+            "dataset_references",
+            "climatology",
+            "cruise_names",
+        ]
+    )
+    vars_meta = pd.DataFrame(
+        columns=[
+            "var_short_name",
+            "var_long_name",
+            "var_sensor",
+            "var_unit",
+            "var_spatial_res",
+            "var_temporal_res",
+            "var_discipline",
+            "visualize",
+            "var_keywords",
+            "var_comment",
+        ]
+    )
+    return dataset_meta, vars_meta
+
+
+def combine_df_to_excel(filename, df, dataset_metadata, vars_metadata):
+    """ Combines data, dataset metadata and var metadata dfs and saves as excel """
+    writer = pd.ExcelWriter(filename, engine="xlsxwriter")
+    df.to_excel(writer, sheet_name="data", index=False)
+    dataset_metadata.to_excel(writer, sheet_name="dataset_meta_data", index=False)
+    vars_metadata.to_excel(writer, sheet_name="vars_meta_data", index=False)
+    writer.save()

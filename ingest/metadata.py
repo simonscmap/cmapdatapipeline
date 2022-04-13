@@ -42,8 +42,8 @@ def import_metadata(branch, tableName):
     vars_meta_list = glob.glob(
         branch_path + tableName + "/metadata/" + "*vars_metadata*"
     )
-    dataset_metadata_df = pd.read_csv(ds_meta_list[0], sep=",")
-    vars_metadata_df = pd.read_csv(vars_meta_list[0], sep=",")
+    dataset_metadata_df = pd.read_csv(ds_meta_list[0], sep=",", encoding='utf-8')
+    vars_metadata_df = pd.read_csv(vars_meta_list[0], sep=",", encoding='utf-8')
 
     dataset_metadata_df = cmn.nanToNA(cmn.strip_whitespace_headers(dataset_metadata_df))
     vars_metadata_df = cmn.nanToNA(cmn.strip_whitespace_headers(vars_metadata_df))
@@ -59,7 +59,10 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
     Dataset_Version = dataset_metadata_df["dataset_version"].iloc[0]
     Dataset_Release_Date = dataset_metadata_df["dataset_release_date"].iloc[0]
     Dataset_Make = dataset_metadata_df["dataset_make"].iloc[0]
-    Data_Source = dataset_metadata_df["dataset_source"].iloc[0]
+    Data_Source = (
+        dataset_metadata_df["dataset_source"].iloc[0]
+        .replace("\ufeff", "")
+    )
     Distributor = dataset_metadata_df["dataset_distributor"].iloc[0]
     Acknowledgement = (
         dataset_metadata_df["dataset_acknowledgement"].iloc[0].replace("\xa0", " ")
@@ -123,6 +126,7 @@ def tblDataset_References_Insert(dataset_metadata_df, server, db_name, DOI_link_
     reference_list = (
         dataset_metadata_df["dataset_references"]
         .str.replace("\xa0", " ")
+        .str.replace("\ufeff", "")
         .replace("", np.nan)
         .dropna()
         .tolist()
@@ -175,15 +179,16 @@ def tblVariables_Insert(
 
     if type(data_df) != bool:
         if data_df.empty:
-            Temporal_Coverage_Begin_list, Temporal_Coverage_End_list = cmn.getColBounds(
-                data_df, "time", list_multiplier=len(variable_metadata_df)
-            )
-            Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds(
-                data_df, "lat", list_multiplier=len(variable_metadata_df)
-            )
-            Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds(
-                data_df, "lon", list_multiplier=len(variable_metadata_df)
-            )
+            print('Empty data tab')
+        Temporal_Coverage_Begin_list, Temporal_Coverage_End_list = cmn.getColBounds(
+            data_df, "time", list_multiplier=len(variable_metadata_df)
+        )
+        Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds(
+            data_df, "lat", list_multiplier=len(variable_metadata_df)
+        )
+        Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds(
+            data_df, "lon", list_multiplier=len(variable_metadata_df)
+        )
     else:
         if "_Climatology" in Table_Name:
             (
@@ -353,7 +358,7 @@ def tblKeywords_Insert(variable_metadata_df, dataset_metadata_df, Table_Name, db
         )
         keyword_list = (variable_metadata_df.loc[index, "var_keywords"]).split(",")
         for keyword in keyword_list:
-            keyword = keyword.lstrip()
+            keyword = keyword.lstrip().replace('\ufeff','')
             query = (VarID, keyword)
             print(query)
             if len(keyword) > 0:  # won't insert empty values

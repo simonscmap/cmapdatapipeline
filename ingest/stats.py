@@ -33,7 +33,6 @@ def updateStatsTable(ID, json_str, server):
     try:
         DB.DB_modify(deleteQuery, server)
         DB.DB_modify(insertQuery, server)
-
     except Exception as e:
         print(e)
 
@@ -61,8 +60,11 @@ def updateStats_Small(tableName, db_name, server, data_df=None):
     min_max_df = pd.DataFrame(
         {"time": [data_df["time"].min(), data_df["time"].max()]}, index=["min", "max"]
     )
-    df = pd.concat([stats_df, min_max_df], axis=1, sort=True)
-    df['time'] =  df['time'].dt.date
+    df = pd.concat([min_max_df, stats_df], axis=1, sort=True)
+    if 'datetime' in df.time.dtype.name:
+        df['time'] =  df['time'].dt.date
+    else:
+        df['time'] =  df['time'].astype('datetime64[ns]').dt.date
     json_str = df.to_json(date_format="iso")
     sql_df = pd.DataFrame({"Dataset_ID": [Dataset_ID], "JSON": [json_str]})
     updateStatsTable(Dataset_ID, json_str, server)
