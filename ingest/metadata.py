@@ -42,8 +42,8 @@ def import_metadata(branch, tableName):
     vars_meta_list = glob.glob(
         branch_path + tableName + "/metadata/" + "*vars_metadata*"
     )
-    dataset_metadata_df = pd.read_csv(ds_meta_list[0], sep=",", encoding='utf-8')
-    vars_metadata_df = pd.read_csv(vars_meta_list[0], sep=",", encoding='utf-8')
+    dataset_metadata_df = pd.read_csv(ds_meta_list[0], sep=",")
+    vars_metadata_df = pd.read_csv(vars_meta_list[0], sep=",")
 
     dataset_metadata_df = cmn.nanToNA(cmn.strip_whitespace_headers(dataset_metadata_df))
     vars_metadata_df = cmn.nanToNA(cmn.strip_whitespace_headers(vars_metadata_df))
@@ -76,7 +76,8 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
         .replace("’", "")
         .replace("‘", "")
         .replace("\n", "")
-        .replace("\xa0", "")
+        .replace("\xa0", " ")
+        .replace("\ufeff", "")
     )
     Climatology = dataset_metadata_df["climatology"].iloc[0]
     Db = db_name
@@ -107,6 +108,7 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
         Dataset_History,
     )
     columnList = "(ID,DB,Dataset_Name,Dataset_Long_Name,Variables,Data_Source,Distributor,Description,Climatology,Acknowledgement,Doc_URL,Icon_URL,Contact_Email,Dataset_Version,Dataset_Release_Date,Dataset_History)"
+
     try:
         DB.lineInsert(
             server, db_name +".[dbo].[tblDatasets]", columnList, query, ID_insert=True

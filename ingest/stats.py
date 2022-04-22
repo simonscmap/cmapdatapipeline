@@ -66,7 +66,7 @@ def updateStats_Small(tableName, db_name, server, data_df=None):
     else:
         df['time'] =  df['time'].astype('datetime64[ns]').dt.date
     json_str = df.to_json(date_format="iso")
-    sql_df = pd.DataFrame({"Dataset_ID": [Dataset_ID], "JSON": [json_str]})
+    # sql_df = pd.DataFrame({"Dataset_ID": [Dataset_ID], "JSON": [json_str]})
     updateStatsTable(Dataset_ID, json_str, server)
     print("Updated stats for " + tableName)
 

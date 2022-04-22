@@ -198,7 +198,14 @@ def import_single_datafile(branch, tableName):
     ds_data_list = glob.glob(
         branch_path + tableName + "/raw/" + "*_data.csv"
     )
-    data_df = pd.read_csv(ds_data_list[0], sep=",")
+    try:
+        data_df = pd.read_csv(ds_data_list[0], sep=",")
+    except:
+        ## Older logic saved in rep
+        ds_data_list = glob.glob(
+        branch_path + tableName + "/rep/" + "*_data.csv"
+        )
+        data_df = pd.read_csv(ds_data_list[0], sep=",")
     data_df = cmn.nanToNA(cmn.strip_whitespace_headers(data_df))
     return data_df
 
@@ -250,7 +257,8 @@ def data_df_to_db(df, tableName, server, clean_data_df_flag=True):
     if clean_data_df_flag == True:
         clean_data_df(df)
     temp_file_path = tableName + ".csv"
-    df.to_csv(temp_file_path, index=False, header=False)
+    ## toSQLbcp starts from second row, dropping header drops first row of data
+    df.to_csv(temp_file_path, index=False)
     DB.toSQLbcp(temp_file_path, tableName, server)
     os.remove(temp_file_path)
 
