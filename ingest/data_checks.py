@@ -166,6 +166,41 @@ def NaNtoNone(df):
     df = df.replace(np.nan, '', regex=True)
     return df
 
+def check_df_on_trajectory(df, cruise_name, loc_round, server, db_name='Opedia'):
+    """Data checks on a dataframe before import
+    Checks lat, lon, and date against known trajectory    
+    """
+    ## Temp table import to sandbox server
+    conn_str = DB.pyodbc_connection_string('Beast')
+    quoted_conn_str = DB.urllib_pyodbc_format(conn_str)
+    engine = DB.sqlalchemy_engine_string(quoted_conn_str)
+
+    df_distinct = df[['time','lat','lon']].drop_duplicates()
+    df_distinct.to_sql('test_dataset', con=engine, if_exists='replace', index=False)
+
+    cruise_id = cmn.getCruiseID_Cruise_Name(cruise_name, server)
+    df_traj = DB.dbRead(f"SELECT * FROM {db_name}.dbo.tblCruise_Trajectory WHERE Cruise_ID = {cruise_id}",server)
+    df_traj[['time','lat','lon']].to_sql('test_trajectory', con=engine, if_exists='replace', index=False)
+
+    qry_time = """ SELECT d.[time], d.[lat], d.[lon], t.[time], t.[lat], t.[lon], d.lat-t.lat as lat_diff, d.lon-t.lon as lon_diff
+        FROM [dbo].[test_dataset] d
+        left join [dbo].[test_trajectory] t
+        on CAST(d.[time] as smalldatetime)= CAST(t.[time] as smalldatetime)
+        where t.time is null or abs(d.lon-t.lon) >0.5 or abs(d.lat-t.lat) >0.5"""
+    df_time_check = DB.dbRead(qry_time,'Beast')
+
+    qry_loc = f""" SELECT d.[time], d.[lat], d.[lon], t.[time], t.[lat], t.[lon], ABS(DATEDIFF(hour, d.[time], t.[time])) as time_diff_hr
+        FROM [dbo].[test_dataset] d
+        left join [dbo].[test_trajectory] t
+        on round(d.lat, {loc_round})= round(t.lat, {loc_round}) and round(d.lon, {loc_round})= round(t.lon, {loc_round})
+        where t.lat is null or ABS(DATEDIFF(hour,  d.[time], t.[time])) >1 """
+    df_loc_check = DB.dbRead(qry_loc,'Beast') 
+    print(f"Trajectory date range: {df_traj['time'].min()} - {df_traj['time'].max()}")
+    print(f"Dataset date range: {df_distinct['time'].min()} - {df_distinct['time'].max()}")
+    return df_time_check, df_loc_check
+
+
+
 def check_df_values(df):
     """Data checks on a dataframe before import
     Checks lat, lon, and depth

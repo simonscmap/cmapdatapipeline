@@ -25,6 +25,9 @@ import region_classification as rc
 ########## Cruise Helper Funcs ###############
 ##############################################
 
+ 
+
+
 
 def build_cruise_metadata_from_user_input(df):
     """Attempts to build cruise_metadata dataframe from input trajectory metadata + user input. Recomended to ingest via cruise template instead.
@@ -56,6 +59,7 @@ def build_cruise_metadata_from_user_input(df):
             "Lon_Min": lon_min,
             "Lon_Max": lon_max,
             "Chief_Name": [chief_sci],
+            "Cruise_Series": 'NULL'
         }
     )
     return tblCruise_df, cruise_name

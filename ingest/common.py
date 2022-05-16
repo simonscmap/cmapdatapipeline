@@ -313,6 +313,11 @@ def getTableName_Dtypes(tableName, server):
 
     return query_return
 
+def getCruiseID_Cruise_Name(cruiseName, server):
+    """Get cruise ID from cruise name"""
+    query = f"""SELECT ID FROM tblCruise where name = '{cruiseName}'"""
+    cruise_ID = DB.dbRead(query, server=server)
+    return cruise_ID['ID'][0]
 
 def getCruiseDetails(cruiseName, server):
     """Get cruise details from cruise name using uspCruiseByName"""

@@ -126,6 +126,40 @@ def add_ST_cols_cruise(metadata_df, traj_df):
     metadata_df = cruise.add_ST_cols_to_metadata_df(metadata_df, traj_df)
     return metadata_df
 
+def build_cruise_trajectory_from_dataset(cruiseName, tableName, db_name, server):
+    """Ingests trajectory as point data from table in CMAP if underway data is unavailable
+    Ags: tableName (str)
+         server(str)
+    
+    """
+    ## Check trajectory doesn't exist already
+    cruise_ID = cmn.get_cruise_IDS([cruiseName], server)
+    qry = f'SELECT DISTINCT time, lat, lon from dbo.{tableName}'
+    df_points = DB.dbRead(qry, server)
+    if len(cruise_ID) ==0:
+        metadata_df, cruise_name = cruise.build_cruise_metadata_from_user_input(df_points)
+        insertCruise(metadata_df, df_points, cruise_name, db_name, server)
+        cruise_ID = cmn.get_cruise_IDS([cruiseName], server)
+        dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
+        metadata.tblDataset_Cruises_Line_Insert(dataset_ID, cruise_ID[0], db_name, server)
+    else:
+        check_query = f'SELECT count(*) traj_count from dbo.tblCruise_Trajectory where Cruise_ID = {cruise_ID}'
+        traj_check = DB.dbRead(check_query, server)
+        if len(traj_check) > 0:
+            print(f'Trajectory data exists for cruise {cruiseName}, CruiseID: {cruise_ID}')
+            sys.exit()           
+        df_points["Cruise_ID"] = cruise_ID[0]
+        df_points = df_points[["Cruise_ID", "time", "lat", "lon"]]
+        contYN = input(f"Do you want to add {str(len(df_points))} trajectory points for {cruiseName}? " + " ?  [yes/no]: ")
+        if contYN.lower() == "yes":
+            DB.toSQLbcp_wrapper(df_points, 'tblCruise_Trajectory', server)
+            try:
+                metadata.tblDataset_Cruises_Line_Insert(dataset_ID, cruise_ID, db_name, server)
+            except:
+                print('CruiseID and DatasetID pair already in tblDataset_Cruises')
+            print('Trajectory data added')
+        else:
+            sys.exit()
 
 def insertCruise(metadata_df, trajectory_df, cruise_name, db_name, server):
     """Inserts metadata_df, trajectory_df into server as well as ocean region classifcation into tblCruise_Regions. If you want to add more to the template such as keywords etc, they could be included here.

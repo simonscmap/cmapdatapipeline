@@ -120,6 +120,16 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
     print("Metadata inserted into tblDatasets.")
 
 
+def tblDataset_Single_Reference_Insert(ref, table_name, server, db_name):
+    DatasetID = cmn.getDatasetID_Tbl_Name(table_name, db_name, server)
+    columnList = "(Dataset_ID, Reference)"
+    query = (DatasetID, ref)
+    DB.lineInsert(
+                server, db_name +".[dbo].[tblDataset_References]", columnList, query
+            )
+
+
+
 def tblDataset_References_Insert(dataset_metadata_df, server, db_name, DOI_link_append=None):
 
     Dataset_Name = dataset_metadata_df["dataset_short_name"].iloc[0]
@@ -402,6 +412,14 @@ def user_input_build_cruise(df, dataset_metadata_df, server):
         traj_df, "tblCruise_Trajectory", server, clean_data_df_flag=False
     )
 
+def tblDataset_Cruises_Line_Insert(dataset_ID, cruise_ID, db_name, server):
+    query = (dataset_ID, cruise_ID)
+    DB.lineInsert(
+        server,
+        db_name + ".[dbo].[tblDataset_Cruises]",
+        "(Dataset_ID, Cruise_ID)",
+        query,
+    )
 
 def tblDataset_Cruises_Insert(data_df, dataset_metadata_df, db_name, server):
 
@@ -430,13 +448,7 @@ def tblDataset_Cruises_Insert(data_df, dataset_metadata_df, db_name, server):
         dataset_metadata_df["dataset_short_name"].iloc[0], db_name, server
     )
     for cruise_ID in cruise_ID_list:
-        query = (dataset_ID, cruise_ID)
-        DB.lineInsert(
-            server,
-            db_name + ".[dbo].[tblDataset_Cruises]",
-            "(Dataset_ID, Cruise_ID)",
-            query,
-        )
+        tblDataset_Cruises_Line_Insert(dataset_ID, cruise_ID, db_name, server)
     print("Dataset matched to cruises")
 
 

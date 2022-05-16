@@ -185,8 +185,13 @@ def urllib_pyodbc_format(conn_str):
     quoted_conn_str = urllib.parse.quote_plus(conn_str)
     return quoted_conn_str
 
+def sqlalchemy_engine_string(quoted_conn_str):
+    engine = sqlalchemy.create_engine(
+        "mssql+pyodbc:///?odbc_connect={}".format(quoted_conn_str)
+    )
+    return engine
 
-def toSQLpandas(df, tableName, server, ch=1000):
+def toSQLpandas(df, tableName, server, exists='append', ch=1000):
     """SQL ingestion option, uses pandas to_sql functionality.
 
     Args:
@@ -199,10 +204,8 @@ def toSQLpandas(df, tableName, server, ch=1000):
     # engine = sqlalchemy.create_engine(
     #     "mssql+pyodbc:///?odbc_connect={}".format(quoted_conn_str),fast_executemany=True
     # )
-    engine = sqlalchemy.create_engine(
-        "mssql+pyodbc:///?odbc_connect={}".format(quoted_conn_str)
-    )
-    df.to_sql(tableName, con=engine, if_exists="append", method="multi", index=False, chunksize=ch)
+    engine = sqlalchemy_engine_string(quoted_conn_str)
+    df.to_sql(tableName, con=engine, if_exists=exists, method="multi", index=False, chunksize=ch)
 
 
 def toSQLbcpandas(df, tableName, server):
