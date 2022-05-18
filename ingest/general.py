@@ -380,10 +380,22 @@ def full_ingestion(args):
             args.tableName
         )   
     splitExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=False)
-
     data_dict = data.importDataMemory(
         args.branch, args.tableName, args.process_level, import_data=True
     )
+    ## Check variable names and units for organism names
+    check_org = dc.check_metadata_for_organism(data_dict['variable_metadata_df'], args.Server)
+    if not check_org: 
+        contYN = input ("Stop to check organisms? [yes/no]: ")
+        if contYN != 'no':
+            print("Ingest stopped")
+            sys.exit()    
+    check_value = dc.check_df_ingest(data_dict['data_df'], args.tableName, args.Server)
+    if check_value > 0: 
+        contYN = input ("Stop to check data values? [yes/no]: ")
+        if contYN != 'no':
+            print("Ingest stopped")
+            sys.exit()
     SQL_suggestion(data_dict, args.tableName, args.branch, args.Server, args.Database)
     insertData(data_dict, args.tableName, args.Server)
     org_check_pass = insertMetadata(
@@ -402,7 +414,7 @@ def full_ingestion(args):
             insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
             if args.Server == "Rainier" and args.icon_filename =="":
                 createIcon(data_dict, args.tableName)
-                push_icon()
+                #push_icon()
 
 
 def dataless_ingestion(args):

@@ -12,6 +12,7 @@ from matplotlib.pyplot import axis
 # from this import s
 import pandas as pd
 import numpy as np
+from itertools import zip_longest
 
 
 import common as cmn
@@ -220,6 +221,7 @@ def check_df_values(df):
                 continue
             if (mn <= std *-5 or mx >= std *5):
                 print(f'#############Check data values for {d}. Min: {mn}, Max: {mx}, Stdv: {std}')
+                i +=1
     if 'lon' in df.columns.tolist():
         if sum(df['lon']>180) > 0 or sum(df['lon']<-180) > 0:
             print('#############Run dc.mapTo180180(df)')
@@ -395,6 +397,54 @@ def add_day_week_month_year_clim(df):
     df["dayofyear"] = pd.to_datetime(df["time"]).dt.dayofyear
     return df
 
+def check_metadata_for_organism(df, server):
+    """Checks variable_metadata_df for variable names or units that could be associated with organisms
+
+    Args:
+        df (Pandas DataFrame): Input Pandas DataFrame (ie variable_metadata).
+        server (str): Valid CMAP server name. ex Rainier
+    Returns:
+        org_var_check_passed (bool): If all variable checks passed
+
+    """   
+    unit_checks = ['cell','number','#']
+    var_checks = ['abundance', 'ecotype', 'enumeration', 'cell', 'heterotrophic', 'genus']
+    qry = 'SELECT Name FROM tblOrganism'
+    org_df = DB.dbRead(qry, server)
+    org_list = org_df['Name'].tolist()
+    i = 0
+    org_var_check_passed = True
+    var_short = df['var_short_name'].tolist()
+    var_long = df['var_long_name'].tolist()
+    unit_list = df['var_unit'].tolist()
+    match_short, match_long, match_unit, match_org = [],[],[],[]
+    for v in var_checks:
+        for l in var_long:
+            if v in l.lower():
+                match_long.append(l)        
+        for s in var_short:
+            if v in s:
+                match_short.append(s)
+    for u in unit_checks:
+        for ul in unit_list:
+            if u in ul.lower():
+                match_unit.append(ul) 
+    for o in org_list:
+        for s in var_short:
+            if o in s.lower():
+                match_org.append(s)
+        for l in var_long:
+            if o in l.lower():
+                match_org.append(l)
+    if len(match_short) + len(match_long) > 0 or len(match_org) > 0:
+        org_var_check_passed = False
+        print(match_short)
+        print(match_long)
+        print(match_org)
+    return org_var_check_passed
+    
+
+
 def validate_organism_ingest(df, server):
     """Checks for Organism ID, if null checks variable name and units to flag for review
 
@@ -454,4 +504,5 @@ def validate_organism_ingest(df, server):
             org_check_passed = False
     else:
         print('No organism or coefficient columns present')
+
     return org_check_passed

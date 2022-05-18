@@ -5,12 +5,13 @@ Date: 07-23-2021
 cmapdata - SQL - SQL table/index suggestions and formatting
 """
 
-
+import sys
 import pandas as pd
 import numpy as np
 
 import credentials as cr
 import common as cmn
+import DB
 
 ######## Python Specific ############
 
@@ -123,3 +124,33 @@ def SQL_tbl_suggestion_formatter(sdf, tableName, server, db_name, FG="Primary"):
 
     sql_dict = {"sql_tbl": SQL_tbl}
     return sql_dict
+
+def full_SQL_suggestion_build(df, tableName, branch, server, db_name):
+    """Creates suggested SQL table based on data types of input dataframe.
+
+    Args:
+        df (dataframe): Pandas dataframe to build table from 
+        tableName (str): CMAP table name
+        branch (str): vault branch path, ex float.
+        server (str): Valid CMAP server
+    """
+    if branch != "model" or branch != "satellite":
+        make = "observation"
+    else:
+        make = branch
+    cdt = build_SQL_suggestion_df(df)
+    fg_input = input("Filegroup to use (ie FG3, FG4):")
+    sql_tbl = SQL_tbl_suggestion_formatter(cdt, tableName, server, db_name, fg_input)
+    sql_index = SQL_index_suggestion_formatter(
+        df, tableName, server, db_name, fg_input
+    )
+    sql_combined_str = sql_tbl["sql_tbl"] + sql_index["sql_index"]
+    print(sql_combined_str)
+    contYN = input("Do you want to build this table in SQL? " + " ?  [yes/no]: ")
+    if contYN.lower() == "yes":
+        DB.DB_modify(sql_tbl["sql_tbl"], server)
+        DB.DB_modify(sql_index["sql_index"], server)
+
+    else:
+        sys.exit()
+    write_SQL_file(sql_combined_str, tableName, make)
