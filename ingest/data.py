@@ -13,13 +13,14 @@ import numpy as np
 import glob
 import xarray as xr
 
-sys.path.append("ingest")
-
 import vault_structure as vs
 import DB
 import common as cmn
 import metadata
 
+def remove_negative_depth(df):
+    df = df.loc[df['depth'] >= 0 ]
+    return df
 
 def removeMissings(df, cols):
     """Removes missing rows for all columns provided

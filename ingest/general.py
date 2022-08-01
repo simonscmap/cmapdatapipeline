@@ -179,25 +179,18 @@ def insertCruise(metadata_df, trajectory_df, cruise_name, db_name, server):
     query = 'SELECT MAX(ID) FROM tblCruise'
     max_id = DB.dbRead(query, server)
 
-    if server.lower() == 'mariana':  
-        insert_id = max_id.iloc[0,0] + 1
-        metadata_df.insert(0,'ID',insert_id)
-        print(metadata_df)       
-
-        DB.lineInsert(
-            server,
-            "tblCruise",
-            "(ID,Nickname,Name,Ship_Name,Start_Time,End_Time,Lat_Min,Lat_Max,Lon_Min,Lon_Max,Chief_Name,Cruise_Series)",
-            tuple(metadata_df.iloc[0].astype(str).to_list()),
-        )    
-    else:
-        DB.lineInsert(
+    DB.lineInsert(
             server,
             "tblCruise",
             "(Nickname,Name,Ship_Name,Start_Time,End_Time,Lat_Min,Lat_Max,Lon_Min,Lon_Max,Chief_Name,Cruise_Series)",
             tuple(metadata_df.iloc[0].astype(str).to_list()),
         )
+    print(trajectory_df.shape)
     trajectory_df = cruise.add_ID_trajectory_df(trajectory_df, cruise_name, server)
+    trajectory_df = data.mapTo180180(trajectory_df)
+    trajectory_df = data.removeMissings(trajectory_df, ['lat','lon'])
+    trajectory_df.drop_duplicates(keep='first', inplace=True)
+
     data.data_df_to_db(
         trajectory_df, "tblCruise_Trajectory", server, clean_data_df_flag=False
     )

@@ -200,10 +200,12 @@ def single_file_split(filename, branch, tableName, data_missing_flag):
         base_path +'/raw/'+ filename, sheet_name="dataset_meta_data"
     )
     dataset_metadata_df.columns = dataset_metadata_df.columns.str.lower()
+    dataset_metadata_df.replace({'\'': '\'\''}, regex=True, inplace = True)
     vars_metadata_df = pd.read_excel(
         base_path +'/raw/'+ filename, sheet_name="vars_meta_data"
     )
     vars_metadata_df.columns = vars_metadata_df.columns.str.lower()
+    vars_metadata_df.replace({'\'': '\'\''}, regex=True, inplace = True)
     dataset_metadata_df.to_csv(
          base_path +'/metadata/' + base_filename + "_dataset_metadata.csv", sep=",", index=False
     )
@@ -212,6 +214,7 @@ def single_file_split(filename, branch, tableName, data_missing_flag):
     )
     if data_missing_flag == False:
         data_df = pd.read_excel(base_path +'/raw/' + filename, sheet_name="data")
+        data_df.replace({'\'': '\'\''}, regex=True, inplace = True)
         data_df.to_csv(base_path+'/raw/' + base_filename + "_data.csv", sep=",", index=False)
 
 

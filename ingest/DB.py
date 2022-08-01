@@ -14,12 +14,12 @@ import credentials as cr
 import pyodbc
 import sqlalchemy
 import urllib
-import pyodbc
 import pandas.io.sql as sql
 import platform
 import pandas as pd
 import bcpandas
 import pycmap
+import common as cmn
 
 pycmap.API(cr.api_key)
 ######## DB Specific ############
@@ -141,6 +141,18 @@ def dbConnect(server):
     cursor = conn.cursor()
 
     return conn, cursor
+
+def addSensor(server, sensor):
+    """Adds new Sensor and associated ID from server to Sensor table
+    Args:
+        server (str): Valid CMAP server name. ex Rainier
+        sensor (str): Name of sensor to be added
+    """
+    last_id = cmn.get_last_ID('tblSensors', server)
+    insertQuery = f"INSERT INTO dbo.tblSensors VALUES ({last_id + 1}, '{sensor}')"
+    conn, cursor = dbConnect(server)
+    cursor.execute(insertQuery)
+    conn.commit()
 
 
 def lineInsert(server, tableName, columnList, query, ID_insert=False):

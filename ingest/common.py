@@ -590,10 +590,16 @@ def built_meta_DataFrame():
     return dataset_meta, vars_meta
 
 
-def combine_df_to_excel(filename, df, dataset_metadata, vars_metadata):
+def combine_df_to_excel(filename, df, dataset_metadata, vars_metadata, cruise=False):
     """ Combines data, dataset metadata and var metadata dfs and saves as excel """
     writer = pd.ExcelWriter(filename, engine="xlsxwriter")
-    df.to_excel(writer, sheet_name="data", index=False)
-    dataset_metadata.to_excel(writer, sheet_name="dataset_meta_data", index=False)
-    vars_metadata.to_excel(writer, sheet_name="vars_meta_data", index=False)
+    if cruise:
+        dataset_metadata.to_excel(writer, sheet_name="cruise_trajectory", index=False)
+        vars_metadata.to_excel(writer, sheet_name="cruise_metadata", index=False)
+    else:
+        df.to_excel(writer, sheet_name="data", index=False)
+        dataset_metadata.to_excel(writer, sheet_name="dataset_meta_data", index=False)
+        vars_metadata.to_excel(writer, sheet_name="vars_meta_data", index=False)
     writer.save()
+
+

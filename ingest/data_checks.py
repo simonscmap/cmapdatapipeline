@@ -8,12 +8,9 @@ cmapdata - data - data cleaning and reformatting functions.
 
 import sys
 import os
-from matplotlib.pyplot import axis
 # from this import s
 import pandas as pd
 import numpy as np
-from itertools import zip_longest
-
 
 import common as cmn
 import DB
