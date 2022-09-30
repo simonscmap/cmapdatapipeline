@@ -13,6 +13,7 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 import dropbox
+
 import credentials as cr
 import vault_structure as vs
 import common as cm
@@ -60,11 +61,11 @@ def cruise_staging_to_vault(cruise_name, remove_file_flag):
     clear_directory(meta_tree)
     clear_directory(traj_tree)
 
-    meta_fname = vs.staging + "metadata/" + cruise_name + "_cruise_metadata.csv"
-    traj_fname = vs.staging + "metadata/" + cruise_name + "_cruise_trajectory.csv"
+    meta_fname = vs.staging + "metadata/" + cruise_name + "_cruise_metadata.parquet"
+    traj_fname = vs.staging + "metadata/" + cruise_name + "_cruise_trajectory.parquet"
 
-    shutil.copyfile(meta_fname, meta_tree + cruise_name + "_cruise_metadata.csv")
-    shutil.copyfile(traj_fname, traj_tree + cruise_name + "_cruise_trajectory.csv")
+    shutil.copyfile(meta_fname, meta_tree + cruise_name + "_cruise_metadata.parquet")
+    shutil.copyfile(traj_fname, traj_tree + cruise_name + "_cruise_trajectory.parquet")
 
     if remove_file_flag == True:
         os.remove(meta_fname)
@@ -130,26 +131,26 @@ def staging_to_vault(
 
     clear_directory(rep_tree)
     clear_directory(nrt_tree)
-    clear_directory(metadata_tree)
+    #clear_directory(metadata_tree)
 
-    data_fname = vs.staging + "data/" + base_filename + "_data.csv"
+    data_fname = vs.staging + "data/" + base_filename + "_data.parquet"
     dataset_metadata_fname = (
-        vs.staging + "metadata/" + base_filename + "_dataset_metadata.csv"
+        vs.staging + "metadata/" + base_filename + "_dataset_metadata.parquet"
     )
     vars_metadata_fname = (
-        vs.staging + "metadata/" + base_filename + "_vars_metadata.csv"
+        vs.staging + "metadata/" + base_filename + "_vars_metadata.parquet"
     )
     if skip_data_flag == False:
         if process_level.lower() == "nrt":
-            shutil.copyfile(data_fname, nrt_tree + base_filename + "_data.csv")
+            shutil.copyfile(data_fname, nrt_tree + base_filename + "_data.parquet")
         else:
-            shutil.copyfile(data_fname, rep_tree + base_filename + "_data.csv")
+            shutil.copyfile(data_fname, rep_tree + base_filename + "_data.parquet")
 
     shutil.copyfile(
-        dataset_metadata_fname, metadata_tree + base_filename + "_dataset_metadata.csv"
+        dataset_metadata_fname, metadata_tree + base_filename + "_dataset_metadata.parquet"
     )
     shutil.copyfile(
-        vars_metadata_fname, metadata_tree + base_filename + "_vars_metadata.csv"
+        vars_metadata_fname, metadata_tree + base_filename + "_vars_metadata.parquet"
     )
 
     if remove_file_flag == True:
@@ -173,11 +174,11 @@ def cruise_file_split(filename, cruise_name):
     cruise_trajectory = pd.read_excel(
         vs.combined + filename, sheet_name="cruise_trajectory"
     )
-    cruise_metadata.to_csv(
-        vs.metadata + cruise_name + "_cruise_metadata.csv", sep=",", index=False
+    cruise_metadata.to_parquet(
+        vs.metadata + cruise_name + "_cruise_metadata.parquet", index=False
     )
-    cruise_trajectory.to_csv(
-        vs.metadata + cruise_name + "_cruise_trajectory.csv", sep=",", index=False
+    cruise_trajectory.to_parquet(
+        vs.metadata + cruise_name + "_cruise_trajectory.parquet", index=False
     )
 
 
@@ -206,16 +207,23 @@ def single_file_split(filename, branch, tableName, data_missing_flag):
     )
     vars_metadata_df.columns = vars_metadata_df.columns.str.lower()
     vars_metadata_df.replace({'\'': '\'\''}, regex=True, inplace = True)
-    dataset_metadata_df.to_csv(
-         base_path +'/metadata/' + base_filename + "_dataset_metadata.csv", sep=",", index=False
+    # dataset_metadata_df.to_csv(
+    #      base_path +'/metadata/' + base_filename + "_dataset_metadata.csv", sep=",", index=False
+    # )
+    dataset_metadata_df.to_parquet(
+         base_path +'/metadata/' + base_filename + "_dataset_metadata.parquet", index=False
     )
-    vars_metadata_df.to_csv(
-         base_path +'/metadata/' + base_filename + "_vars_metadata.csv", sep=",", index=False
-    )
+    # vars_metadata_df.to_csv(
+    #      base_path +'/metadata/' + base_filename + "_vars_metadata.csv", sep=",", index=False
+    # )
+    vars_metadata_df.astype({'var_unit': str}).to_parquet(
+         base_path +'/metadata/' + base_filename + "_vars_metadata.parquet", index=False
+    )    
     if data_missing_flag == False:
         data_df = pd.read_excel(base_path +'/raw/' + filename, sheet_name="data")
         data_df.replace({'\'': '\'\''}, regex=True, inplace = True)
-        data_df.to_csv(base_path+'/raw/' + base_filename + "_data.csv", sep=",", index=False)
+        # data_df.to_csv(base_path+'/raw/' + base_filename + "_data.csv", sep=",", index=False)
+        data_df.to_parquet(base_path+'/raw/' + base_filename + "_data.parquet", index=False)
 
 
 def remove_data_metadata_fnames_staging(staging_sep_flag="combined"):
@@ -277,7 +285,7 @@ def dropbox_file_transfer(input_file_path, output_file_path):
     output_file_path : string
         Output filepath, filename and extension to be transfered.
     """
-    dbx = dropbox.Dropbox(cr.dropbox_api_key, timeout=900)
+    dbx = dropbox.Dropbox(cr.dropbox_api_key_web, timeout=900)
     chunk_size = 1024 * 1024
     with open(input_file_path, "rb") as f:
         file_size = os.path.getsize(input_file_path)
@@ -311,3 +319,52 @@ def dropbox_file_transfer(input_file_path, output_file_path):
                         )
                         cursor.offset = f.tell()
                     pbar.update(chunk_size)
+
+
+def dropbox_file_sync(input_file_path, output_file_path):
+
+    """
+    Transfers a file from dropbox using the dropbox v2 python api
+
+    Parameters
+    ----------
+    input_file_path : string
+        Input filepath, filename and extension to be transfered.
+    output_file_path : string
+        Output filepath, filename and extension to be transfered.
+    """
+    dbx = dropbox.Dropbox(cr.dropbox_api_key, timeout=900)
+    chunk_size = 1024 * 1024
+    with open(input_file_path, "rb") as f:
+        file_size = os.path.getsize(input_file_path)
+        if file_size <= chunk_size:
+            dbx.files_download(
+                f.read(), output_file_path, mode=dropbox.files.WriteMode.overwrite
+            )
+
+def dropbox_validator_sync(ingest_excel):
+
+    """
+    Transfers all files from dropbox validator for a dataset using the dropbox v2 python api
+
+    Parameters
+    ----------
+    folder_name : string
+        Input filepath, filename and extension to be transfered.
+    """
+    
+    folder_name = ingest_excel.rsplit('.',1)[0]
+    input_folder_path = f'/{folder_name}'
+    output_folder_path = vs.app_data + folder_name
+    dbx = dropbox.Dropbox(cr.dropbox_api_key_web, timeout=900)
+    vs.makedir(vs.app_data+folder_name)
+    try:
+        dlist = dbx.files_list_folder(path=input_folder_path)
+        for f in dlist.entries:
+            dbx.files_download_to_file(output_folder_path+'/'+f.name, f.path_lower)
+    except:
+        print(f'No validator folder for {folder_name}')            
+    
+
+
+

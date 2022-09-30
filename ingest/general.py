@@ -72,11 +72,11 @@ def import_cruise_data_dict(cruise_name):
     cruise_path = vs.r2r_cruise + cruise_name
     print(cruise_name)
     print(cruise_path)
-    metadata_df = pd.read_csv(
-        cruise_path + f"""/metadata/{cruise_name}_cruise_metadata.csv""", sep=","
+    metadata_df = pd.read_parquet(
+        cruise_path + f"""/metadata/{cruise_name}_cruise_metadata.parquet"""
     )
-    traj_df = pd.read_csv(
-        cruise_path + f"""/trajectory/{cruise_name}_cruise_trajectory.csv""", sep=","
+    traj_df = pd.read_parquet(
+        cruise_path + f"""/trajectory/{cruise_name}_cruise_trajectory.parquet"""
     )
     metadata_df = metadata_df[
         metadata_df.columns.drop(list(metadata_df.filter(regex="Unnamed:")))
@@ -85,6 +85,8 @@ def import_cruise_data_dict(cruise_name):
     traj_df["time"] = pd.to_datetime(
         traj_df["time"].astype(str), format="%Y-%m-%d %H:%M:%S"
     ).astype("datetime64[s]")
+    traj_df["lat"] = traj_df["lat"].astype(float)
+    traj_df["lon"] = traj_df["lon"].astype(float)
 
     data_dict = {"metadata_df": metadata_df, "trajectory_df": traj_df}
     return data_dict
@@ -203,7 +205,7 @@ def insertData(data_dict, tableName, server):
 
 
 def insertMetadata_no_data(
-    data_dict, tableName, DOI_link_append, icon_filename, server, db_name, process_level
+    data_dict, tableName, DOI_link_append, icon_filename, server, db_name, process_level, data_server
 ):
     """Main argparse wrapper function for inserting metadata for large datasets that do not have a single data sheet (ex. ARGO, sat etc.)
 
@@ -225,7 +227,6 @@ def insertMetadata_no_data(
         )
     if contYN != 'yes':
         metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, icon_filename, server, db_name)
-
         ## spaces in cruise field
         df_clean_cruise = cmn.strip_leading_trailing_whitespace_column(data_dict["dataset_metadata_df"],"cruise_names").replace('',np.nan,regex=True)
         if df_clean_cruise["cruise_names"].dropna().empty == False:
@@ -243,6 +244,7 @@ def insertMetadata_no_data(
             server,
             db_name,
             process_level,
+            data_server,
             CRS="CRS",
         )
         metadata.tblKeywords_Insert(
@@ -286,6 +288,7 @@ def insertMetadata(data_dict, tableName, DOI_link_append, icon_filename, server,
         )
     if contYN != 'yes':
         metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, icon_filename, server, db_name)
+        metadata.tblDataset_Server_Insert(tableName, db_name, server)
         metadata.tblDataset_References_Insert(
             data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
         )
@@ -326,9 +329,9 @@ def insert_small_stats(data_dict, tableName, db_name, server):
     stats.updateStats_Small(tableName, db_name, server, data_dict["data_df"])
 
 
-def insert_large_stats(tableName, db_name, server):
+def insert_large_stats(tableName, db_name, server, data_server):
     """Wrapper function for stats.build_stats_df_from_db_calls and stats.update_stats_large"""
-    stats_df = stats.build_stats_df_from_db_calls(tableName, server)
+    stats_df = stats.build_stats_df_from_db_calls(tableName, server, data_server)
     stats.update_stats_large(tableName, stats_df, db_name, server)
 
 
@@ -366,6 +369,7 @@ def full_ingestion(args):
 
     print("Full Ingestion")
     if not args.in_vault:
+        transfer.dropbox_validator_sync(args.staging_filename)        
         print("Transfer from validator to vault")
         validator_to_vault(
             args.staging_filename,
@@ -398,7 +402,7 @@ def full_ingestion(args):
         insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
         if args.Server == "Rainier" and args.icon_filename =="":
             createIcon(data_dict, args.tableName)
-            push_icon()
+            # push_icon()
     else:
         contYN = input(
         "Add stats without reviewing organism data?  [yes/no]: "
@@ -423,17 +427,17 @@ def dataless_ingestion(args):
         args.branch, args.tableName, args.process_level, import_data=False
     )
     org_check_passed = insertMetadata_no_data(
-        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level
+        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server
     )
    
     if org_check_passed:
-        insert_large_stats(args.tableName, args.Database, args.Server)
+        insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
     else:
         contYN = input(
         "Add stats without reviewing organism data?  [yes/no]: "
         )
         if contYN == 'yes':
-            insert_large_stats(args.tableName, args.Database, args.Server)
+            insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
 
 
 def update_metadata(args):
@@ -450,16 +454,16 @@ def update_metadata(args):
     )
     metadata.deleteTableMetadata(args.tableName, args.Database, args.Server)
     org_check_pass = insertMetadata_no_data(
-        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level
+        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server
     )
     if org_check_pass:
-        insert_large_stats(args.tableName, args.Database, args.Server)
+        insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
     else:
         contYN = input(
         "Add stats without reviewing organism data?  [yes/no]: "
         )
         if contYN == 'yes':
-            insert_large_stats(args.tableName, args.Database, args.Server)
+            insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
     #     transfer.df_to_parquet(data_dict["variable_metadata_df"],'variable_metadata',args.branch, args.tableName,'metadata')
     #     transfer.df_to_parquet(data_dict["dataset_metadata_df"],'dataset_metadata',args.branch, args.tableName,'metadata')
 
@@ -499,6 +503,9 @@ def main():
     parser.add_argument(
         "-S", "--Server", help="Server choice: Rainier, Mariana", nargs="?"
     )
+    parser.add_argument(
+        "-a", "--data_server", help="Server data is on: Rossby, Mariana", nargs="?", default=""
+    )    
     parser.add_argument(
         "-D", "--Database", help="Database name: Opedia, Opedia_Sandbox", nargs="?", default="Opedia"
     )

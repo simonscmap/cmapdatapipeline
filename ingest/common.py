@@ -46,6 +46,23 @@ def getLast_file_download(table, vault_type, raw=True):
         base_folder = f'{getattr(vs,vault_type)}{table}/'
     ## getctime gives create time, getmtime gets modified time
     last_download =  max(glob.glob(base_folder+'*'), key=os.path.getctime)
+    last_modified =  max(glob.glob(base_folder+'*'), key=os.path.getmtime)
+    if last_download != last_modified:
+        print(f"All submissions: {glob.glob(base_folder+'*')}")
+        print(f'max create date: {last_download}')
+        print(f'max modified date: {last_modified}')
+        contYN = input(f"Do you want to continue with {max([last_download,last_modified])}? " + " ?  [yes/no]: ")
+        if contYN.lower() == "yes":
+            last_download = max([last_download,last_modified])
+        else:
+            contYN = input(f"Do you want to specify ingest from: {glob.glob(base_folder+'*')}? " + " ?  [yes/no]: ")
+            if contYN.lower() == "yes":
+                excel_index = input("Enter the zero based index of file in list above")
+                last_download = glob.glob(base_folder+'*')[excel_index]
+            else:
+                sys.exit()
+        last_download = max([last_download,last_modified])
+
     return last_download
 
 def check_file_download(file_name, table, vault_type, raw=True):
@@ -152,9 +169,12 @@ def lowercase_List(list):
     return lower_list
 
 
-def getColBounds_from_DB(tableName, col, server, list_multiplier=0):
+def getColBounds_from_DB(tableName, col, server, data_server, list_multiplier=0):
     qry = f"""SELECT MIN({col}),MAX({col}) FROM {tableName}"""
-    df = DB.dbRead(qry, server)
+    if len(data_server) > 0:
+        df = DB.dbRead(qry, data_server)
+    else:
+        df = DB.dbRead(qry, server)        
     min_col = [df.iloc[0].astype(str).iloc[0]]
     max_col = [df.iloc[0].astype(str).iloc[1]]
     if list_multiplier != "0":
@@ -302,14 +322,17 @@ def getKeywordsIDDataset(dataset_ID, server):
     return query_return
 
 
-def getTableName_Dtypes(tableName, server):
+def getTableName_Dtypes(tableName, server, data_server):
     """Get data types from input table name"""
     query = (
         """ select COLUMN_NAME, DATA_TYPE from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = '"""
         + tableName
         + """'"""
     )
-    query_return = DB.dbRead(query, server)
+    if len(data_server) > 0:
+        query_return = DB.dbRead(query, data_server)
+    else:
+        query_return = DB.dbRead(query, server)
 
     return query_return
 
@@ -344,7 +367,7 @@ def findVarID(datasetID, Short_Name, db_name, server):
         + Short_Name
         + """'"""
     )
-    query = DB.dbRead(cur_str, server)
+    query = DB.dbRead(cur_str, server)        
     print(query)
     VarID = query.iloc[0][0]
     return VarID

@@ -53,6 +53,7 @@ def updateStats_Small(tableName, db_name, server, data_df=None):
         query = "SELECT * FROM {tableName}".format(tableName=tableName)
         data_df = DB.dbRead(query, server)
     Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
+    data_df.replace(r'^\s*$', np.nan, regex=True, inplace = True)
     stats_df = data_df.describe()
     if "_Climatology" in tableName:
         return
@@ -167,7 +168,7 @@ def aggregate_large_stats(branch, tableName, server):
     return stats_DF
 
 
-def build_stats_df_from_db_calls(tableName, server):
+def build_stats_df_from_db_calls(tableName, server, data_server):
     """
 
     Builds basic (min,max,count) summary stats from existing table in DB
@@ -179,13 +180,18 @@ def build_stats_df_from_db_calls(tableName, server):
     Returns:
         Pandas DataFrame: stats dataframe
     """
+    if len(data_server) >0:
+        stats_server = data_server
+    else:
+        stats_server = server
+
     if "_Climatology" in tableName:
         col_list = cmn.get_numeric_cols_in_table_excluding_climatology(
-        tableName, server
+        tableName, stats_server
         )
     else:
         col_list =  ["time"] + cmn.get_numeric_cols_in_table_excluding_climatology(
-        tableName, server
+        tableName, stats_server
         ) 
     stats_DF = pd.DataFrame(index=["count", "max", "mean", "min", "std"])
     for var in tqdm(col_list):
@@ -198,16 +204,16 @@ def build_stats_df_from_db_calls(tableName, server):
             stats_qry = (
                 f"""SELECT count_big({var}),cast(MAX(cast({var} as date)) as nvarchar(10)),cast(MIN(cast({var} as date)) as nvarchar(10)),'','' FROM {tableName}"""
             )         
-            var_df = DB.dbRead(stats_qry, server)    
+            var_df = DB.dbRead(stats_qry, stats_server)    
         else:
             try:
                 stats_qry = (
                     f"""SELECT count_big({var}),MAX({var}),MIN({var}),AVG({var}),STDEV({var}) FROM {tableName}"""
                 )
-                var_df = DB.dbRead(stats_qry, server)
+                var_df = DB.dbRead(stats_qry, stats_server)
             except:
                 stats_qry = f"""SELECT count_big({var}),MAX(cast({var} as numeric(12, 0))),MIN(cast({var} as numeric(12, 0))),AVG(cast({var} as numeric(12, 0))),STDEV(cast({var} as numeric(12, 0))) FROM {tableName}"""
-                var_df = DB.dbRead(stats_qry, server)            
+                var_df = DB.dbRead(stats_qry, stats_server)            
         if (var == 'lat' or var == 'lon'):
             stats_DF.at["mean", var] = ""
             stats_DF.at["std", var] = ""

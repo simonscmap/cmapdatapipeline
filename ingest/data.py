@@ -197,16 +197,16 @@ def fetch_single_datafile(branch, tableName, process_level="REP", file_ext=".csv
 def import_single_datafile(branch, tableName):
     branch_path = cmn.vault_struct_retrieval(branch)
     ds_data_list = glob.glob(
-        branch_path + tableName + "/raw/" + "*_data.csv"
+        branch_path + tableName + "/raw/" + "*_data.parquet"
     )
     try:
-        data_df = pd.read_csv(ds_data_list[0], sep=",")
+        data_df = pd.read_parquet(ds_data_list[0])
     except:
         ## Older logic saved in rep
         ds_data_list = glob.glob(
-        branch_path + tableName + "/rep/" + "*_data.csv"
+        branch_path + tableName + "/rep/" + "*_data.parquet"
         )
-        data_df = pd.read_csv(ds_data_list[0], sep=",")
+        data_df = pd.read_parquet(ds_data_list[0])
     data_df = cmn.nanToNA(cmn.strip_whitespace_headers(data_df))
     return data_df
 

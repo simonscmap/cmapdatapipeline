@@ -35,18 +35,19 @@ def ID_Var_Map(series_to_map, res_col, tableName, server):
 
 
 def import_metadata(branch, tableName):
-    branch_path = cmn.vault_struct_retrieval(branch)
-    ds_meta_list = glob.glob(
-        branch_path + tableName + "/metadata/" + "*dataset_metadata*"
-    )
-    vars_meta_list = glob.glob(
-        branch_path + tableName + "/metadata/" + "*vars_metadata*"
-    )
-    dataset_metadata_df = pd.read_csv(ds_meta_list[0], sep=",")
-    vars_metadata_df = pd.read_csv(vars_meta_list[0], sep=",")
+    branch_path = cmn.vault_struct_retrieval(branch)   
+    ds_meta_list = max(glob.glob(branch_path + tableName + "/metadata/" + "*dataset_metadata*"), key=os.path.getctime)
+    vars_meta_list = max(glob.glob(branch_path + tableName + "/metadata/" + "*vars_metadata*"), key=os.path.getctime)
+    # vars_meta_list = glob.glob(
+    #     branch_path + tableName + "/metadata/" + "*vars_metadata*"
+    # )
+    dataset_metadata_df = pd.read_parquet(ds_meta_list)
+    vars_metadata_df = pd.read_parquet(vars_meta_list)
 
     dataset_metadata_df = cmn.nanToNA(cmn.strip_whitespace_headers(dataset_metadata_df))
     vars_metadata_df = cmn.nanToNA(cmn.strip_whitespace_headers(vars_metadata_df))
+    dataset_metadata_df.replace({"'":"''"},inplace=True)
+    vars_metadata_df.replace({"'":"''"},inplace=True)
     return dataset_metadata_df, vars_metadata_df
 
 
@@ -58,6 +59,8 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
     Dataset_Long_Name = dataset_metadata_df["dataset_long_name"].iloc[0]
     Dataset_Version = dataset_metadata_df["dataset_version"].iloc[0]
     Dataset_Release_Date = dataset_metadata_df["dataset_release_date"].iloc[0]
+    if type(Dataset_Release_Date) != str:
+        Dataset_Release_Date = Dataset_Release_Date.date().strftime('%Y-%m-%d')
     Dataset_Make = dataset_metadata_df["dataset_make"].iloc[0]
     Data_Source = (
         dataset_metadata_df["dataset_source"].iloc[0]
@@ -80,6 +83,8 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
         .replace("\ufeff", "")
     )
     Climatology = dataset_metadata_df["climatology"].iloc[0]
+    if Climatology != '1':
+        Climatology = '0'
     Db = db_name
     # Temps
     Variables = ""
@@ -164,6 +169,7 @@ def tblVariables_Insert(
     server,
     db_name,
     process_level,
+    data_server,
     CRS="CRS",
 ):
     Db_list = len(variable_metadata_df) * [db_name]
@@ -214,13 +220,13 @@ def tblVariables_Insert(
             Temporal_Coverage_Begin_list,
             Temporal_Coverage_End_list,
             ) = cmn.getColBounds_from_DB(
-            Table_Name, "time", server, list_multiplier=len(variable_metadata_df)
+            Table_Name, "time", server, data_server, list_multiplier=len(variable_metadata_df)
             )
         Lat_Coverage_Begin_list, Lat_Coverage_End_list = cmn.getColBounds_from_DB(
-            Table_Name, "lat", server, list_multiplier=len(variable_metadata_df)
+            Table_Name, "lat", server, data_server, list_multiplier=len(variable_metadata_df)
         )
         Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds_from_DB(
-            Table_Name, "lon", server, list_multiplier=len(variable_metadata_df)
+            Table_Name, "lon", server, data_server, list_multiplier=len(variable_metadata_df)
         )
 
     Grid_Mapping_list = [CRS] * len(variable_metadata_df)
@@ -246,7 +252,7 @@ def tblVariables_Insert(
     )
     Comment_list = cmn.nanToNA(variable_metadata_df["var_comment"]).tolist()
     Visualize_list = cmn.nanToNA(variable_metadata_df["visualize"]).tolist()
-    Data_Type_list = cmn.getTableName_Dtypes(Table_Name, server)["DATA_TYPE"].tolist()
+    Data_Type_list = cmn.getTableName_Dtypes(Table_Name, server, data_server)["DATA_TYPE"].tolist()
     if 'org_id' in variable_metadata_df.columns.tolist():
         Org_list = cmn.nanToNA(variable_metadata_df["org_id"]).tolist()
         ## Replace naToNA result ' ' with NULL due to FK on org table
@@ -340,7 +346,7 @@ def tblVariables_Insert(
             Org_ID, 
             Conversion_Coefficient,
         )
-
+        
         try:
             DB.lineInsert(
                 server,
@@ -383,6 +389,20 @@ def tblKeywords_Insert(variable_metadata_df, dataset_metadata_df, Table_Name, db
                     )
                 except Exception as e:
                     print(e)
+
+def tblDataset_Server_Insert(tableName, db_name, server):
+    columnList = "(Dataset_ID, Server_Alias)"
+    for svr in cr.server_alias_list:
+        try:
+            Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, svr)
+            query = (Dataset_ID, server.lower())
+            DB.lineInsert(
+                    svr, db_name +".[dbo].[tblDataset_Servers]", columnList, query
+                )            
+        except:
+            print(f'{tableName} not on {svr}')
+            continue      
+
 
 
 def user_input_build_cruise(df, dataset_metadata_df, server):
@@ -556,6 +576,16 @@ def deleteFromtblDatasets(Dataset_ID, db_name, server):
     DB.DB_modify(cur_str, server)
     print("tblDataset entries deleted for Dataset_ID: ", Dataset_ID)
 
+def deleteFromtblDataset_Servers(Dataset_ID, db_name, server):
+    cur_str = (
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblDataset_Servers] WHERE [Dataset_ID] = """ + str(
+        Dataset_ID
+    ))
+    DB.DB_modify(cur_str, server)
+    print("tblDataset_Servers entries deleted for Dataset_ID: ", Dataset_ID)
+
 
 def dropTable(tableName, server):
     cur_str = """DROP TABLE """ + tableName
@@ -577,6 +607,7 @@ def deleteCatalogTables(tableName, db_name, server):
         deleteFromtblDataset_Regions(Dataset_ID, db_name, server)
         deleteFromtblDataset_References(Dataset_ID, db_name, server)
         deleteFromtblVariables(Dataset_ID, db_name, server)
+        deleteFromtblDataset_Servers(Dataset_ID, db_name, server)
         deleteFromtblDatasets(Dataset_ID, db_name, server)
         dropTable(tableName, server)
     else:
@@ -596,6 +627,7 @@ def deleteTableMetadata(tableName, db_name, server):
         deleteFromtblDataset_Regions(Dataset_ID, db_name, server)
         deleteFromtblDataset_References(Dataset_ID, db_name, server)
         deleteFromtblVariables(Dataset_ID, db_name, server)
+        deleteFromtblDataset_Servers(Dataset_ID, db_name, server)
         deleteFromtblDatasets(Dataset_ID, db_name, server)
     else:
         print("Metadata for dataset ID" + Dataset_ID + " not deleted")        

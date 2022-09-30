@@ -53,7 +53,7 @@ def remove_blank_columns(df):
     for c in empty_cols:
         contYN = input(
         "Are you sure you want to delete column "
-        + c
+        + str(c)
         + " ?  [yes/no]: "
         )
         if contYN == 'yes':

@@ -189,11 +189,11 @@ def ST_bounds_from_df(df):
 
 def fill_ST_bounds_metadata(cruise_name):
     """ST filler func for webscraping - old"""
-    traj_path = vs.r2r_cruise + cruise_name + "/" + cruise_name + "_trajectory.csv"
-    meta_path = vs.r2r_cruise + cruise_name + "/" + cruise_name + "_cruise_metadata.csv"
-    meta_df = pd.read_csv(meta_path, sep=",")
+    traj_path = vs.r2r_cruise + cruise_name + "/" + cruise_name + "_trajectory.parquet"
+    meta_path = vs.r2r_cruise + cruise_name + "/" + cruise_name + "_cruise_metadata.parquet"
+    meta_df = pd.read_parquet(meta_path)
     try:
-        traj_df = pd.read_csv(traj_path, sep=",")
+        traj_df = pd.read_parquet(traj_path)
         traj_df["time"] = pd.to_datetime(traj_df["time"], errors="coerce").dt.strftime(
             "%Y-%m-%d %H:%M:%S"
         )
@@ -218,12 +218,12 @@ def update_tblCruises(server):
     for cruise in new_cruises:
         try:
             meta_df = cmn.nanToNA(
-                pd.read_csv(
+                pd.read_parquet(
                     vs.r2r_cruise
                     + cruise.upper()
                     + "/"
                     + cruise.upper()
-                    + "_cruise_metadata.csv"
+                    + "_cruise_metadata.parquet"
                 )
             )
             DB.lineInsert(

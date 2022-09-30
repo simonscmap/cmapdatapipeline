@@ -55,9 +55,9 @@ def SQL_index_suggestion_formatter(
     """Creates SQL index suggestion from input data DF"""
     if "depth" in cmn.lowercase_List(list(data_df)):
         uniqueTF = data_df.duplicated(subset=["time", "lat", "lon", "depth"]).any()
-        depth_str = "depth"
+        depth_str = "_depth"
         depth_flag_comma = ","
-        depth_flag_lp = "["
+        depth_flag_lp = "[depth"
         depth_flag_rp = "]"
     else:
         uniqueTF = data_df.duplicated(subset=["time", "lat", "lon"]).any()
@@ -67,20 +67,20 @@ def SQL_index_suggestion_formatter(
         depth_flag_rp = ""
 
     if uniqueTF == True:
-        UNIQUE_flag = ""
+        UNIQUE_flag = "NON"
     else:
-        UNIQUE_flag = "UNIQUE"
+        UNIQUE_flag = "UNIQUE "
     # if any are True, there are duplicates in subset
     SQL_index_str = f"""
     USE [{db_name}]
 
 
-    CREATE {UNIQUE_flag} NONCLUSTERED INDEX [IX_{tableName}_time_lat_lon_{depth_str}] ON [dbo].[{tableName}]
+    CREATE {UNIQUE_flag}CLUSTERED INDEX [IX_{tableName}_time_lat_lon{depth_str}] ON [dbo].[{tableName}]
     (
     	[time] ASC,
     	[lat] ASC,
     	[lon] ASC{depth_flag_comma}
-    	{depth_flag_lp}{depth_str}{depth_flag_rp}
+    	{depth_flag_lp}{depth_flag_rp}
     )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [{FG}]"""
 
     SQL_index_dir = {"sql_index": SQL_index_str}

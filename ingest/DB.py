@@ -154,6 +154,18 @@ def addSensor(server, sensor):
     cursor.execute(insertQuery)
     conn.commit()
 
+def addSpatialResolution(server, res):
+    """Adds new Sensor and associated ID from server to Sensor table
+    Args:
+        server (str): Valid CMAP server name. ex Rainier
+        res (str): Name of spatial resolution to be added
+    """
+    last_id = cmn.get_last_ID('tblSpatial_Resolutions', server)
+    insertQuery = f"INSERT INTO dbo.tblSpatial_Resolutions VALUES ({last_id + 1}, '{res}')"
+    conn, cursor = dbConnect(server)
+    cursor.execute(insertQuery)
+    conn.commit()
+
 
 def lineInsert(server, tableName, columnList, query, ID_insert=False):
     """Single line insert functionallity
@@ -248,7 +260,7 @@ def toSQLbcp(export_path, tableName, server):
             + """'"""
             + export_path
             + """'"""
-            + """ -e error -F 2 -c -t, -b 10000 -h'TABLOCK' -U """
+            + """ -e error -F 2 -c -t, -b 50000 -h'TABLOCK' -U """
             + usr
             + """ -P """
             + psw
