@@ -46,15 +46,16 @@ def import_metadata(branch, tableName):
 
     dataset_metadata_df = cmn.nanToNA(cmn.strip_whitespace_headers(dataset_metadata_df))
     vars_metadata_df = cmn.nanToNA(cmn.strip_whitespace_headers(vars_metadata_df))
-    dataset_metadata_df.replace({"'":"''"},inplace=True)
-    vars_metadata_df.replace({"'":"''"},inplace=True)
+    ## Parquet nans are string
+    dataset_metadata_df.replace({'nan':''},inplace=True)
+    vars_metadata_df.replace({'nan':''},inplace=True)
     return dataset_metadata_df, vars_metadata_df
 
 
 def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db_name):
     last_dataset_ID = cmn.get_last_ID("tblDatasets", server) + 1
     dataset_metadata_df = cmn.nanToNA(dataset_metadata_df)
-    dataset_metadata_df.replace({"'": "''"}, regex=True, inplace=True)
+    # dataset_metadata_df.replace({"'": "''"}, regex=True, inplace=True)
     Dataset_Name = dataset_metadata_df["dataset_short_name"].iloc[0]
     Dataset_Long_Name = dataset_metadata_df["dataset_long_name"].iloc[0]
     Dataset_Version = dataset_metadata_df["dataset_version"].iloc[0]
@@ -75,7 +76,7 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
     Description = (
         dataset_metadata_df["dataset_description"]
         .iloc[0]
-        .replace("'", "")
+        # .replace("'", "CHAR(39)")
         .replace("’", "")
         .replace("‘", "")
         .replace("\n", "")
@@ -113,7 +114,6 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
         Dataset_History,
     )
     columnList = "(ID,DB,Dataset_Name,Dataset_Long_Name,Variables,Data_Source,Distributor,Description,Climatology,Acknowledgement,Doc_URL,Icon_URL,Contact_Email,Dataset_Version,Dataset_Release_Date,Dataset_History)"
-
     try:
         DB.lineInsert(
             server, db_name +".[dbo].[tblDatasets]", columnList, query, ID_insert=True
@@ -172,6 +172,8 @@ def tblVariables_Insert(
     data_server,
     CRS="CRS",
 ):
+    if len(data_server) == 0:
+        data_server = server
     Db_list = len(variable_metadata_df) * [db_name]
     IDvar_list = len(variable_metadata_df) * [
         cmn.getDatasetID_DS_Name(

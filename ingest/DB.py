@@ -181,6 +181,7 @@ def lineInsert(server, tableName, columnList, query, ID_insert=False):
         tableName, columnList, query
     )
     insertQuery = insertQuery.replace("'NULL'", "NULL")
+    insertQuery = insertQuery.replace("CHAR(39)", "''")
     if ID_insert == True:
         insertQuery = (
             f"""SET IDENTITY_INSERT {tableName} ON """

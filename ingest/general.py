@@ -288,7 +288,6 @@ def insertMetadata(data_dict, tableName, DOI_link_append, icon_filename, server,
         )
     if contYN != 'yes':
         metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, icon_filename, server, db_name)
-        metadata.tblDataset_Server_Insert(tableName, db_name, server)
         metadata.tblDataset_References_Insert(
             data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
         )
@@ -300,6 +299,7 @@ def insertMetadata(data_dict, tableName, DOI_link_append, icon_filename, server,
             server,
             db_name,
             process_level,
+            data_server="",
             CRS="CRS",
         )
         metadata.tblKeywords_Insert(
@@ -398,20 +398,11 @@ def full_ingestion(args):
     org_check_pass = insertMetadata(
         data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level
     )
-    if org_check_pass:
-        insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
-        if args.Server == "Rainier" and args.icon_filename =="":
-            createIcon(data_dict, args.tableName)
-            # push_icon()
-    else:
-        contYN = input(
-        "Add stats without reviewing organism data?  [yes/no]: "
-        )
-        if contYN == 'yes':
-            insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
-            if args.Server == "Rainier" and args.icon_filename =="":
-                createIcon(data_dict, args.tableName)
-                #push_icon()
+    insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
+    if args.Server == "Rainier" and args.icon_filename =="":
+        createIcon(data_dict, args.tableName)
+        # push_icon()
+
 
 
 def dataless_ingestion(args):

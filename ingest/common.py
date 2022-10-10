@@ -47,10 +47,12 @@ def getLast_file_download(table, vault_type, raw=True):
     ## getctime gives create time, getmtime gets modified time
     last_download =  max(glob.glob(base_folder+'*'), key=os.path.getctime)
     last_modified =  max(glob.glob(base_folder+'*'), key=os.path.getmtime)
-    if last_download != last_modified:
+    max_filename =  max(glob.glob(base_folder+'*'))
+    if max_filename != last_download != last_modified:
         print(f"All submissions: {glob.glob(base_folder+'*')}")
         print(f'max create date: {last_download}')
         print(f'max modified date: {last_modified}')
+        print(f'max filename: {max_filename}')
         contYN = input(f"Do you want to continue with {max([last_download,last_modified])}? " + " ?  [yes/no]: ")
         if contYN.lower() == "yes":
             last_download = max([last_download,last_modified])

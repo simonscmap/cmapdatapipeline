@@ -201,12 +201,18 @@ def single_file_split(filename, branch, tableName, data_missing_flag):
         base_path +'/raw/'+ filename, sheet_name="dataset_meta_data"
     )
     dataset_metadata_df.columns = dataset_metadata_df.columns.str.lower()
-    dataset_metadata_df.replace({'\'': '\'\''}, regex=True, inplace = True)
+    # dataset_metadata_df.replace({'\'': '\'\''}, regex=True, inplace = True)
+    if (len(dataset_metadata_df[dataset_metadata_df.apply(lambda r: r.str.contains('"', case=False).any(), axis=1)] ) >0) and (len(dataset_metadata_df[dataset_metadata_df.apply(lambda r: r.str.contains("'", case=False).any(), axis=1)] ) >0) :
+            dataset_metadata_df.replace({'"': '\'\''}, regex=True, inplace = True)
+    dataset_metadata_df.replace({"'": "CHAR(39)"}, regex=True, inplace = True)
     vars_metadata_df = pd.read_excel(
         base_path +'/raw/'+ filename, sheet_name="vars_meta_data"
     )
     vars_metadata_df.columns = vars_metadata_df.columns.str.lower()
-    vars_metadata_df.replace({'\'': '\'\''}, regex=True, inplace = True)
+    # vars_metadata_df.replace({'\'': '\'\''}, regex=True, inplace = True)
+    if (len(vars_metadata_df[vars_metadata_df.apply(lambda r: r.str.contains('"', case=False).any(), axis=1)] ) >0) and (len(vars_metadata_df[vars_metadata_df.apply(lambda r: r.str.contains("'", case=False).any(), axis=1)] ) >0) :
+            vars_metadata_df.replace({'"': '\'\''}, regex=True, inplace = True)
+    vars_metadata_df.replace({"'": "CHAR(39)"}, regex=True, inplace = True)
     # dataset_metadata_df.to_csv(
     #      base_path +'/metadata/' + base_filename + "_dataset_metadata.csv", sep=",", index=False
     # )
@@ -222,6 +228,8 @@ def single_file_split(filename, branch, tableName, data_missing_flag):
     if data_missing_flag == False:
         data_df = pd.read_excel(base_path +'/raw/' + filename, sheet_name="data")
         data_df.replace({'\'': '\'\''}, regex=True, inplace = True)
+        if (len(data_df[data_df.apply(lambda r: r.str.contains('"', case=False).any(), axis=1)] ) >0) and (len(data_df[data_df.apply(lambda r: r.str.contains("'", case=False).any(), axis=1)] ) >0) :
+            data_df.replace({'"': '\'\''}, regex=True, inplace = True)
         # data_df.to_csv(base_path+'/raw/' + base_filename + "_data.csv", sep=",", index=False)
         data_df.to_parquet(base_path+'/raw/' + base_filename + "_data.parquet", index=False)
 
@@ -366,5 +374,32 @@ def dropbox_validator_sync(ingest_excel):
         print(f'No validator folder for {folder_name}')            
     
 
+def convert_csv_meta_to_parquet(tableName,branch):
+    """
+    Converts existing csv metadata files in vault to parquet files
 
+    Parameters
+    ----------
+    tableName : string
+        SQL tableName
+    branch : string
+        Vault organization path: ex: cruise, satellite
+    """
+    tbl = tableName
+    mk = branch
+    directory = getattr(vs,mk) + tbl
+    meta = os.path.join(directory, 'metadata')
+    flist = glob.glob(meta+'/*metadata.csv')
+    if len(flist) < 2:
+        print('### No existing csv files for metadata')
+    else:
+        for fil in flist:
+            if '_dataset_metadata.csv' in fil:
+                df_ds = pd.read_csv(fil)
+                df_ds.to_parquet(os.path.join(meta,f'{tbl}_dataset_metadata.parquet'))
+                print('Dataset metadata exported')
+            if '_vars_metadata.csv' in fil:
+                df_vs = pd.read_csv(fil)
+                df_vs.to_parquet(os.path.join(meta,f'{tbl}_vars_metadata.parquet'))
+                print('Variable metadata exported')
 
