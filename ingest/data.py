@@ -59,7 +59,7 @@ def format_time_col(df, time_col, format="%Y-%m-%d %H:%M:%S"):
     df
         Pandas DataFrame with time col formatted
     """
-    df[time_col] = pd.to_datetime(df[time_col].astype(str), errors="coerce")
+    df[time_col] = pd.to_datetime(df[time_col].astype(str))
     # df["time"].dt.strftime(format)
 
     df[time_col] = df[time_col].dt.strftime(format)
@@ -141,7 +141,7 @@ def ensureST_numeric(df):
     ST_cols.remove("time")
     for col in ST_cols:
         df[col] = df[col].map(lambda x: x.strip() if isinstance(x, str) else x)
-        df[col] = pd.to_numeric(df[col], errors="coerce")
+        df[col] = pd.to_numeric(df[col])
     return df
 
 

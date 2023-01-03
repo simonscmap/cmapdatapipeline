@@ -20,6 +20,8 @@ import common as cmn
 import DB
 import transfer
 import region_classification as rc
+import data
+import metadata
 
 ##############################################
 ########## Cruise Helper Funcs ###############
@@ -90,6 +92,34 @@ def resample_trajectory(df, interval="1min"):
     rs_df = rs_df[["Cruise_ID", "time", "lat", "lon"]]
     return rs_df
 
+def insert_cruise_trajectory(trajectory_df, cruise_name, db_name, server):
+    trajectory_df = add_ID_trajectory_df(trajectory_df, cruise_name, server)
+    trajectory_df = data.mapTo180180(trajectory_df)
+    trajectory_df = data.removeMissings(trajectory_df, ['lat','lon'])
+    trajectory_df.drop_duplicates(keep='first', inplace=True)
+
+    data.data_df_to_db(
+        trajectory_df, "tblCruise_Trajectory", server, clean_data_df_flag=False
+    )
+    metadata.ocean_region_classification_cruise(trajectory_df, cruise_name, db_name, server)
+
+def delete_cruise_trajectory(cruise_name, db_name, server):
+    cruise_id = cmn.getCruiseID_Cruise_Name(cruise_name, server)
+    cur_str = (
+        """DELETE FROM """
+        + db_name 
+        + """.[dbo].[tblCruise_Trajectory] WHERE [Cruise_ID] = """
+        + str(cruise_id)
+    )
+    DB.DB_modify(cur_str, server)
+    cur_str = (
+        """DELETE FROM """
+        + db_name 
+        + """.[dbo].[dbo.tblCruise_Regions] WHERE [Cruise_ID] = """
+        + str(cruise_id)
+    )
+    DB.DB_modify(cur_str, server)
+    print("tblCruise_Trajectory entries deleted for: ", cruise_name)
 
 def vault_cruises():
     """Returns cruise dirs from r2r_cruise dir in vault_structure"""
@@ -194,7 +224,7 @@ def fill_ST_bounds_metadata(cruise_name):
     meta_df = pd.read_parquet(meta_path)
     try:
         traj_df = pd.read_parquet(traj_path)
-        traj_df["time"] = pd.to_datetime(traj_df["time"], errors="coerce").dt.strftime(
+        traj_df["time"] = pd.to_datetime(traj_df["time"]).dt.strftime(
             "%Y-%m-%d %H:%M:%S"
         )
     except:
@@ -303,7 +333,7 @@ def clean_cruise_traj(cruise_name):
         shutil.rmtree(vs.r2r_cruise + cruise_name + "/")
 
     df = df[["time", "lat", "lon"]]
-    df["time"] = pd.to_datetime(df["time"], errors="coerce").dt.strftime(
+    df["time"] = pd.to_datetime(df["time"]).dt.strftime(
         "%Y-%m-%d %H:%M:%S"
     )
     dfr = resample_trajectory(df, interval="1min")

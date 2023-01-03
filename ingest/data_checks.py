@@ -80,7 +80,7 @@ def format_time_col(df, time_col, format="%Y-%m-%d %H:%M:%S"):
     df
         Pandas DataFrame with time col formatted
     """
-    df[time_col] = pd.to_datetime(df[time_col].astype(str), errors="coerce")
+    df[time_col] = pd.to_datetime(df[time_col].astype(str))
     # df["time"].dt.strftime(format)
 
     df[time_col] = df[time_col].dt.strftime(format)

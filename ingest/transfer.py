@@ -174,11 +174,12 @@ def cruise_file_split(filename, cruise_name):
     cruise_trajectory = pd.read_excel(
         vs.combined + filename, sheet_name="cruise_trajectory"
     )
+    meta_tree, traj_tree = vs.cruise_leaf_structure(vs.r2r_cruise + cruise_name)
     cruise_metadata.to_parquet(
-        vs.metadata + cruise_name + "_cruise_metadata.parquet", index=False
+        meta_tree + cruise_name + "_cruise_metadata.parquet"
     )
     cruise_trajectory.to_parquet(
-        vs.metadata + cruise_name + "_cruise_trajectory.parquet", index=False
+        traj_tree + cruise_name + "_cruise_trajectory.parquet"
     )
 
 
@@ -213,15 +214,9 @@ def single_file_split(filename, branch, tableName, data_missing_flag):
     if (len(vars_metadata_df[vars_metadata_df.apply(lambda r: r.str.contains('"', case=False).any(), axis=1)] ) >0) and (len(vars_metadata_df[vars_metadata_df.apply(lambda r: r.str.contains("'", case=False).any(), axis=1)] ) >0) :
             vars_metadata_df.replace({'"': '\'\''}, regex=True, inplace = True)
     vars_metadata_df.replace({"'": "CHAR(39)"}, regex=True, inplace = True)
-    # dataset_metadata_df.to_csv(
-    #      base_path +'/metadata/' + base_filename + "_dataset_metadata.csv", sep=",", index=False
-    # )
     dataset_metadata_df.to_parquet(
          base_path +'/metadata/' + base_filename + "_dataset_metadata.parquet", index=False
     )
-    # vars_metadata_df.to_csv(
-    #      base_path +'/metadata/' + base_filename + "_vars_metadata.csv", sep=",", index=False
-    # )
     vars_metadata_df.astype({'var_unit': str}).to_parquet(
          base_path +'/metadata/' + base_filename + "_vars_metadata.parquet", index=False
     )    
@@ -231,7 +226,7 @@ def single_file_split(filename, branch, tableName, data_missing_flag):
         if (len(data_df[data_df.apply(lambda r: r.str.contains('"', case=False).any(), axis=1)] ) >0) and (len(data_df[data_df.apply(lambda r: r.str.contains("'", case=False).any(), axis=1)] ) >0) :
             data_df.replace({'"': '\'\''}, regex=True, inplace = True)
         # data_df.to_csv(base_path+'/raw/' + base_filename + "_data.csv", sep=",", index=False)
-        data_df.to_parquet(base_path+'/raw/' + base_filename + "_data.parquet", index=False)
+        data_df.to_parquet(base_path+'/rep/' + base_filename + "_data.parquet", index=False)
 
 
 def remove_data_metadata_fnames_staging(staging_sep_flag="combined"):
@@ -372,34 +367,46 @@ def dropbox_validator_sync(ingest_excel):
             dbx.files_download_to_file(output_folder_path+'/'+f.name, f.path_lower)
     except:
         print(f'No validator folder for {folder_name}')            
-    
+ 
 
-def convert_csv_meta_to_parquet(tableName,branch):
+
+def convert_csv_meta_to_parquet(tableName,branch,remove_file_flag):
     """
     Converts existing csv metadata files in vault to parquet files
-
+    Returns flag = 0 if no csv present, flag = 2 if both dataset and vars metadata converted
     Parameters
     ----------
     tableName : string
         SQL tableName
     branch : string
         Vault organization path: ex: cruise, satellite
+    remove_file_flag: bit
+        Set true to delete csv file after converting to parquet
     """
     tbl = tableName
     mk = branch
     directory = getattr(vs,mk) + tbl
     meta = os.path.join(directory, 'metadata')
     flist = glob.glob(meta+'/*metadata.csv')
+    flag = 0
     if len(flist) < 2:
-        print('### No existing csv files for metadata')
+        print(f'### No existing csv files for {tableName} metadata')
     else:
         for fil in flist:
             if '_dataset_metadata.csv' in fil:
                 df_ds = pd.read_csv(fil)
                 df_ds.to_parquet(os.path.join(meta,f'{tbl}_dataset_metadata.parquet'))
-                print('Dataset metadata exported')
+                print(f'Dataset metadata exported for {tbl}')
+                if remove_file_flag == True:
+                    os.remove(fil)
+                flag += 1
             if '_vars_metadata.csv' in fil:
                 df_vs = pd.read_csv(fil)
                 df_vs.to_parquet(os.path.join(meta,f'{tbl}_vars_metadata.parquet'))
-                print('Variable metadata exported')
+                print(f'Variable metadata exported for {tbl}')
+                if remove_file_flag == True:
+                    os.remove(fil)
+                flag += 1
+    return flag
+            
 

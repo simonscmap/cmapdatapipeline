@@ -205,7 +205,7 @@ def insertData(data_dict, tableName, server):
 
 
 def insertMetadata_no_data(
-    data_dict, tableName, DOI_link_append, icon_filename, server, db_name, process_level, data_server
+    data_dict, tableName, DOI_link_append, icon_filename, server, db_name, process_level, data_server, branch
 ):
     """Main argparse wrapper function for inserting metadata for large datasets that do not have a single data sheet (ex. ARGO, sat etc.)
 
@@ -235,7 +235,6 @@ def insertMetadata_no_data(
         metadata.tblDataset_References_Insert(
             data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
         )
-        
         metadata.tblVariables_Insert(
             False,
             data_dict["dataset_metadata_df"],
@@ -247,6 +246,7 @@ def insertMetadata_no_data(
             data_server,
             CRS="CRS",
         )
+        metadata.tblDataset_Vault_Insert(tableName, server, db_name, branch)
         metadata.tblKeywords_Insert(
             data_dict["variable_metadata_df"],
             data_dict["dataset_metadata_df"],
@@ -254,7 +254,7 @@ def insertMetadata_no_data(
             db_name,
             server,
         )
-        # region id 114 is global
+        ## region id 114 is global
         metadata.ocean_region_insert(
             ["114"], data_dict["dataset_metadata_df"]["dataset_short_name"].iloc[0], db_name, server
         )
@@ -269,7 +269,7 @@ def insertMetadata_no_data(
     return org_check_passed
 
 
-def insertMetadata(data_dict, tableName, DOI_link_append, icon_filename, server, db_name, process_level):
+def insertMetadata(data_dict, tableName, DOI_link_append, icon_filename, server, db_name, process_level, branch):
     """Wrapper function for metadata ingestion. Used for datasets that can fit in memory and can pass through the validator.
 
     Args:
@@ -302,6 +302,7 @@ def insertMetadata(data_dict, tableName, DOI_link_append, icon_filename, server,
             data_server="",
             CRS="CRS",
         )
+        metadata.tblDataset_Vault_Insert(tableName, server, db_name, branch)
         metadata.tblKeywords_Insert(
             data_dict["variable_metadata_df"],
             data_dict["dataset_metadata_df"],
@@ -349,7 +350,7 @@ def push_icon():
 def cruise_ingestion(args):
     """Main wrapper function for inserting cruise metadata and trajectory"""
     splitCruiseExcel(args.staging_filename, args.cruise_name)
-    cruise_staging_to_vault(args.cruise_name, remove_file_flag=False)
+    # cruise_staging_to_vault(args.cruise_name, remove_file_flag=False)
     data_dict = import_cruise_data_dict(args.cruise_name)
     data_dict["metadata_df"] = add_ST_cols_cruise(
         data_dict["metadata_df"], data_dict["trajectory_df"]
@@ -396,7 +397,7 @@ def full_ingestion(args):
     SQL_suggestion(data_dict, args.tableName, args.branch, args.Server, args.Database)
     insertData(data_dict, args.tableName, args.Server)
     org_check_pass = insertMetadata(
-        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level
+        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level, args.branch
     )
     insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
     if args.Server == "Rainier" and args.icon_filename =="":
@@ -418,7 +419,7 @@ def dataless_ingestion(args):
         args.branch, args.tableName, args.process_level, import_data=False
     )
     org_check_passed = insertMetadata_no_data(
-        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server
+        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch
     )
    
     if org_check_passed:
@@ -445,7 +446,7 @@ def update_metadata(args):
     )
     metadata.deleteTableMetadata(args.tableName, args.Database, args.Server)
     org_check_pass = insertMetadata_no_data(
-        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server
+        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch
     )
     if org_check_pass:
         insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)

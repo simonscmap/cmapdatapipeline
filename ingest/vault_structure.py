@@ -25,7 +25,11 @@ def cruise_leaf_structure(base):
     makedir(traj)
     meta = base + "metadata/"
     makedir(meta)
-    return meta, traj
+    code = base + "code/"
+    makedir(code)
+    raw = base + "raw/"
+    makedir(raw)
+    return meta, traj, code, raw
 
 
 
@@ -117,6 +121,7 @@ makedir(in_situ)
 remote = obs + "remote/"
 makedir(remote)
 
+
 #########  obs/in-situ/cruise  #########
 cruise = in_situ + "cruise/"
 makedir(cruise)
@@ -128,6 +133,10 @@ makedir(station)
 #########  obs/in-situ/float  #########
 float_dir = in_situ + "float/"
 makedir(float_dir)
+
+#########  obs/in-situ/drifter  #########
+drifter = in_situ + "drifter/"
+makedir(drifter)
 
 ########  obs/remote/satellite  ########
 satellite = remote + "satellite/"

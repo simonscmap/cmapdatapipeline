@@ -11,8 +11,10 @@ import os
 import pandas as pd
 import numpy as np
 import glob
+import dropbox
 import DB
 import vault_structure as vs
+import credentials as cr
 
 
 def getMax_SQL_date(table, server):
@@ -207,12 +209,12 @@ def getColBounds(df, col, list_multiplier=0):
     """
     if col == "time":
         min_col = [
-            pd.to_datetime(df["time"], errors="coerce")
+            pd.to_datetime(df["time"])
             .min()
             .strftime("%Y-%m-%d %H:%M:%S")
         ]
         max_col = [
-            pd.to_datetime(df["time"], errors="coerce")
+            pd.to_datetime(df["time"])
             .max()
             .strftime("%Y-%m-%d %H:%M:%S")
         ]
@@ -626,5 +628,16 @@ def combine_df_to_excel(filename, df, dataset_metadata, vars_metadata, cruise=Fa
         dataset_metadata.to_excel(writer, sheet_name="dataset_meta_data", index=False)
         vars_metadata.to_excel(writer, sheet_name="vars_meta_data", index=False)
     writer.save()
+
+def dropbox_public_link(folder_path):
+    dbx = dropbox.Dropbox(cr.dropbox_api_key_vault, timeout=900)
+    existing_link = dbx.sharing_list_shared_links(folder_path)
+    try:
+        shared_url = existing_link.links[0].url
+    except:        
+        print('create new')
+        dbx_link = dbx.sharing_create_shared_link_with_settings(folder_path)
+        shared_url = dbx_link.url
+    return shared_url
 
 

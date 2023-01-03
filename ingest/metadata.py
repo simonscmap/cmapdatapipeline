@@ -11,6 +11,7 @@ import os
 import glob
 import geopandas
 from geopandas.tools import sjoin
+from matplotlib.pyplot import table
 import pandas as pd
 import numpy as np
 import xarray as xr
@@ -133,13 +134,24 @@ def tblDataset_Single_Reference_Insert(ref, table_name, server, db_name):
                 server, db_name +".[dbo].[tblDataset_References]", columnList, query
             )
 
-
+def tblDataset_Vault_Insert(tableName, server, db_name, make):
+    Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
+    full_vault_path = getattr(vs,make)+tableName
+    vault_path = full_vault_path.split('vault/')[1]+'/'
+    vault_url = cmn.dropbox_public_link(full_vault_path.split('Simons CMAP')[1])
+    columnList = "(Dataset_ID, Vault_Path, Vault_URL)"
+    qry = (Dataset_ID,vault_path,vault_url)
+    DB.lineInsert(
+                server, db_name +".[dbo].[tblDataset_Vault]", columnList, qry
+            )
+    print(f"Metadata inserted into tblDataset_Vault for {tableName} ")
 
 def tblDataset_References_Insert(dataset_metadata_df, server, db_name, DOI_link_append=None):
 
     Dataset_Name = dataset_metadata_df["dataset_short_name"].iloc[0]
+    Ref_ID = cmn.get_last_ID("tblDataset_References", server) + 1
     IDvar = cmn.getDatasetID_DS_Name(Dataset_Name, db_name, server)
-    columnList = "(Dataset_ID, Reference)"
+    columnList = "(Reference_ID, Dataset_ID, Reference, Data_DOI)"
     reference_list = (
         dataset_metadata_df["dataset_references"]
         .str.replace("\xa0", " ")
@@ -148,16 +160,16 @@ def tblDataset_References_Insert(dataset_metadata_df, server, db_name, DOI_link_
         .dropna()
         .tolist()
     )
-    if DOI_link_append != None:
-        reference_list.append(DOI_link_append)
 
     for ref in reference_list:
         if ref != " ":
-            query = (IDvar, ref)
+            query = (Ref_ID, IDvar, ref, 0)
             
             DB.lineInsert(
                 server, db_name +".[dbo].[tblDataset_References]", columnList, query
             )
+    if DOI_link_append != None:
+        query = (Ref_ID, IDvar, DOI_link_append, 1)      
     print("Inserting data into tblDataset_References.")
 
 
@@ -556,6 +568,15 @@ def deleteFromtblDataset_References(Dataset_ID, db_name, server):
     DB.DB_modify(cur_str, server)
     print("tblDataset_References entries deleted for Dataset_ID: ", Dataset_ID)
 
+def deleteFromtblDataset_Vault(Dataset_ID, db_name, server):
+    cur_str = (
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblDataset_Vault] WHERE [Dataset_ID] = """
+        + str(Dataset_ID)
+    )
+    DB.DB_modify(cur_str, server)
+    print("tblDataset_Vault entries deleted for Dataset_ID: ", Dataset_ID)
 
 def deleteFromtblVariables(Dataset_ID, db_name, server):
     cur_str = (
@@ -610,6 +631,7 @@ def deleteCatalogTables(tableName, db_name, server):
         deleteFromtblDataset_References(Dataset_ID, db_name, server)
         deleteFromtblVariables(Dataset_ID, db_name, server)
         deleteFromtblDataset_Servers(Dataset_ID, db_name, server)
+        deleteFromtblDataset_Vault(Dataset_ID, db_name, server)
         deleteFromtblDatasets(Dataset_ID, db_name, server)
         dropTable(tableName, server)
     else:
@@ -630,6 +652,7 @@ def deleteTableMetadata(tableName, db_name, server):
         deleteFromtblDataset_References(Dataset_ID, db_name, server)
         deleteFromtblVariables(Dataset_ID, db_name, server)
         deleteFromtblDataset_Servers(Dataset_ID, db_name, server)
+        deleteFromtblDataset_Vault(Dataset_ID, db_name, server)
         deleteFromtblDatasets(Dataset_ID, db_name, server)
     else:
         print("Metadata for dataset ID" + Dataset_ID + " not deleted")        
@@ -681,6 +704,62 @@ def addKeywords(keywords_list, tableName, db_name, server, var_short_name_list="
                 print("Added keyword: " + keyword)
             except Exception as e:
                 print(e)
+
+def export_metadata_to_parquet(tableName, db_name, server, branch):
+    ds_cols = ['dataset_short_name','dataset_long_name','dataset_version','dataset_release_date','dataset_make','dataset_source','dataset_distributor','dataset_acknowledgement','dataset_history','dataset_description','dataset_references','climatology','cruise_names']
+    ## Vault export path
+    directory = getattr(vs,branch) + tableName
+    DatasetID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
+    ## Pull dataset metadata
+    qry = f"""
+        select distinct d.id as Dataset_ID, d.Dataset_Name as dataset_short_name, d.Dataset_Long_Name as dataset_long_name, d.Dataset_Version as dataset_version, d.Dataset_Release_Date as dataset_release_date, m.Make as dataset_make, d.Data_Source as dataset_source, d.Distributor as dataset_distributor, d.Acknowledgement as dataset_acknowledgement, d.Dataset_History as dataset_history, d.Description as dataset_description, d.Climatology as climatology
+            from tblDatasets d 
+            inner join tblVariables v on d.ID = v.Dataset_ID 
+            inner join tblMakes m on v.Make_ID =m.ID 
+            where d.ID = {DatasetID}
+    """
+    df_ds = DB.dbRead(qry, server)
+    qry = f"Select Dataset_ID, Reference as dataset_references from  tblDataset_References where Dataset_ID = {DatasetID}"
+    df_ds_ref = DB.dbRead(qry, server)
+    qry = f"Select dc.cruise_id, c.Name as cruise_names from tblDataset_Cruises dc inner join tblCruise c on dc.cruise_id = c.id where Dataset_ID = {DatasetID}"
+    df_ds_cruise = DB.dbRead(qry, server)
+    if branch == 'cruise' and len(df_ds_cruise) == 0:
+        print("### Check associated cruises")        
+    if branch == 'cruise' and len(df_ds_cruise) > 0:
+        df_ds_meta = pd.concat([df_ds, df_ds_ref['dataset_references'],df_ds_cruise['cruise_names']],axis=1)
+    else:
+        df_ds_meta = pd.concat([df_ds, df_ds_ref['dataset_references']],axis=1)
+        df_ds_meta['cruise_names'] = ''
+    df_ds_meta = df_ds_meta[ds_cols]
+    if os.path.isfile(directory+f'/metadata/{tableName}_dataset_metadata.parquet'):
+        os.remove(directory+f'/metadata/{tableName}_dataset_metadata.parquet')
+        print('Dataset metadata replaced')
+    df_ds_meta.to_parquet(directory+f'/metadata/{tableName}_dataset_metadata.parquet')
+    ## Climatology reads as True / False object. SQL can handle text False for bit column
+    # df_ds_meta.replace({'climatology' : {False: 0, True:1}}, inplace=True)
+    # df_ds_meta['climatology'] = df_ds_meta['climatology'].astype('Int64')
+    ## Pull variable metadata
+    qry = f"""
+        select  v.Short_Name as var_short_name, v.Long_Name as var_long_name, s.Sensor as var_sensor, v.Unit as var_unit, r.Spatial_Resolution as var_spatial_res, t.Temporal_Resolution as var_temporal_res, d.Study_Domain as var_discipline, v.Visualize as visualize, [keywords_agg].Keywords as var_keywords, v.Comment as var_comment
+            from tblVariables v 
+            inner join tblSensors s on v.Sensor_ID = s.ID
+            inner join tblSpatial_Resolutions r on v.Spatial_Res_ID = r.ID
+            inner join tblTemporal_Resolutions t on v.Temporal_Res_ID = t.ID
+            inner join tblStudy_Domains d on v.Study_Domain_ID = d.id
+            JOIN (SELECT var_ID, STRING_AGG (CAST(keywords as NVARCHAR(MAX)), ', ') AS Keywords FROM tblVariables var_table
+            JOIN tblKeywords key_table ON [var_table].ID = [key_table].var_ID GROUP BY var_ID)
+            AS keywords_agg ON [keywords_agg].var_ID = v.ID
+            where v.Dataset_ID = {DatasetID}
+    """
+    df_var_meta = DB.dbRead(qry, server)
+    if os.path.isfile(directory+f'/metadata/{tableName}_vars_metadata.parquet'):
+        os.remove(directory+f'/metadata/{tableName}_vars_metadata.parquet')
+        print('Vars metadata replaced')
+    df_var_meta.to_parquet(directory+f'/metadata/{tableName}_vars_metadata.parquet')
+    if len(glob.glob(directory+'/metadata/*parquet')) > 2:
+        print(f'##### More than two metadata parquet files for {tableName}')    
+    print(f'Metadata export for {tableName} complete')
+
 
 
 def pullNetCDFMetadata(ncdf_path,meta_csv):
