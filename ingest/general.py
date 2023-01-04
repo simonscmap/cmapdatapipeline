@@ -205,7 +205,7 @@ def insertData(data_dict, tableName, server):
 
 
 def insertMetadata_no_data(
-    data_dict, tableName, DOI_link_append, icon_filename, server, db_name, process_level, data_server, branch
+    data_dict, tableName, DOI_link_append, DOI_download_link, DOI_download_file, DOI_CMAP_template, icon_filename, server, db_name, process_level, data_server, branch
 ):
     """Main argparse wrapper function for inserting metadata for large datasets that do not have a single data sheet (ex. ARGO, sat etc.)
 
@@ -213,8 +213,12 @@ def insertMetadata_no_data(
         data_dict (dictionary): data dictionary containing data and metadata dataframes
         tableName (str): CMAP table name
         DOI_link_append (str): DOI link to append to tblDataset_References
+        icon_filename (str): ong or jpg in github /static. if blank a map will be made from data
         server (str): Valid CMAP server
+        db_name (str): Default Opedia
         process_level (str): rep or nrt
+        data_server (str): Valid CMAP server where data is located
+        branch (str): cruise, satellite, etc.
 
     Returns:
         org_check_passed (bool): True if passed organism table checks
@@ -233,7 +237,7 @@ def insertMetadata_no_data(
             metadata.tblMetadata_Cruises_Insert(data_dict["dataset_metadata_df"], db_name, server)    
         
         metadata.tblDataset_References_Insert(
-            data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
+            data_dict["dataset_metadata_df"], server, db_name, DOI_link_append, DOI_download_link, DOI_download_file, DOI_CMAP_template
         )
         metadata.tblVariables_Insert(
             False,
@@ -269,7 +273,7 @@ def insertMetadata_no_data(
     return org_check_passed
 
 
-def insertMetadata(data_dict, tableName, DOI_link_append, icon_filename, server, db_name, process_level, branch):
+def insertMetadata(data_dict, tableName, DOI_link_append, DOI_download_link, DOI_download_file, DOI_CMAP_template, icon_filename, server, db_name, process_level, branch):
     """Wrapper function for metadata ingestion. Used for datasets that can fit in memory and can pass through the validator.
 
     Args:
@@ -289,7 +293,7 @@ def insertMetadata(data_dict, tableName, DOI_link_append, icon_filename, server,
     if contYN != 'yes':
         metadata.tblDatasets_Insert(data_dict["dataset_metadata_df"], tableName, icon_filename, server, db_name)
         metadata.tblDataset_References_Insert(
-            data_dict["dataset_metadata_df"], server, db_name, DOI_link_append
+            data_dict["dataset_metadata_df"], server, db_name, DOI_link_append, DOI_download_link, DOI_download_file, DOI_CMAP_template
         )
         metadata.tblVariables_Insert(
             data_dict["data_df"],
@@ -397,7 +401,7 @@ def full_ingestion(args):
     SQL_suggestion(data_dict, args.tableName, args.branch, args.Server, args.Database)
     insertData(data_dict, args.tableName, args.Server)
     org_check_pass = insertMetadata(
-        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level, args.branch
+        data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.branch
     )
     insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
     if args.Server == "Rainier" and args.icon_filename =="":
@@ -419,7 +423,7 @@ def dataless_ingestion(args):
         args.branch, args.tableName, args.process_level, import_data=False
     )
     org_check_passed = insertMetadata_no_data(
-        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch
+        data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch
     )
    
     if org_check_passed:
@@ -446,7 +450,7 @@ def update_metadata(args):
     )
     metadata.deleteTableMetadata(args.tableName, args.Database, args.Server)
     org_check_pass = insertMetadata_no_data(
-        data_dict, args.tableName, args.DOI_link_append, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch
+        data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch
     )
     if org_check_pass:
         insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
@@ -488,7 +492,25 @@ def main():
         help="DOI string to append to reference_list",
         nargs="?",
     )
-
+    parser.add_argument(
+        "-l",
+        "--DOI_download_link",
+        help="DOI download link string for tblDataset_DOI_Download",
+        nargs="?",
+    )
+    parser.add_argument(
+        "-f",
+        "--DOI_download_file",
+        help="DOI download filename string for tblDataset_DOI_Download",
+        nargs="?",
+    )    
+    parser.add_argument(
+        "-t",
+        "--DOI_CMAP_template",
+        help="Boolean if DOI download file is in three tab CMAP format",
+        nargs="?",
+        default=True
+    )   
     parser.add_argument("-N", "--Dataless_Ingestion", nargs="?", const=True)
     parser.add_argument("-U", "--Update_Metadata", nargs="?", const=True)
     parser.add_argument("-C", "--cruise_name", help="UNOLS Name", nargs="?")

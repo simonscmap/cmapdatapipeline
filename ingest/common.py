@@ -37,7 +37,8 @@ def getLast_file_download(table, vault_type, raw=True):
     """Returns .....
     Args:
         table (str): CMAP table name
-        vault_raw (str): Vault folder type (ie cruise, station, satellite)
+        vault_type (str): Vault folder type (ie cruise, station, satellite)
+        raw (bool): Get last file from /raw folder in vault. Default is True
     Returns:
         last_download (str): Full filepath of the latest file downloaded
     """

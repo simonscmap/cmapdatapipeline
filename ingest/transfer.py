@@ -7,6 +7,7 @@ cmapdata - transfer - dataset template moveing and splitting.
 
 
 import os
+import sys
 import glob
 import shutil
 import pandas as pd
@@ -90,8 +91,17 @@ def validator_to_vault(filename, branch, tableName):
     vs.leafStruc(branch + tableName)
     base_filename = os.path.splitext(os.path.basename(filename))[0]
     ## If edits are made in validator, additional copies of excel file are saved in Apps directory
-    validator_file = cm.getLast_file_download(base_filename, 'app_data', False)
-    # vault_path = getattr(vs,branch)+tableName+'/raw/'
+    # validator_file = cm.getLast_file_download(base_filename, 'app_data', False)
+    final_file = glob.glob(f'{vs.app_data}{base_filename}/final/*')
+    if len(final_file) ==1:
+        validator_file = final_file[0]
+    ## This won't continue if there's nothing in the final_file list
+    else:
+        contYN = input(f"Multiple files in final folder. Do you want to ingest: {final_file[0]}? " + " ?  [yes/no]: ")
+        if contYN.lower() == "yes":
+            validator_file = final_file[0]
+        else:
+            sys.exit()
     vault_path = branch+tableName+'/raw/'
     shutil.copyfile(validator_file, vault_path + base_filename +'.xlsx')
 
@@ -357,13 +367,15 @@ def dropbox_validator_sync(ingest_excel):
     """
     
     folder_name = ingest_excel.rsplit('.',1)[0]
-    input_folder_path = f'/{folder_name}'
-    output_folder_path = vs.app_data + folder_name
+    input_folder_path = f'/{folder_name}/final'
+    output_folder_path = vs.app_data + folder_name +'/final'
     dbx = dropbox.Dropbox(cr.dropbox_api_key_web, timeout=900)
     vs.makedir(vs.app_data+folder_name)
+    vs.makedir(vs.app_data+folder_name+'/final')
     try:
         dlist = dbx.files_list_folder(path=input_folder_path)
         for f in dlist.entries:
+            print(f.name)
             dbx.files_download_to_file(output_folder_path+'/'+f.name, f.path_lower)
     except:
         print(f'No validator folder for {folder_name}')            

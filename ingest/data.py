@@ -122,7 +122,7 @@ def clean_data_df(df):
     df = cmn.strip_whitespace_headers(df)
     # df = cmn.nanToNA(df)
     df = format_time_col(df, "time")
-    df = removeMissings(df, ST_columns(df))
+    #df = removeMissings(df, ST_columns(df))
     df = ensureST_numeric(df)
     df = sort_values(df, ST_columns(df))
     return df

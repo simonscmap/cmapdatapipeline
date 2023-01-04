@@ -146,10 +146,16 @@ def tblDataset_Vault_Insert(tableName, server, db_name, make):
             )
     print(f"Metadata inserted into tblDataset_Vault for {tableName} ")
 
-def tblDataset_References_Insert(dataset_metadata_df, server, db_name, DOI_link_append=None):
+def tblDataset_DOI_Download_Insert(Ref_ID, server, db_name, DOI_download_link, DOI_download_file, DOI_CMAP_template):
+    columnList = "(Reference_ID, DOI_Download_Link, Entity_Name, CMAP_format)"
+    query = (Ref_ID, DOI_download_link, DOI_download_file, DOI_CMAP_template)   
+    DB.lineInsert(
+            server, db_name +".[dbo].[tblDataset_DOI_Download]", columnList, query
+        ) 
+    print("Inserting data into tblDataset_DOI_Download.")    
 
+def tblDataset_References_Insert(dataset_metadata_df, server, db_name, DOI_link_append=None, DOI_download_link=None, DOI_download_file=None, DOI_CMAP_template=None):
     Dataset_Name = dataset_metadata_df["dataset_short_name"].iloc[0]
-    Ref_ID = cmn.get_last_ID("tblDataset_References", server) + 1
     IDvar = cmn.getDatasetID_DS_Name(Dataset_Name, db_name, server)
     columnList = "(Reference_ID, Dataset_ID, Reference, Data_DOI)"
     reference_list = (
@@ -163,13 +169,19 @@ def tblDataset_References_Insert(dataset_metadata_df, server, db_name, DOI_link_
 
     for ref in reference_list:
         if ref != " ":
+            Ref_ID = cmn.get_last_ID("tblDataset_References", server) + 1
             query = (Ref_ID, IDvar, ref, 0)
             
             DB.lineInsert(
                 server, db_name +".[dbo].[tblDataset_References]", columnList, query
             )
     if DOI_link_append != None:
-        query = (Ref_ID, IDvar, DOI_link_append, 1)      
+        Ref_ID = cmn.get_last_ID("tblDataset_References", server) + 1
+        query = (Ref_ID, IDvar, DOI_link_append, 1)   
+        DB.lineInsert(
+                server, db_name +".[dbo].[tblDataset_References]", columnList, query
+            )  
+        tblDataset_DOI_Download_Insert(Ref_ID, server, db_name, DOI_download_link, DOI_download_file, DOI_CMAP_template)     
     print("Inserting data into tblDataset_References.")
 
 
@@ -557,6 +569,17 @@ def deleteFromtblDataset_Regions(Dataset_ID, db_name, server):
     DB.DB_modify(cur_str, server)
     print("tblDataset_Regions entries deleted for Dataset_ID: ", Dataset_ID)
 
+def deleteFromtblDataset_DOI_Download(Dataset_ID, db_name, server):
+    cur_str = (
+        """DELETE d FROM """
+        + db_name
+        + """.[dbo].[tblDataset_References] r INNER JOIN """
+        + db_name 
+        + """ .[dbo].[tblDataset_DOI_Download] d ON r.Reference_ID = d.Reference_ID WHERE [Dataset_ID] = """
+        + str(Dataset_ID)
+    )
+    DB.DB_modify(cur_str, server)
+    print("tblDataset_DOI_Download entries deleted for Dataset_ID: ", Dataset_ID)
 
 def deleteFromtblDataset_References(Dataset_ID, db_name, server):
     cur_str = (
@@ -628,6 +651,7 @@ def deleteCatalogTables(tableName, db_name, server):
         deleteFromtblDataset_Stats(Dataset_ID, db_name, server)
         deleteFromtblDataset_Cruises(Dataset_ID, db_name, server)
         deleteFromtblDataset_Regions(Dataset_ID, db_name, server)
+        deleteFromtblDataset_DOI_Download(Dataset_ID, db_name, server)
         deleteFromtblDataset_References(Dataset_ID, db_name, server)
         deleteFromtblVariables(Dataset_ID, db_name, server)
         deleteFromtblDataset_Servers(Dataset_ID, db_name, server)
@@ -649,6 +673,7 @@ def deleteTableMetadata(tableName, db_name, server):
         deleteFromtblDataset_Stats(Dataset_ID, db_name, server)
         deleteFromtblDataset_Cruises(Dataset_ID, db_name, server)
         deleteFromtblDataset_Regions(Dataset_ID, db_name, server)
+        deleteFromtblDataset_DOI_Download(Dataset_ID, db_name, server)
         deleteFromtblDataset_References(Dataset_ID, db_name, server)
         deleteFromtblVariables(Dataset_ID, db_name, server)
         deleteFromtblDataset_Servers(Dataset_ID, db_name, server)
