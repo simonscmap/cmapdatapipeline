@@ -42,7 +42,24 @@ def removeMissings(df, cols):
         df.dropna(subset=[col], inplace=True)
     return df
 
-
+def removeUnnamed(df):
+    """Removes unnamed, blank columns in dataframe
+        Parameters
+        ----------
+        df : Pandas DataFrame
+            The dataframe to be modified
+        Returns
+        -------
+        df
+            Pandas DataFrame with blank columns removed
+        """
+    unnamed = [u for u in df.columns.tolist() if 'Unnamed' in u ]
+    if len(unnamed) > 0:
+        for u in unnamed:
+            if len(df[~df[u].isnull()]) == 0:
+                df.drop(u, axis=1, inplace=True)
+    return df
+    
 def format_time_col(df, time_col, format="%Y-%m-%d %H:%M:%S"):
     """Formats dataframe timecolumn
 

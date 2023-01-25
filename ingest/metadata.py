@@ -730,6 +730,16 @@ def addKeywords(keywords_list, tableName, db_name, server, var_short_name_list="
             except Exception as e:
                 print(e)
 
+def export_data_to_parquet(tableName, db_name, server, branch,rep='rep'):
+    ## Vault export path
+    directory = getattr(vs,branch) + tableName
+    if os.path.isfile(directory+f'/{rep}/{tableName}_data.parquet'):
+        os.remove(directory+f'/{rep}/{tableName}_data.parquet')
+        print('Vars metadata replaced')
+    qry = f"SELECT * FROM dbo.{tableName}"
+    df = DB.dbRead(qry,server)
+    df.to_parquet(directory+f'/{rep}/{tableName}_data.parquet')
+
 def export_metadata_to_parquet(tableName, db_name, server, branch):
     ds_cols = ['dataset_short_name','dataset_long_name','dataset_version','dataset_release_date','dataset_make','dataset_source','dataset_distributor','dataset_acknowledgement','dataset_history','dataset_description','dataset_references','climatology','cruise_names']
     ## Vault export path

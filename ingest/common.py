@@ -307,6 +307,23 @@ def getDatasetID_Tbl_Name(tableName, db_name, server):
     dsID = query_return.iloc[0][0]
     return dsID
 
+def getRefID_Tbl_Name_Ref(ref, tableName, db_name, server):
+    """Get DatasetID from input table name"""
+    dsID = getDatasetID_Tbl_Name(tableName, db_name, server)
+    cur_str = (
+        """select distinct [Reference_ID], [Dataset_ID] FROM """
+        + db_name
+        + """.[dbo].[tblDataset_References] WHERE [Dataset_ID] = """
+        + str(dsID)
+        + """ AND [Reference] = '"""
+        + ref
+        + """'"""        
+    )
+    query_return = DB.dbRead(cur_str, server=server)
+
+    refID = query_return.iloc[0][0]
+    return refID, dsID
+
 
 def getKeywordIDsTableNameVarName(tableName, var_short_name_list, server):
     """Get list of keyword ID's from input tableName"""
@@ -346,6 +363,7 @@ def getCruiseID_Cruise_Name(cruiseName, server):
     query = f"""SELECT ID FROM tblCruise where name = '{cruiseName}'"""
     cruise_ID = DB.dbRead(query, server=server)
     return cruise_ID['ID'][0]
+    
 
 def getCruiseDetails(cruiseName, server):
     """Get cruise details from cruise name using uspCruiseByName"""
@@ -631,7 +649,19 @@ def combine_df_to_excel(filename, df, dataset_metadata, vars_metadata, cruise=Fa
     writer.save()
 
 def dropbox_public_link(folder_path):
-    dbx = dropbox.Dropbox(cr.dropbox_api_key_vault, timeout=900)
+    # auth_flow = dropbox.DropboxOAuth2FlowNoRedirect(
+    #     cr.dropbox_vault_key,
+    #     cr.dropbox_vault_secret,
+    #     token_access_type="offline",
+    # )
+    # oauth_result = auth_flow.finish('')
+    # print(oauth_result.refresh_token)
+    # dbx = dropbox.Dropbox(cr.dropbox_api_key_vault, app_key=cr.dropbox_vault_key, app_secret=cr.dropbox_vault_secret, timeout=900)
+    dbx = dropbox.Dropbox(
+            app_key = cr.dropbox_vault_key,
+            app_secret = cr.dropbox_vault_secret,
+            oauth2_refresh_token = cr.dropbox_vault_refresh_token
+        )
     existing_link = dbx.sharing_list_shared_links(folder_path)
     try:
         shared_url = existing_link.links[0].url

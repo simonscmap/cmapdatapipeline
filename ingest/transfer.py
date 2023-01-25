@@ -225,10 +225,10 @@ def single_file_split(filename, branch, tableName, data_missing_flag):
             vars_metadata_df.replace({'"': '\'\''}, regex=True, inplace = True)
     vars_metadata_df.replace({"'": "CHAR(39)"}, regex=True, inplace = True)
     dataset_metadata_df.to_parquet(
-         base_path +'/metadata/' + base_filename + "_dataset_metadata.parquet", index=False
+         base_path +'/metadata/' + tableName + "_dataset_metadata.parquet", index=False
     )
     vars_metadata_df.astype({'var_unit': str}).to_parquet(
-         base_path +'/metadata/' + base_filename + "_vars_metadata.parquet", index=False
+         base_path +'/metadata/' + tableName + "_vars_metadata.parquet", index=False
     )    
     if data_missing_flag == False:
         data_df = pd.read_excel(base_path +'/raw/' + filename, sheet_name="data")
@@ -236,7 +236,10 @@ def single_file_split(filename, branch, tableName, data_missing_flag):
         if (len(data_df[data_df.apply(lambda r: r.str.contains('"', case=False).any(), axis=1)] ) >0) and (len(data_df[data_df.apply(lambda r: r.str.contains("'", case=False).any(), axis=1)] ) >0) :
             data_df.replace({'"': '\'\''}, regex=True, inplace = True)
         # data_df.to_csv(base_path+'/raw/' + base_filename + "_data.csv", sep=",", index=False)
-        data_df.to_parquet(base_path+'/rep/' + base_filename + "_data.parquet", index=False)
+        ## Handling mixed column types when exporting to parquet
+        for col in data_df.select_dtypes([object]):
+            data_df[col] = data_df[col].astype(str)
+        data_df.to_parquet(base_path+'/rep/' + tableName + "_data.parquet", index=False)
 
 
 def remove_data_metadata_fnames_staging(staging_sep_flag="combined"):
@@ -298,7 +301,12 @@ def dropbox_file_transfer(input_file_path, output_file_path):
     output_file_path : string
         Output filepath, filename and extension to be transfered.
     """
-    dbx = dropbox.Dropbox(cr.dropbox_api_key_web, timeout=900)
+    # dbx = dropbox.Dropbox(cr.dropbox_api_key_web, timeout=900)
+    dbx = dropbox.Dropbox(
+            app_key = cr.dropbox_vault_key,
+            app_secret = cr.dropbox_vault_secret,
+            oauth2_refresh_token = cr.dropbox_vault_refresh_token
+        )
     chunk_size = 1024 * 1024
     with open(input_file_path, "rb") as f:
         file_size = os.path.getsize(input_file_path)
@@ -346,7 +354,12 @@ def dropbox_file_sync(input_file_path, output_file_path):
     output_file_path : string
         Output filepath, filename and extension to be transfered.
     """
-    dbx = dropbox.Dropbox(cr.dropbox_api_key, timeout=900)
+    dbx = dropbox.Dropbox(
+            app_key = cr.dropbox_vault_key,
+            app_secret = cr.dropbox_vault_secret,
+            oauth2_refresh_token = cr.dropbox_vault_refresh_token
+        )
+    # dbx = dropbox.Dropbox(cr.dropbox_api_key, timeout=900)
     chunk_size = 1024 * 1024
     with open(input_file_path, "rb") as f:
         file_size = os.path.getsize(input_file_path)
@@ -369,7 +382,12 @@ def dropbox_validator_sync(ingest_excel):
     folder_name = ingest_excel.rsplit('.',1)[0]
     input_folder_path = f'/{folder_name}/final'
     output_folder_path = vs.app_data + folder_name +'/final'
-    dbx = dropbox.Dropbox(cr.dropbox_api_key_web, timeout=900)
+    dbx = dropbox.Dropbox(
+            app_key = cr.dropbox_vault_key,
+            app_secret = cr.dropbox_vault_secret,
+            oauth2_refresh_token = cr.dropbox_vault_refresh_token
+        )
+    # dbx = dropbox.Dropbox(cr.dropbox_api_key_web, timeout=900)
     vs.makedir(vs.app_data+folder_name)
     vs.makedir(vs.app_data+folder_name+'/final')
     try:
