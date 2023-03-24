@@ -170,21 +170,32 @@ def staging_to_vault(
             os.remove(data_fname)
 
 
-def cruise_file_split(filename, cruise_name):
+def cruise_file_split(filename, cruise_name, in_vault):
     """Splits combined cruise template file into cruise metadata and cruise trajectory
 
     Args:
         filename (string): path name of file.
     """
-    base_filename = os.path.splitext(os.path.basename(filename))[0]
+        #meta, traj, code, raw
+    meta_tree, traj_tree, code_tree, raw_tree = vs.cruise_leaf_structure(vs.r2r_cruise + cruise_name)
 
-    cruise_metadata = pd.read_excel(
-        vs.combined + filename, sheet_name="cruise_metadata"
-    )
-    cruise_trajectory = pd.read_excel(
-        vs.combined + filename, sheet_name="cruise_trajectory"
-    )
-    meta_tree, traj_tree = vs.cruise_leaf_structure(vs.r2r_cruise + cruise_name)
+    if not in_vault:    
+        cruise_metadata = pd.read_excel(
+            vs.combined + filename, sheet_name="cruise_metadata"
+        )
+        cruise_trajectory = pd.read_excel(
+            vs.combined + filename, sheet_name="cruise_trajectory"
+        )
+
+        shutil.copyfile(vs.combined + filename, raw_tree + filename)
+    else:
+        cruise_metadata = pd.read_excel(
+            raw_tree + filename, sheet_name="cruise_metadata"
+        )
+        cruise_trajectory = pd.read_excel(
+            raw_tree + filename, sheet_name="cruise_trajectory"
+        )
+
     cruise_metadata.to_parquet(
         meta_tree + cruise_name + "_cruise_metadata.parquet"
     )

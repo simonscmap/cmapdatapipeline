@@ -62,12 +62,43 @@ def updateStats_Small(tableName, db_name, server, data_df=None):
         {"time": [data_df["time"].min(), data_df["time"].max()]}, index=["min", "max"]
     )
     df = pd.concat([min_max_df, stats_df], axis=1, sort=True)
+    ## Stats has to include time for plot defaults
     if 'datetime' in df.time.dtype.name:
-        df['time'] =  df['time'].dt.date
+        df['time'] =  df['time']
     else:
-        df['time'] =  df['time'].astype('datetime64[ns]').dt.date
+        df['time'] =  df['time'].astype('datetime64[ns]')
     json_str = df.to_json(date_format="iso")
-    # sql_df = pd.DataFrame({"Dataset_ID": [Dataset_ID], "JSON": [json_str]})
+    updateStatsTable(Dataset_ID, json_str, server)
+    print("Updated stats for " + tableName)
+
+def updateStats_Manual(dt1, dt2, lat1, lat2, lon1, lon2, dpt1, dpt2, tableName, db_name, server):
+    """Updates entry for tblDataset_Stats, wraps around updateStatsTable, but with common inputs.
+    Args:
+        dt1, dt1, lat1, lat2, lon1, lon2: Min/Max stats of dataset
+        dpt1, dpt2: Mix/max depth of dataset. If no depth in dataset, set to None
+        tableName (str): CMAP table name
+        db_name (str): CMAP database name (Opedia)
+        Server (str): Valid CMAP server name
+    """
+    Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
+    var_df = DB.dbRead(f"SELECT Short_Name FROM tblVariables WHERE Dataset_ID = {Dataset_ID}", server)
+    stats_df = pd.DataFrame(index=['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'])
+    for var in var_df['Short_Name'].to_list():
+        stats_df[var] = np.nan
+    if dpt1 is None:
+        min_max_df = pd.DataFrame(
+            {"time": [dt1, dt2], "lat":[lat1, lat2], "lon":[lon1, lon2]}, index=["min", "max"]
+        )
+    else:
+        min_max_df = pd.DataFrame(
+            {"time": [dt1, dt2], "lat":[lat1, lat2], "lon":[lon1, lon2], "depth":[dpt1, dpt2]}, index=["min", "max"]
+        )        
+    df = pd.concat([min_max_df, stats_df], axis=1, sort=True)
+    # if 'datetime' in df.time.dtype.name:
+    #     df['time'] =  df['time'].dt.date
+    # else:
+    #     df['time'] =  df['time'].astype('datetime64[ns]').dt.date
+    json_str = df.to_json(date_format="iso")
     updateStatsTable(Dataset_ID, json_str, server)
     print("Updated stats for " + tableName)
 
@@ -198,11 +229,11 @@ def build_stats_df_from_db_calls(tableName, server, data_server):
         print(var)
         stats_DF[var] = ""
         if var == 'time':
+            # stats_qry = (
+            #     f"""SELECT count_big({var}),MAX({var}),MIN({var}),'','' FROM {tableName}"""
+            # )     
             stats_qry = (
-                f"""SELECT count_big({var}),MAX(cast({var} as date)),MIN(cast({var} as date)),'','' FROM {tableName}"""
-            )     
-            stats_qry = (
-                f"""SELECT count_big({var}),cast(MAX(cast({var} as date)) as nvarchar(10)),cast(MIN(cast({var} as date)) as nvarchar(10)),'','' FROM {tableName}"""
+                f"""SELECT count_big({var}),MAX(cast({var} as datetime)),MIN(cast({var} as datetime)),'','' FROM {tableName}"""
             )         
             var_df = DB.dbRead(stats_qry, stats_server)    
         else:

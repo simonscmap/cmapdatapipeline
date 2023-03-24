@@ -15,6 +15,8 @@ from matplotlib.pyplot import table
 import pandas as pd
 import numpy as np
 import xarray as xr
+import datetime
+from pytz import timezone
 
 
 import credentials as cr
@@ -80,7 +82,7 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
         # .replace("'", "CHAR(39)")
         .replace("’", "")
         .replace("‘", "")
-        .replace("\n", "")
+        # .replace("\n", "")
         .replace("\xa0", " ")
         .replace("\ufeff", "")
     )
@@ -123,13 +125,70 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
         DB.lineInsert(
             server, db_name +".[dbo].[tblDatasets]", columnList, query, ID_insert=False
         )
+    ## Fix line breaks in description
+    for row in dataset_metadata_df.itertuples():
+        if getattr(row, 'Index') ==0:
+            desc = row.dataset_description
+            qry = f"update tbldatasets set description = '{desc}' where id = {last_dataset_ID}"   
+            DB.DB_modify(qry, server)   
     print("Metadata inserted into tblDatasets.")
 
+def tblProcess_Queue_Download_Insert(Original_Name, Table_Name, db_name, server, error_flag=''):
+    dl_str = datetime.datetime.now().astimezone(timezone('US/Pacific')).strftime("%Y-%m-%d %H:%M:%S")
+    if len(error_flag) ==0:
+        columnList = "(Original_Name, Table_Name, Downloaded)"
+        query = (Original_Name, Table_Name, dl_str)
+    else:
+        columnList = "(Original_Name, Table_Name, Downloaded, Error_Str)"
+        query = (Original_Name, Table_Name, dl_str, error_flag)        
+    DB.lineInsert(
+                server, db_name +".[dbo].[tblProcess_Queue]", columnList, query
+            )
+def tblProcess_Queue_Download_Error_Update(Error_Date, Original_Name, Table_Name, db_name, server, error_flag=''):
+    pr_str = datetime.datetime.now().astimezone(timezone('US/Pacific')).strftime("%Y-%m-%d %H:%M:%S")
+    if len(error_flag) ==0:    
+        qry = f"UPDATE {db_name}.[dbo].[tblProcess_Queue] SET Downloaded = '{pr_str}', Original_Name = '{Original_Name}', Error_Str = NULL WHERE Table_Name = '{Table_Name}' and Original_Name = '{Error_Date}' "
+    else:
+        qry = f"UPDATE {db_name}.[dbo].[tblProcess_Queue] SET Downloaded = '{pr_str}', Error_Str='{error_flag}' WHERE Table_Name = '{Table_Name}' and Original_Name = '{Error_Date}' "        
+    DB.DB_modify(qry,server)
 
-def tblDataset_Single_Reference_Insert(ref, table_name, server, db_name):
+def tblProcess_Queue_Process_Update(Original_Name, Path, Table_Name, db_name, server, error_flag=''):
+    pr_str = datetime.datetime.now().astimezone(timezone('US/Pacific')).strftime("%Y-%m-%d %H:%M:%S")
+    if len(error_flag) ==0:    
+        qry = f"UPDATE {db_name}.[dbo].[tblProcess_Queue] SET Processed = '{pr_str}', Path='{Path}' WHERE Table_Name = '{Table_Name}' and Original_Name = '{Original_Name}' "
+    else:
+        qry = f"UPDATE {db_name}.[dbo].[tblProcess_Queue] SET Processed = '{pr_str}', Error_Str='{error_flag}' WHERE Table_Name = '{Table_Name}' and Original_Name = '{Original_Name}' "        
+    DB.DB_modify(qry,server)
+
+def tblProcess_Queue_Overwrite(Original_Name, Table_Name, db_name, server, error_flag=''):
+    pr_str = datetime.datetime.now().astimezone(timezone('US/Pacific')).strftime("%Y-%m-%d %H:%M:%S")
+    if len(error_flag) ==0:    
+        qry = f"UPDATE {db_name}.[dbo].[tblProcess_Queue] SET Downloaded = '{pr_str}', Processed=NULL WHERE Table_Name = '{Table_Name}' and Original_Name = '{Original_Name}' "
+    else:
+        qry = f"UPDATE {db_name}.[dbo].[tblProcess_Queue] SET Downloaded = '{pr_str}', Processed=NULL, Error_Str='{error_flag}' WHERE Table_Name = '{Table_Name}' and Original_Name = '{Original_Name}' "        
+    DB.DB_modify(qry,server)
+
+
+def tblIngestion_Queue_Staged_Update(Path, Table_Name, db_name, server):
+    sr_str = datetime.datetime.now().astimezone(timezone('US/Pacific')).strftime("%Y-%m-%d %H:%M:%S")
+    columnList = "(Path, Table_Name, Staged)"
+    query = (Path, Table_Name,sr_str)
+    DB.lineInsert(
+                server, db_name +".[dbo].[tblIngestion_Queue]", columnList, query
+            )
+
+def tblIngestion_Queue_Overwrite(Path, Table_Name, db_name, server):
+    sr_str = datetime.datetime.now().astimezone(timezone('US/Pacific')).strftime("%Y-%m-%d %H:%M:%S")
+    qry = f"UPDATE {db_name}.[dbo].[tblIngestion_Queue] SET Staged = '{sr_str}', Started=NULL,Ingested=NULL WHERE Table_Name = '{Table_Name}' and Path = '{Path}' "
+    DB.DB_modify(qry,server)
+
+
+
+def tblDataset_Single_Reference_Insert(ref, table_name, server, db_name, data_doi=0):
     DatasetID = cmn.getDatasetID_Tbl_Name(table_name, db_name, server)
-    columnList = "(Dataset_ID, Reference)"
-    query = (DatasetID, ref)
+    Ref_ID = cmn.get_last_ID("tblDataset_References", server) + 1
+    columnList = "(Reference_ID, Dataset_ID, Reference, Data_DOI)"
+    query = (Ref_ID,DatasetID, ref,data_doi)
     DB.lineInsert(
                 server, db_name +".[dbo].[tblDataset_References]", columnList, query
             )
@@ -194,6 +253,7 @@ def tblVariables_Insert(
     db_name,
     process_level,
     data_server,
+    has_depth,
     CRS="CRS",
 ):
     if len(data_server) == 0:
@@ -233,6 +293,28 @@ def tblVariables_Insert(
         Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds(
             data_df, "lon", list_multiplier=len(variable_metadata_df)
         )
+        if 'depth' in data_df.columns.tolist():
+            has_depth = 1
+            has_depth_list = [has_depth] * len(variable_metadata_df)
+        else:
+            has_depth = 0
+            has_depth_list = [has_depth] * len(variable_metadata_df)
+    
+    elif data_server.lower() == 'cluster':
+        min_date = input("Enter min date (ex 2011-09-13 00:00:00.000)\n")        
+        max_date = input("Enter max date (ex 2021-09-13 00:00:00.000)\n")
+        min_lat = input("Enter min latitude (ex -57.5)\n")      
+        max_lat = input("Enter max latitude (ex -57.5)\n")    
+        min_lon = input("Enter min longitude (ex -57.5)\n")      
+        max_lon = input("Enter max longitude (ex -57.5)\n")          
+        Temporal_Coverage_Begin_list = [min_date] * int(len(variable_metadata_df))
+        Temporal_Coverage_End_list = [max_date] * int(len(variable_metadata_df))
+        Lat_Coverage_Begin_list = [min_lat] * int(len(variable_metadata_df))
+        Lat_Coverage_End_list = [max_lat] * int(len(variable_metadata_df))
+        Lon_Coverage_Begin_list = [min_lon] * int(len(variable_metadata_df))
+        Lon_Coverage_End_list = [max_lon] * int(len(variable_metadata_df))
+        has_depth_list = [has_depth] * len(variable_metadata_df)
+    
     else:
         if "_Climatology" in Table_Name:
             (
@@ -254,6 +336,7 @@ def tblVariables_Insert(
         Lon_Coverage_Begin_list, Lon_Coverage_End_list = cmn.getColBounds_from_DB(
             Table_Name, "lon", server, data_server, list_multiplier=len(variable_metadata_df)
         )
+        has_depth_list = [has_depth] * len(variable_metadata_df)
 
     Grid_Mapping_list = [CRS] * len(variable_metadata_df)
     Sensor_ID_list = ID_Var_Map(
@@ -278,7 +361,11 @@ def tblVariables_Insert(
     )
     Comment_list = cmn.nanToNA(variable_metadata_df["var_comment"]).tolist()
     Visualize_list = cmn.nanToNA(variable_metadata_df["visualize"]).tolist()
-    Data_Type_list = cmn.getTableName_Dtypes(Table_Name, server, data_server)["DATA_TYPE"].tolist()
+    if data_server.lower() == 'cluster':
+        data_type = input("Enter data type, one for all variables (ex. float) \n")          
+        Data_Type_list = [data_type] * int(len(variable_metadata_df))
+    else:        
+        Data_Type_list = cmn.getTableName_Dtypes(Table_Name, server, data_server)["DATA_TYPE"].tolist()
     if 'org_id' in variable_metadata_df.columns.tolist():
         Org_list = cmn.nanToNA(variable_metadata_df["org_id"]).tolist()
         ## Replace naToNA result ' ' with NULL due to FK on org table
@@ -291,7 +378,7 @@ def tblVariables_Insert(
         Conversion_Coefficient_list = [x if ' ' not in str(x) else 'NULL' for x in Conversion_Coefficient]
     else:
         Conversion_Coefficient_list = ['NULL'] * len(variable_metadata_df)
-    columnList = "(ID,DB, Dataset_ID, Table_Name, Short_Name, Long_Name, Unit, Temporal_Res_ID, Spatial_Res_ID, Temporal_Coverage_Begin, Temporal_Coverage_End, Lat_Coverage_Begin, Lat_Coverage_End, Lon_Coverage_Begin, Lon_Coverage_End, Grid_Mapping, Make_ID, Sensor_ID, Process_ID, Study_Domain_ID, Comment, Visualize, Data_Type, Org_ID, Conversion_Coefficient)"
+    columnList = "(ID,DB, Dataset_ID, Table_Name, Short_Name, Long_Name, Unit, Temporal_Res_ID, Spatial_Res_ID, Temporal_Coverage_Begin, Temporal_Coverage_End, Lat_Coverage_Begin, Lat_Coverage_End, Lon_Coverage_Begin, Lon_Coverage_End, Grid_Mapping, Make_ID, Sensor_ID, Process_ID, Study_Domain_ID, Comment, Visualize, Data_Type, Org_ID, Conversion_Coefficient, Has_Depth)"
 
     for (
         Db,
@@ -318,6 +405,7 @@ def tblVariables_Insert(
         Data_Type,
         Org_ID, 
         Conversion_Coefficient,
+        has_depth
     ) in zip(
         Db_list,
         IDvar_list,
@@ -343,6 +431,7 @@ def tblVariables_Insert(
         Data_Type_list,
         Org_ID_list, 
         Conversion_Coefficient_list,
+        has_depth_list
     ):
         last_var_ID = cmn.get_last_ID("tblVariables", server) + 1
         query = (
@@ -371,6 +460,7 @@ def tblVariables_Insert(
             Data_Type,
             Org_ID, 
             Conversion_Coefficient,
+            has_depth
         )
         
         try:
@@ -415,6 +505,21 @@ def tblKeywords_Insert(variable_metadata_df, dataset_metadata_df, Table_Name, db
                     )
                 except Exception as e:
                     print(e)
+
+def tblKeywords_Insert_VarID(var_id, keyword, db_name, server):
+    keyword = keyword.lstrip().replace('\ufeff','')
+    query = (var_id, keyword)
+    print(query)
+    if len(keyword) > 0:  # won't insert empty values
+        try:  # Cannot insert duplicate entries, so skips if duplicate
+            DB.lineInsert(
+                server,
+                db_name +".[dbo].[tblKeywords]",
+                "(var_ID, keywords)",
+                query,
+            )
+        except Exception as e:
+            print(e)                    
 
 def tblDataset_Server_Insert(tableName, db_name, server):
     columnList = "(Dataset_ID, Server_Alias)"
@@ -536,6 +641,15 @@ def deleteFromtblKeywords(Dataset_ID, db_name, server):
     DB.DB_modify(cur_str, server)
     print("tblKeyword entries deleted for Dataset_ID: ", Dataset_ID)
 
+def deleteFromtblKeywords_VarID(var_id, db_name, server):
+    cur_str = (
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblKeywords] WHERE [var_ID] = """
+        + str(var_id)
+    )
+    DB.DB_modify(cur_str, server)
+    print("tblKeyword entries deleted for Variable_ID: ", var_id)
 
 def deleteFromtblDataset_Stats(Dataset_ID, db_name, server):
     cur_str = (
@@ -610,6 +724,16 @@ def deleteFromtblVariables(Dataset_ID, db_name, server):
     )
     DB.DB_modify(cur_str, server)
     print("tblVariables entries deleted for Dataset_ID: ", Dataset_ID)
+
+def deleteFromtblVariables_VarID(var_id, db_name, server):
+    cur_str = (
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblVariables] WHERE [ID] = """
+        + str(var_id)
+    )
+    DB.DB_modify(cur_str, server)
+    print("tblVariables entries deleted for Variable_ID: ", var_id)    
 
 
 def deleteFromtblDatasets(Dataset_ID, db_name, server):
@@ -736,7 +860,7 @@ def export_data_to_parquet(tableName, db_name, server, branch,rep='rep'):
     if os.path.isfile(directory+f'/{rep}/{tableName}_data.parquet'):
         os.remove(directory+f'/{rep}/{tableName}_data.parquet')
         print('Vars metadata replaced')
-    qry = f"SELECT * FROM dbo.{tableName}"
+    qry = f"SELECT * FROM {db_name}.dbo.{tableName}"
     df = DB.dbRead(qry,server)
     df.to_parquet(directory+f'/{rep}/{tableName}_data.parquet')
 

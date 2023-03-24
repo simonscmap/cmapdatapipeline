@@ -138,6 +138,10 @@ makedir(float_dir)
 drifter = in_situ + "drifter/"
 makedir(drifter)
 
+#########  obs/in-situ/drifter  #########
+mixed = in_situ + "mixed/"
+makedir(mixed)
+
 ########  obs/remote/satellite  ########
 satellite = remote + "satellite/"
 makedir(satellite)

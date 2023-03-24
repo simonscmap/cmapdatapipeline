@@ -47,9 +47,9 @@ def splitExcel(staging_filename, branch, tableName, data_missing_flag):
     transfer.single_file_split(staging_filename, branch, tableName, data_missing_flag)
 
 
-def splitCruiseExcel(staging_filename, cruise_name):
+def splitCruiseExcel(staging_filename, cruise_name, in_vault):
     """Wrapper function for transfer.cruise_file_split"""
-    transfer.cruise_file_split(staging_filename, cruise_name)
+    transfer.cruise_file_split(staging_filename, cruise_name, in_vault)
 
 
 def validator_to_vault(
@@ -205,7 +205,7 @@ def insertData(data_dict, tableName, server):
 
 
 def insertMetadata_no_data(
-    data_dict, tableName, DOI_link_append, DOI_download_link, DOI_download_file, DOI_CMAP_template, icon_filename, server, db_name, process_level, data_server, branch
+    data_dict, tableName, DOI_link_append, DOI_download_link, DOI_download_file, DOI_CMAP_template, icon_filename, server, db_name, process_level, data_server, branch, depth_flag
 ):
     """Main argparse wrapper function for inserting metadata for large datasets that do not have a single data sheet (ex. ARGO, sat etc.)
 
@@ -219,6 +219,7 @@ def insertMetadata_no_data(
         process_level (str): rep or nrt
         data_server (str): Valid CMAP server where data is located
         branch (str): cruise, satellite, etc.
+        depth_flag (bool): if dataset has depth then 1 else 0
 
     Returns:
         org_check_passed (bool): True if passed organism table checks
@@ -248,6 +249,7 @@ def insertMetadata_no_data(
             db_name,
             process_level,
             data_server,
+            has_depth=depth_flag,
             CRS="CRS",
         )
         metadata.tblDataset_Vault_Insert(tableName, server, db_name, branch)
@@ -304,6 +306,7 @@ def insertMetadata(data_dict, tableName, DOI_link_append, DOI_download_link, DOI
             db_name,
             process_level,
             data_server="",
+            has_depth = None,
             CRS="CRS",
         )
         metadata.tblDataset_Vault_Insert(tableName, server, db_name, branch)
@@ -353,7 +356,7 @@ def push_icon():
 
 def cruise_ingestion(args):
     """Main wrapper function for inserting cruise metadata and trajectory"""
-    splitCruiseExcel(args.staging_filename, args.cruise_name)
+    splitCruiseExcel(args.staging_filename, args.cruise_name, args.in_vault)
     # cruise_staging_to_vault(args.cruise_name, remove_file_flag=False)
     data_dict = import_cruise_data_dict(args.cruise_name)
     data_dict["metadata_df"] = add_ST_cols_cruise(
@@ -423,17 +426,13 @@ def dataless_ingestion(args):
         args.branch, args.tableName, args.process_level, import_data=False
     )
     org_check_passed = insertMetadata_no_data(
-        data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch
+        data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch, args.depth_flag
     )
    
-    if org_check_passed:
-        insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
+    if args.data_server.lower() =='cluster':
+        print("No stats added for cluster dataset")
     else:
-        contYN = input(
-        "Add stats without reviewing organism data?  [yes/no]: "
-        )
-        if contYN == 'yes':
-            insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
+        insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
 
 
 def update_metadata(args):
@@ -450,22 +449,19 @@ def update_metadata(args):
     )
     metadata.deleteTableMetadata(args.tableName, args.Database, args.Server)
     org_check_pass = insertMetadata_no_data(
-        data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch
+        data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch, args.depth_flag
     )
-    if org_check_pass:
-        insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
+    if args.data_server.lower() =='cluster':
+        print("No stats added for cluster dataset")
     else:
-        contYN = input(
-        "Add stats without reviewing organism data?  [yes/no]: "
-        )
-        if contYN == 'yes':
-            insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
+        insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
     #     transfer.df_to_parquet(data_dict["variable_metadata_df"],'variable_metadata',args.branch, args.tableName,'metadata')
     #     transfer.df_to_parquet(data_dict["dataset_metadata_df"],'dataset_metadata',args.branch, args.tableName,'metadata')
 
 
 def main():
     """Main function that parses arguments and determines which data ingestion path depending on args"""
+    """Optional args: d, l, f,t,N,U,C,S,a,D,i,v,F """
     parser = argparse.ArgumentParser(description="Ingestion datasets into CMAP")
 
     parser.add_argument(
@@ -509,7 +505,7 @@ def main():
         "--DOI_CMAP_template",
         help="Boolean if DOI download file is in three tab CMAP format",
         nargs="?",
-        default=True
+        default=1
     )   
     parser.add_argument("-N", "--Dataless_Ingestion", nargs="?", const=True)
     parser.add_argument("-U", "--Update_Metadata", nargs="?", const=True)
@@ -524,6 +520,7 @@ def main():
         "-D", "--Database", help="Database name: Opedia, Opedia_Sandbox", nargs="?", default="Opedia"
     )
     parser.add_argument("-v", "--in_vault", help="Boolean if excel is in vault", nargs="?", default=False)
+    parser.add_argument("-F", "--depth_flag", help="Boolean if data has depth", nargs="?", default=0)    
     parser.add_argument(
         "-i", 
         "--icon_filename", 

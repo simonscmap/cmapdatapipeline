@@ -235,8 +235,12 @@ def vault_struct_retrieval(branch):
         vs_struct = vs.cruise
     elif branch.lower() == "float":
         vs_struct = vs.float_dir
+    elif branch.lower() == "drifter":
+        vs_struct = vs.drifter
+    elif branch.lower() == "mixed":
+        vs_struct = vs.mixed        
     elif branch.lower() == "station":
-        vs_struct = vs.station
+        vs_struct = vs.station        
     elif branch.lower() == "satellite":
         vs_struct = vs.satellite
     elif branch.lower() == "model":
@@ -306,6 +310,19 @@ def getDatasetID_Tbl_Name(tableName, db_name, server):
 
     dsID = query_return.iloc[0][0]
     return dsID
+
+def getTbl_Name_DatasetID(Dataset_ID, db_name, server):
+    """Get DatasetID from input table name"""
+    cur_str = (
+        """select distinct [Table_Name] FROM """
+        + db_name
+        + """.[dbo].[tblVariables] WHERE [Dataset_ID] = """
+        + str(Dataset_ID)
+    )
+    query_return = DB.dbRead(cur_str, server=server)
+
+    tableName = query_return.iloc[0][0]
+    return tableName    
 
 def getRefID_Tbl_Name_Ref(ref, tableName, db_name, server):
     """Get DatasetID from input table name"""
