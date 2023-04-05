@@ -1,58 +1,71 @@
 import sys
 import os
-import urllib.request
-import requests
 
-from cmapingest import vault_structure as vs
+sys.path.append("ingest")
+from ingest import vault_structure as vs
+from ingest import credentials as cr
+from ingest import common as cm
+from ingest import data_checks as dc
 
+#https://oceandata.sci.gsfc.nasa.gov/directaccess/MODIS-Aqua/Mapped/8-Day/9km/poc/
 
-def get_POC(year, day):
-    start_index = day / 8
+tbl = 'tblModis_POC'
+
+base_folder = f'{vs.satellite}{tbl}/raw/'
+
+max_sql_date = cm.getMax_SQL_date(tbl, 'Rainier')
+doy = max_sql_date.timetuple().tm_yday
+last_file_dl = cm.getLast_file_download(tbl, 'satellite')
+os.chdir(base_folder)
+
+def get_POC(year, day,base_folder):
+    # start_index = day / 8
     if day % 8 == 0:
-        start_index = start_index - 1
-    start_index = (start_index * 8) + 1
-
+        start_index = day - 1
+        print("########## day minus 1")
+    # start_index = (start_index * 8)  + 1
+    start_index = day
     end_index = start_index + 7
     if start_index == 361:
         end_index = 365
     if (year % 4 == 0) and (start_index == 361):
-        end_index = 366
-    base_folder = vs.collected_data + "MODIS_POC_8_day_data/"
-    start_index = int(start_index) - 1
-    end_index = int(end_index) - 1
-
-    url = (
-        "https://oceandata.sci.gsfc.nasa.gov/ob/getfile/A"
-        + str(year)
+        end_index = 366 
+    # start_index = int(start_index) - 1
+    # end_index = int(end_index) - 1
+    wget_str = (
+    "wget --load-cookies ~/.urs_cookies --save-cookies ~/.urs_cookies --auth-no-challenge=on --keep-session-cookies --content-disposition https://oceandata.sci.gsfc.nasa.gov/cgi/getfile/A"
+    + str(year)
+    + str(start_index).zfill(3)
+    + str(year)
+    + str(end_index).zfill(3)
+    + ".L3m_8D_POC_poc_9km.nc"
+    )
+    print(start_index)
+    print(end_index)
+    file_name = ("A"+ str(year)
         + str(start_index).zfill(3)
         + str(year)
         + str(end_index).zfill(3)
-        + ".L3m_8D_POC_poc_9km.nc"
-    )
-    path = base_folder + "MODIS_POC_8_day_" + str(year) + str(day).zfill(3) + ".nc"
-    print("Downloading: " + url)
-    result = requests.get(url)
-    try:
-        result.raise_for_status()
-        f = open(path, "wb")
-        f.write(result.content)
-        f.close()
-        # print('contents of URL written to '+path)
-    except:
-        # print('requests.get() returned an error code '+str(result.status_code))
-        print(
-            "No file found for date: "
-            + str(year)
-            + str(start_index).zfill(3)
-            + str(year)
-            + str(end_index)
-        )
+        + ".L3m_8D_POC_poc_9km.nc")
+    downloaded = os.path.isfile(base_folder + file_name) 
+    if not downloaded:
+        try:
+            os.system(wget_str)
+        except:
+            print("No file found for date: " + str(year) + str(start_index).zfill(3))
+    else:
+        print("Already downloaded: " + str(year) + str(start_index).zfill(3))
 
 
-year_list = range(2002, 2020, 1)
+
+year_list = range(2020, 2021, 1)
 startDay = int(1)
-endDay = int(365)
+endDay = int(24)
+
+year = 2006
+endDay = int(16)
 
 for year in year_list:
-    for day in range(startDay, endDay + 1):
-        get_POC(year, day)
+    ## Step through list by 8 to save calls
+    for day in range(startDay, endDay + 1, 8):
+        get_POC(year, day,base_folder)  

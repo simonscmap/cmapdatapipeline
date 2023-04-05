@@ -15,7 +15,8 @@ vs.leafStruc(vs.satellite + tbl)
 
 
 start_date = datetime.date(2019, 4, 28)
-end_date = datetime.date(2022, 1, 31)
+end_date = datetime.date(2022, 8, 3)
+end_date = datetime.date.today()
 delta = datetime.timedelta(days=1)
 
 while start_date <= end_date:

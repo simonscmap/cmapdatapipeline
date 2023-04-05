@@ -239,11 +239,11 @@ def build_stats_df_from_db_calls(tableName, server, data_server):
         else:
             try:
                 stats_qry = (
-                    f"""SELECT count_big({var}),MAX({var}),MIN({var}),AVG({var}),STDEV({var}) FROM {tableName}"""
+                    f"""SELECT count_big([{var}]),MAX([{var}]),MIN([{var}]),AVG([{var}]),STDEV([{var}]) FROM {tableName}"""
                 )
                 var_df = DB.dbRead(stats_qry, stats_server)
             except:
-                stats_qry = f"""SELECT count_big({var}),MAX(cast({var} as numeric(12, 0))),MIN(cast({var} as numeric(12, 0))),AVG(cast({var} as numeric(12, 0))),STDEV(cast({var} as numeric(12, 0))) FROM {tableName}"""
+                stats_qry = f"""SELECT count_big([{var}]),MAX(cast([{var}] as numeric(12, 0))),MIN(cast([{var}] as numeric(12, 0))),AVG(cast([{var}] as numeric(12, 0))),STDEV(cast([{var}] as numeric(12, 0))) FROM {tableName}"""
                 var_df = DB.dbRead(stats_qry, stats_server)            
         if (var == 'lat' or var == 'lon'):
             stats_DF.at["mean", var] = ""

@@ -51,6 +51,13 @@ def splitCruiseExcel(staging_filename, cruise_name, in_vault):
     """Wrapper function for transfer.cruise_file_split"""
     transfer.cruise_file_split(staging_filename, cruise_name, in_vault)
 
+def addServer(tableName,db_name,server):
+    """Wrapper function for metadata.tblDataset_Server_Insert"""
+    metadata.tblDataset_Server_Insert(tableName,db_name,server)
+
+def addAllServers(tableName):
+    """Wrapper function for metadata.addServerAlias"""
+    metadata.addServerAlias(tableName)
 
 def validator_to_vault(
     staging_filename, branch, tableName
@@ -407,8 +414,10 @@ def full_ingestion(args):
         data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.branch
     )
     insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
-    if args.Server == "Rainier" and args.icon_filename =="":
-        createIcon(data_dict, args.tableName)
+    if args.Server == "Rainier":
+        addAllServers(args.tableName)
+        if args.icon_filename =="":
+            createIcon(data_dict, args.tableName)
         # push_icon()
 
 
@@ -428,7 +437,11 @@ def dataless_ingestion(args):
     org_check_passed = insertMetadata_no_data(
         data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch, args.depth_flag
     )
-   
+    if args.Server == "Rainier":
+        if len(args.data_server) > 0:
+            addServer(args.tableName,args.Database,args.data_server)
+        else:
+            addAllServers(args.tableName)   
     if args.data_server.lower() =='cluster':
         print("No stats added for cluster dataset")
     else:
@@ -451,6 +464,11 @@ def update_metadata(args):
     org_check_pass = insertMetadata_no_data(
         data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch, args.depth_flag
     )
+    if args.Server == "Rainier":
+        if len(args.data_server) > 0:
+            addServer(args.tableName,args.Database,args.data_server)
+        else:
+            addAllServers(args.tableName)
     if args.data_server.lower() =='cluster':
         print("No stats added for cluster dataset")
     else:

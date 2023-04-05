@@ -14,7 +14,7 @@ import vault_structure as vs
 #https://www.gebco.net/data_and_products/gridded_bathymetry_data/
 tbl = 'tblGEBCO_2022_Grid_Ice_Surface'
 vs.leafStruc(vs.model+tbl)
-e
+
 
 raw_folder = vs.model+tbl+'/raw'
 meta_folder = vs.model+tbl+'/metadata/'

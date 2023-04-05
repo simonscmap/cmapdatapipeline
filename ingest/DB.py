@@ -155,7 +155,7 @@ def addSensor(server, sensor):
     conn.commit()
 
 def addSpatialResolution(server, res):
-    """Adds new Sensor and associated ID from server to Sensor table
+    """Adds new resolution and associated ID from server to spatial resolution table
     Args:
         server (str): Valid CMAP server name. ex Rainier
         res (str): Name of spatial resolution to be added
@@ -165,6 +165,18 @@ def addSpatialResolution(server, res):
     conn, cursor = dbConnect(server)
     cursor.execute(insertQuery)
     conn.commit()
+
+def addStudyDomain(server, study):
+    """Adds new resolution and associated ID from server to study domain table
+    Args:
+        server (str): Valid CMAP server name. ex Rainier
+        study (str): Name of study domain to be added
+    """
+    last_id = cmn.get_last_ID('tblStudy_Domains', server)
+    insertQuery = f"INSERT INTO dbo.tblStudy_Domains VALUES ({last_id + 1}, '{study}')"
+    conn, cursor = dbConnect(server)
+    cursor.execute(insertQuery)
+    conn.commit()    
 
 
 def lineInsert(server, tableName, columnList, query, ID_insert=False):

@@ -1,6 +1,7 @@
 import sys
 import os
 import glob
+import time
 
 from cmapingest import vault_structure as vs
 from cmapingest import DB
@@ -24,16 +25,22 @@ def get_PAR(year, day):
         + str(day).zfill(3)
         + ".L3m_DAY_PAR_par_9km.nc"
     )
-    try:
-        os.system(wget_str)
-
-    except:
-        print("No file found for date: " + str(year) + str(day).zfill(3))
-
+    file_name = ("A"+ str(year)
+       + str(day).zfill(3)
+        + ".L3m_DAY_PAR_par_9km.nc")
+    downloaded = os.path.isfile(base_folder + file_name) 
+    if not downloaded:
+        try:
+            os.system(wget_str)
+            time.sleep(3)
+        except:
+            print("No file found for date: " + str(year) + str(day).zfill(3))
+    else:
+        print("Already downloaded: " + str(year) + str(day).zfill(3))
 
 year_list = range(2020, 2021, 1)
 
-startDay = int(28)
+startDay = int(16)
 endDay = int(365)
 year = 2020
 

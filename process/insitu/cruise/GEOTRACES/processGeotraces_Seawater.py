@@ -6,17 +6,38 @@ import numpy as np
 import xarray as xr
 
 sys.path.append("../../../ingest")
-sys.path.append("ingest")
+sys.path.append("cmapdata/ingest")
 from ingest import vault_structure as vs
 from ingest import credentials as cr
 from ingest import DB 
 from ingest import data_checks as dc
+from ingest import metadata
 
 
 tbl = 'tblGeotraces_Seawater'
 n = f'{vs.cruise}{tbl}/raw/GEOTRACES_IDP2021_Seawater_Discrete_Sample_Data_v1.nc' 
 
 x = xr.open_dataset(n)
+x.metavar5.attrs
+
+# ## Unique station numbers per cruise name
+# cruise_groups = x.groupby("metavar5").groups
+# cruise_groups[b'D357']
+
+# ## Slice by station numbers for specific cruise
+# #x_1 = x.sel(N_STATIONS=slice(747,760)) 
+# x_1 = x.sel(N_STATIONS=cruise_groups[b'D357'])
+
+# x_1.data_vars
+# ## Check for data errors in date time and station 
+# D357_dates = x_1.groupby("date_time","metavar2").groups
+# x_1.date_time.values
+# df_x = x_1.to_dataframe().reset_index()
+# df_x.head
+# df_x['metavar1']
+# a_df=df_x.drop_duplicates(['date_time','metavar2','latitude','longitude'])[['date_time','metavar2','latitude','longitude']]
+# a_df.sort_values('date_time')
+
 
 df_x = x.to_dataframe().reset_index()
 
@@ -35,27 +56,41 @@ df_x.rename(columns={'latitude':'lat','longitude':'lon', 'date_time':'time'}, in
         
 df_x.shape #(2,198,002, 1590)
 
-df_x1 = df_x.iloc[:,0:800]
 
+## Change flag values from ASCII to int
+flag_defs = {'48.0':'0', '49.0':'1', '50.0':'2', '51.0':'3', '52.0':'4', '53.0':'5', '54.0':'6', '55.0':'7', '56.0':'8', '57.0':'9', '65.0':'A', '66.0':'B', '81.0':'Q'}
+qc_vars = [q for q in df_x.columns.tolist() if '_qc' in q]
+for q in qc_vars:
+      df_x[q] = df_x[q].astype(str)
+      df_x[q] = df_x[q].map(flag_defs).fillna(df_x[q])
+
+for q in qc_vars:
+      df_x[q] = df_x[q].replace('nan', np.nan)
+    
+     
+
+df_x1 = df_x.iloc[:,0:800]
 df_x2 = df_x[list(df_x.columns[0:17]) + list(df_x.columns[800:])]
 
+dc.check_df_dtypes(df_x1, 'tblGeotraces_Seawater_1', "Beast")
+dc.check_df_nulls(df_x1, 'tblGeotraces_Seawater_1', "Beast")
+dc.check_df_dtypes(df_x2, 'tblGeotraces_Seawater_2', "Beast")
+dc.check_df_nulls(df_x2, 'tblGeotraces_Seawater_2', "Beast")
 
-
-dc.check_df_ingest(df_x1, 'tblGeotraces_Seawater_1', "Beast")
-dc.check_df_ingest(df_x2, 'tblGeotraces_Seawater_2', "Beast")
 df_import_1 = dc.mapTo180180(df_x1)
 df_import_2 = dc.mapTo180180(df_x2)
-df_import_2.head
-dc.check_df_ingest(df_import_1, 'tblGeotraces_Seawater_1', "Beast")
-dc.check_df_ingest(df_import_2, 'tblGeotraces_Seawater_2', "Beast")
+df_import_2.shape
+
 
 df_clean_1 = dc.clean_data_df(df_import_1)
 df_clean_1['time'].head
 df_import_1['time'].head
 df_clean_2 = dc.clean_data_df(df_import_2)
-dc.check_df_ingest(df_clean_1, 'tblGeotraces_Seawater_1', "Beast")
-dc.check_df_ingest(df_clean_2, 'tblGeotraces_Seawater_2', "Beast")
-df_clean_1.columns
+
+for v in df_clean_1.columns.to_list():
+      if df_clean_1[v].dtype=='O':
+            print(v)
+            print(df_clean_1[v].astype(str).map(len).max())
 
 DB.toSQLbcp_wrapper(df_clean_1, 'tblGeotraces_Seawater_1', "Beast") 
 DB.toSQLbcp_wrapper(df_clean_2, 'tblGeotraces_Seawater_2', "Beast") 
@@ -1662,7 +1697,7 @@ INSERT INTO dbo.tblGeotraces_Seawater (
       ,s1.[Station]
       ,s1.[Type]
       ,s1.[Bottom_Depth]
-      ,s1.[Operatos_Cruise_Name]
+      ,s1.[Operators_Cruise_Name]
       ,s1.[Ship_Name]
       ,s1.[Period]
       ,s1.[Chief_Scientist]
@@ -3252,7 +3287,13 @@ INSERT INTO dbo.tblGeotraces_Seawater (
 
 DB.queryExecute("Beast", query)
 
+server = 'Rainier'
+server = 'Mariana'
+variable_metadata_df = pd.read_excel(f'{vs.cruise}{tbl}/raw/Geotraces_Seawater_Metadata_DHedits.xlsx', sheet_name='vars_meta_data')
+variable_metadata_df.replace({'KN192-5':'KN192-05'}, inplace=True)
+dataset_metadata_df= pd.read_excel(f'{vs.cruise}{tbl}/raw/Geotraces_Seawater_Metadata_DHedits.xlsx', sheet_name='dataset_meta_data')
+dataset_metadata_df.replace({'KN192-5':'KN192-05'}, inplace=True)
 
-
+metadata.tblKeywords_Insert(variable_metadata_df, dataset_metadata_df, tbl, 'Opedia', server)
 
 

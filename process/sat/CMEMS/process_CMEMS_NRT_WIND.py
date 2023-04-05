@@ -1,3 +1,6 @@
+import sys
+sys.path.append("cmapdata/ingest")
+
 import vault_structure as vs
 import common as cmn
 import DB
@@ -10,9 +13,11 @@ import numpy as np
 from tqdm import tqdm
 
 
+
 NRT_wind_dir = vs.collected_data + "sat/CMEMS_NRT_Wind/"
 
 flist = np.sort(glob.glob(NRT_wind_dir + "*.nc"))
+fil = flist[0]
 for fil in tqdm(flist):
     xdf = xr.open_dataset(fil)
     df = xdf.to_dataframe().reset_index()

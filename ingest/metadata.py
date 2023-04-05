@@ -534,7 +534,14 @@ def tblDataset_Server_Insert(tableName, db_name, server):
             print(f'{tableName} not on {svr}')
             continue      
 
-
+def addServerAlias(tbl,server_list=cr.server_alias_list):
+    """Adds alias in server_list to all servers
+    Args:
+        tbl (str): CMAP table name
+        server_list (list): Default is all servers
+    """
+    for server in server_list:
+        tblDataset_Server_Insert(tbl,'Opedia',server)
 
 def user_input_build_cruise(df, dataset_metadata_df, server):
     tblCruise_df, cruise_name = cruise.build_cruise_metadata_from_user_input(df)

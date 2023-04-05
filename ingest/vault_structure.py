@@ -16,26 +16,8 @@ def makedir(directory):
         os.makedirs(directory)
     return
 
-
-def cruise_leaf_structure(base):
-    """Creates leaf level structure for cruises"""
-    if base[-1] != "/":
-        base = base + "/"
-    traj = base + "trajectory/"
-    makedir(traj)
-    meta = base + "metadata/"
-    makedir(meta)
-    code = base + "code/"
-    makedir(code)
-    raw = base + "raw/"
-    makedir(raw)
-    return meta, traj, code, raw
-
-
-
 def leafStruc(base):
     """Creates leaf level structure for datasets"""
-
     makedir(base)
     if base[-1] != "/":
         base = base + "/"
@@ -55,6 +37,20 @@ def leafStruc(base):
     makedir(raw)
     return nrt, rep, metadata, stats, doc, code, raw
 
+def cruise_leaf_structure(base):
+    """Creates leaf level structure for cruises"""
+    makedir(base)
+    if base[-1] != "/":
+        base = base + "/"
+    traj = base + "trajectory/"
+    makedir(traj)
+    meta = base + "metadata/"
+    makedir(meta)
+    code = base + "code/"
+    makedir(code)
+    raw = base + "raw/"
+    makedir(raw)
+    return meta, traj, code, raw
 
 vault = r"/data/CMAP Data Submission Dropbox/Simons CMAP/vault/"
 staging = r"/data/CMAP Data Submission Dropbox/Simons CMAP/staging/"
@@ -63,6 +59,7 @@ spatial_data = r"/data/CMAP Data Submission Dropbox/Simons CMAP/spatial_data/"
 dataset_audit = r"/data/CMAP Data Submission Dropbox/Simons CMAP/dataset_audit/"
 download_transfer = r"/data/CMAP Data Submission Dropbox/Simons CMAP/download_transfer/"
 app_data = r"/data/CMAP Data Submission Dropbox/Simons CMAP/Apps/Simons CMAP Web Data Submission/"
+
 
 
 ################# Static Mission Icon Directory ##################
