@@ -61,7 +61,7 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
     # dataset_metadata_df.replace({"'": "''"}, regex=True, inplace=True)
     Dataset_Name = dataset_metadata_df["dataset_short_name"].iloc[0]
     Dataset_Long_Name = dataset_metadata_df["dataset_long_name"].iloc[0]
-    Dataset_Version = dataset_metadata_df["dataset_version"].iloc[0]
+    Dataset_Version = str(dataset_metadata_df["dataset_version"].iloc[0])
     Dataset_Release_Date = dataset_metadata_df["dataset_release_date"].iloc[0]
     if type(Dataset_Release_Date) != str:
         Dataset_Release_Date = Dataset_Release_Date.date().strftime('%Y-%m-%d')
@@ -301,12 +301,21 @@ def tblVariables_Insert(
             has_depth_list = [has_depth] * len(variable_metadata_df)
     
     elif data_server.lower() == 'cluster':
+        Yn = input("Read min/max lat lon from parquet? y or n \n")
+        if Yn:
+            fil = input("Input *full* parquet path after vault (ex satellite/tblModis/rep/tblModis_2020.parquet) \n")
+            df_fil = pd.read_parquet(vs.vault+fil)
+            min_lat = df_fil.lat.min()
+            max_lat = df_fil.lat.max()
+            min_lon = df_fil.lon.min()
+            max_lon = df_fil.lon.max()
+        else:
+            min_lat = input("Enter min latitude (ex -57.5)\n")      
+            max_lat = input("Enter max latitude (ex -57.5)\n")    
+            min_lon = input("Enter min longitude (ex -57.5)\n")      
+            max_lon = input("Enter max longitude (ex -57.5)\n")  
         min_date = input("Enter min date (ex 2011-09-13 00:00:00.000)\n")        
-        max_date = input("Enter max date (ex 2021-09-13 00:00:00.000)\n")
-        min_lat = input("Enter min latitude (ex -57.5)\n")      
-        max_lat = input("Enter max latitude (ex -57.5)\n")    
-        min_lon = input("Enter min longitude (ex -57.5)\n")      
-        max_lon = input("Enter max longitude (ex -57.5)\n")          
+        max_date = input("Enter max date (ex 2021-09-13 00:00:00.000)\n")      
         Temporal_Coverage_Begin_list = [min_date] * int(len(variable_metadata_df))
         Temporal_Coverage_End_list = [max_date] * int(len(variable_metadata_df))
         Lat_Coverage_Begin_list = [min_lat] * int(len(variable_metadata_df))
@@ -860,6 +869,24 @@ def addKeywords(keywords_list, tableName, db_name, server, var_short_name_list="
                 print("Added keyword: " + keyword)
             except Exception as e:
                 print(e)
+
+def export_script_to_vault(tableName, branch, script_path, txt_name):
+    """Saves git path for collect and process scripts to vault
+    Args:
+        tableName (str): CMAP table name
+        branch (str): Vault structure folder (cruise, float_dir, model, etc)
+        script_path (str): Directory structure within dataingest (collect/cruise/script.py)
+        txt_name (str): Name of text file to save github link to (collect.txt)
+    """    
+    ## Vault export path
+    code_path = os.path.join(getattr(vs,branch),tableName,"code",txt_name)
+    git_path = cr.git_blob + script_path
+    try:
+        with open(code_path, 'w+') as fh:
+            fh.write(git_path)
+    except:
+        print(f"{txt_name} not written to {tableName}")    
+
 
 def export_data_to_parquet(tableName, db_name, server, branch,rep='rep'):
     ## Vault export path

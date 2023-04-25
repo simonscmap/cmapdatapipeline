@@ -157,7 +157,7 @@ def nanToNA(df):
     Returns:
         df {Pandas DataFrame}: Out Pandas DataFrame
     """
-    df = df.replace(np.nan, " ", regex=True)
+    df = df.replace(np.nan, "", regex=True)
     return df
 
 

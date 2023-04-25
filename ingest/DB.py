@@ -228,7 +228,7 @@ def sqlalchemy_engine_string(quoted_conn_str):
     )
     return engine
 
-def toSQLpandas(df, tableName, server, exists='append', ch=1000):
+def toSQLpandas(df, tableName, server, exists='append', ch=5000):
     """SQL ingestion option, uses pandas to_sql functionality.
 
     Args:
@@ -254,7 +254,7 @@ def toSQLbcpandas(df, tableName, server):
 
 def toSQLbcp_wrapper(df, tableName, server):
     """wrapper func for toSQLbcp function. Simplifies arguments"""
-    export_path = "temp_bcp.csv"
+    export_path = f"{tableName}_{server}_bcp.csv"
     df.to_csv(export_path, index=False)
     toSQLbcp(export_path, tableName, server)
     os.remove(export_path)

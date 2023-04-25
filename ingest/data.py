@@ -137,7 +137,7 @@ def ST_columns(df):
 def clean_data_df(df):
     """Combines multiple data functions to apply a clean to a pandas df"""
     df = cmn.strip_whitespace_headers(df)
-    # df = cmn.nanToNA(df)
+    df = cmn.nanToNA(df)
     df = format_time_col(df, "time")
     #df = removeMissings(df, ST_columns(df))
     df = ensureST_numeric(df)

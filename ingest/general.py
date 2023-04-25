@@ -60,13 +60,14 @@ def addAllServers(tableName):
     metadata.addServerAlias(tableName)
 
 def validator_to_vault(
-    staging_filename, branch, tableName
+    staging_filename, branch, tableName, data_missing_flag
 ):
     """Wrapper function for transfer.validator_to_vault"""
     transfer.validator_to_vault(
         staging_filename,
         branch,
-        tableName
+        tableName,
+        data_missing_flag
     )
 
 def cruise_staging_to_vault(cruise_name, remove_file_flag):
@@ -349,6 +350,9 @@ def insert_large_stats(tableName, db_name, server, data_server):
     stats_df = stats.build_stats_df_from_db_calls(tableName, server, data_server)
     stats.update_stats_large(tableName, stats_df, db_name, server)
 
+def insert_stats_manual(dt1,dt2,lat1,lat2,lon1,lon2,dpt1,dpt2,tableName,db_name,server):
+    """Wrapper function for stats.build_stats_df_from_db_calls and stats.update_stats_large"""
+    stats.updateStats_Manual(dt1,dt2,lat1,lat2,lon1,lon2,dpt1,dpt2,tableName,db_name,server)
 
 def createIcon(data_dict, tableName):
     """Wrapper function for mapping.folium_map"""
@@ -389,7 +393,8 @@ def full_ingestion(args):
         validator_to_vault(
             args.staging_filename,
             getBranch_Path(args),
-            args.tableName
+            args.tableName,
+            data_missing_flag = False
         )   
     splitExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=False)
     data_dict = data.importDataMemory(
@@ -428,7 +433,8 @@ def dataless_ingestion(args):
         validator_to_vault(
             args.staging_filename,
             getBranch_Path(args),
-            args.tableName
+            args.tableName,
+            data_missing_flag = True
         )
     splitExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=True)        
     data_dict = data.importDataMemory(
@@ -443,7 +449,27 @@ def dataless_ingestion(args):
         else:
             addAllServers(args.tableName)   
     if args.data_server.lower() =='cluster':
-        print("No stats added for cluster dataset")
+        Yn = input("Read min/max lat lon from parquet? y or n \n")
+        if Yn:
+            fil = input("Input parquet path (ex /rep/tblModis_2020.parquet) \n")
+            df_fil = pd.read_parquet(getBranch_Path(args)+args.tableName+fil)
+            min_lat = df_fil.lat.min()
+            max_lat = df_fil.lat.max()
+            min_lon = df_fil.lon.min()
+            max_lon = df_fil.lon.max()
+        else:
+            min_lat = input("Enter min latitude (ex -57.5)\n")      
+            max_lat = input("Enter max latitude (ex -57.5)\n")    
+            min_lon = input("Enter min longitude (ex -57.5)\n")      
+            max_lon = input("Enter max longitude (ex -57.5)\n")  
+        min_date = input("Enter min date (ex 2011-09-13 00:00:00.000)\n")        
+        max_date = input("Enter max date (ex 2021-09-13 00:00:00.000)\n")
+        if args.depth_flag ==0:
+            dpt1, dpt2 = None, None
+        else:
+            dpt1 = input("Enter min depth (ex 0)\n")      
+            dpt2 = input("Enter max depth (ex 1000)\n")  
+        insert_stats_manual(min_date,max_date,min_lat,max_lat,min_lon,max_lon,dpt1,dpt2,args.tableName,args.Database,args.Server)
     else:
         insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
 
@@ -455,6 +481,7 @@ def update_metadata(args):
             args.staging_filename,
             getBranch_Path(args),
             args.tableName,
+            data_missing_flag = True
         )
     splitExcel(args.staging_filename, args.branch, args.tableName, data_missing_flag=True)
     data_dict = data.importDataMemory(
@@ -470,7 +497,27 @@ def update_metadata(args):
         else:
             addAllServers(args.tableName)
     if args.data_server.lower() =='cluster':
-        print("No stats added for cluster dataset")
+        Yn = input("Read min/max lat lon from parquet? y or n \n")
+        if Yn:
+            fil = input("Input parquet path (ex /rep/tblModis_2020.parquet) \n")
+            df_fil = pd.read_parquet(getBranch_Path(args)+args.tableName+fil)
+            min_lat = df_fil.lat.min()
+            max_lat = df_fil.lat.max()
+            min_lon = df_fil.lon.min()
+            max_lon = df_fil.lon.max()
+        else:
+            min_lat = input("Enter min latitude (ex -57.5)\n")      
+            max_lat = input("Enter max latitude (ex -57.5)\n")    
+            min_lon = input("Enter min longitude (ex -57.5)\n")      
+            max_lon = input("Enter max longitude (ex -57.5)\n")  
+        min_date = input("Enter min date (ex 2011-09-13 00:00:00.000)\n")        
+        max_date = input("Enter max date (ex 2021-09-13 00:00:00.000)\n")
+        if args.depth_flag ==0:
+            dpt1, dpt2 = None, None
+        else:
+            dpt1 = input("Enter min depth (ex 0)\n")      
+            dpt2 = input("Enter max depth (ex 1000)\n")  
+        insert_stats_manual(min_date,max_date,min_lat,max_lat,min_lon,max_lon,dpt1,dpt2,args.tableName,args.Database,args.Server)
     else:
         insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
     #     transfer.df_to_parquet(data_dict["variable_metadata_df"],'variable_metadata',args.branch, args.tableName,'metadata')

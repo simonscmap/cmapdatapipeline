@@ -75,7 +75,7 @@ def cruise_staging_to_vault(cruise_name, remove_file_flag):
     print("cruise trajectory and metadata transferred from staging to vault.")
 
 
-def validator_to_vault(filename, branch, tableName):
+def validator_to_vault(filename, branch, tableName, data_missing_flag):
     """
     Transfers a file from validator submission to vault.
 
@@ -87,6 +87,8 @@ def validator_to_vault(filename, branch, tableName):
         Vault organization path: ex: vs.cruise
     tableName : string
         SQL tableName
+    data_missing_flag: boolean
+        True if dataless ingestion
     """
     vs.leafStruc(branch + tableName)
     base_filename = os.path.splitext(os.path.basename(filename))[0]
@@ -102,8 +104,12 @@ def validator_to_vault(filename, branch, tableName):
             validator_file = final_file[0]
         else:
             sys.exit()
-    vault_path = branch+tableName+'/raw/'
+    if data_missing_flag == False:
+        vault_path = branch+tableName+'/raw/'
+        shutil.copyfile(validator_file, vault_path + base_filename +'.xlsx')
+    vault_path = branch+tableName+'/metadata/'
     shutil.copyfile(validator_file, vault_path + base_filename +'.xlsx')
+
 
 
 
@@ -220,7 +226,7 @@ def single_file_split(filename, branch, tableName, data_missing_flag):
     base_path = cm.vault_struct_retrieval(branch)+tableName
 
     dataset_metadata_df = pd.read_excel(
-        base_path +'/raw/'+ filename, sheet_name="dataset_meta_data"
+        base_path +'/metadata/'+ filename, sheet_name="dataset_meta_data"
     )
     dataset_metadata_df.columns = dataset_metadata_df.columns.str.lower()
     # dataset_metadata_df.replace({'\'': '\'\''}, regex=True, inplace = True)
@@ -228,7 +234,7 @@ def single_file_split(filename, branch, tableName, data_missing_flag):
             dataset_metadata_df.replace({'"': '\'\''}, regex=True, inplace = True)
     dataset_metadata_df.replace({"'": "CHAR(39)"}, regex=True, inplace = True)
     vars_metadata_df = pd.read_excel(
-        base_path +'/raw/'+ filename, sheet_name="vars_meta_data"
+        base_path +'/metadata/'+ filename, sheet_name="vars_meta_data"
     )
     vars_metadata_df.columns = vars_metadata_df.columns.str.lower()
     # vars_metadata_df.replace({'\'': '\'\''}, regex=True, inplace = True)
