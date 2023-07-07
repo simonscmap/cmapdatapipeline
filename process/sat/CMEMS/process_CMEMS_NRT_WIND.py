@@ -12,7 +12,7 @@ import glob
 import numpy as np
 from tqdm import tqdm
 
-
+# fil = vs.download_transfer+'cmems_obs-oc_glo_bgc-plankton_nrt_l4-multi-4km_P1M_1671036353108.nc'
 
 NRT_wind_dir = vs.collected_data + "sat/CMEMS_NRT_Wind/"
 

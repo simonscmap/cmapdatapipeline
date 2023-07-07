@@ -14,7 +14,7 @@ from ingest import metadata
 from ingest import api_checks as api
 
 
-tbl = 'tblAltimetry_REP_Signal'
+tbl = 'tblAltimetry_NRT_Signal'
 base_folder = f'{vs.satellite}{tbl}/raw/'
 # vs.leafStruc(vs.satellite+tbl)
 
@@ -37,9 +37,7 @@ def getMaxDate(tbl):
         yr, mo, day = mx_name['mx'][0].strip().split('_')
         max_name_date = datetime.date(int(yr),int(mo),int(day))   
 
-        min_time, max_time = api.temporalRange(tbl)   
-        yr, mo, day = max_time.split('-')
-        max_data_date = datetime.date(int(yr),int(mo),int(day)) 
+        max_data_date = api.maxDateCluster(tbl)   
 
         max_date = max([max_path_date,max_name_date,max_data_date])
     else:
@@ -51,18 +49,18 @@ def getMaxDate(tbl):
 
 
 
-#ftp://my.cmems-du.eu/Core/SEALEVEL_GLO_PHY_L4_MY_008_047/cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.25deg_P1D/2021/12/dt_global_allsat_phy_l4_20211201_20220422.nc
+#ftp://mdehghaniashkez@nrt.cmems-du.eu/Core/SEALEVEL_GLO_PHY_L4_NRT_OBSERVATIONS_008_046/dataset-duacs-nrt-global-merged-allsat-phy-l4/2023/04/nrt_global_allsat_phy_l4_20230421_20230421.nc
 
-def wget_file(output_dir, date,retry=False):
+def wget_file(date,retry=False):
     yr = f'{date:%Y}'
     mn = f'{date:%m}'
     dy = f'{date:%d}'
     start_index = date.strftime('%Y%m%d')
-    fpath = f"ftp://my.cmems-du.eu/Core/SEALEVEL_GLO_PHY_L4_MY_008_047/cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.25deg_P1D/{yr}/{mn}/dt_global_allsat_phy_l4_{yr}{mn}{dy}_*"
+    fpath = f"ftp://nrt.cmems-du.eu/Core/SEALEVEL_GLO_PHY_L4_NRT_OBSERVATIONS_008_046/dataset-duacs-nrt-global-merged-allsat-phy-l4/{yr}/{mn}/nrt_global_allsat_phy_l4_{yr}{mn}{dy}_*"
     wget_str = f"""wget --no-parent -nd -r -m --ftp-user={cr.usr_cmem} --ftp-password={cr.psw_cmem} {fpath}  -P  {output_dir}"""
     try:
         os.system(wget_str)
-        pname = glob.glob(f"{base_folder}dt_global_allsat_phy_l4_{yr}{mn}{dy}*")
+        pname = glob.glob(f"{base_folder}nrt_global_allsat_phy_l4_{yr}{mn}{dy}*")
         Original_Name = pname[0].split(f"{base_folder}")[1]
         save_path = base_folder+Original_Name
             ## Remove empty downloads
@@ -93,7 +91,6 @@ def retryError(tbl,output_dir):
 
 # retryError(tbl)
 
-### Check if new data is available
 
 
 max_date = getMaxDate(tbl)
@@ -101,19 +98,28 @@ print(f"Last {tbl} data downloaded: {max_date}")
 end_date = datetime.date.today()
 
 #2020-12-31
-max_date = datetime.date(2021, 1, 16)
-end_date = datetime.date(2022, 6, 23)
-
-
+# max_date = datetime.date(2022, 6, 24) #2022-06-23
+# end_date = datetime.date(2023, 4, 21)
 
 delta = datetime.timedelta(days=1)
 max_date += delta
+end_date -= delta
 
 while max_date <= end_date:
-    wget_file(output_dir, max_date)
+    wget_file(max_date)
     max_date += delta
     time.sleep(.1)
         
-
+# import datetime
+# from pytz import timezone
+# ## After bulk ingest to cluster, add to tblIngestion_Queue
+# qry = f"SELECT Path from dbo.tblProcess_Queue WHERE Table_Name = '{tbl}' AND Processed IS NOT NULL and Error_str IS NULL"
+# all_paths = DB.dbRead(qry,'Rainier')
+# for pth in all_paths['Path'].to_list():
+#     Path = pth.strip()
+#     metadata.tblIngestion_Queue_Staged_Update(Path, tbl, 'Opedia', 'Rainier')
+# sr_str = datetime.datetime.now().astimezone(timezone('US/Pacific')).strftime("%Y-%m-%d %H:%M:%S")
+# qry = f"UPDATE tblIngestion_Queue SET Started = '{sr_str}', Ingested = '{sr_str}' WHERE Table_Name = '{tbl}'"
+# DB.DB_modify(qry,'Rainier')
 
 

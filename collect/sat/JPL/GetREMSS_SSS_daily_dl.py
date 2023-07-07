@@ -33,7 +33,7 @@ while start_dt <= end_dt:
     if os.path.getsize(save_path) == 0:
         print(f'empty download for {start_dt}')
         os.remove(save_path)
-    sleep(5)    
+    sleep(3)    
     start_dt += delta
 
 

@@ -9,6 +9,10 @@ from ingest import data_checks as dc
 
 #https://oceandata.sci.gsfc.nasa.gov/directaccess/MODIS-Aqua/Mapped/8-Day/9km/poc/
 
+## New URL. Only NRT version available after 2022 10 23
+## https://oceandata.sci.gsfc.nasa.gov/cgi/getfile/AQUA_MODIS.20221016_20221023.L3b.8D.POC.nc 
+## https://oceandata.sci.gsfc.nasa.gov/directdataaccess/Level-3%20Binned/Aqua-MODIS/2022/001/AQUA_MODIS.20220101_20220108.L3b.8D.POC.nc  
+
 tbl = 'tblModis_POC'
 
 base_folder = f'{vs.satellite}{tbl}/raw/'

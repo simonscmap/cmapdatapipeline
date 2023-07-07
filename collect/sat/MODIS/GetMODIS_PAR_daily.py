@@ -1,42 +1,53 @@
 import sys
 import os
-import glob
 import time
+import requests
 
-from cmapingest import vault_structure as vs
-from cmapingest import DB
-from cmapingest import common as cm
+sys.path.append("ingest")
 
+import vault_structure as vs
+import DB
+import common as cm
+import credentials as cr
 
 tbl = 'tblModis_PAR'
 
+### Change working directory to collect folder for .netrc authentication
+# modis_dir = os.path.join(os.getcwd(),'collect','sat','MODIS')
+# os.chdir(modis_dir)
+
+#https://oceandata.sci.gsfc.nasa.gov/directdataaccess/Level-3%20Mapped/Aqua-MODIS/2022/067/
+#https://oceandata.sci.gsfc.nasa.gov/ob/getfile/AQUA_MODIS.20220308.L3m.DAY.PAR.par.9km.nc
+
+#echo "machine urs.earthdata.nasa.gov login dharing password Earthdata11!" > ~/.netrc ; > ~/.urs_cookies chmod  0600 ~/.netrc
+
 base_folder = f'{vs.satellite}{tbl}/raw/'
 os.chdir(base_folder)
-max_sql_date = cm.getMax_SQL_date(tbl, 'Rainier')
-last_file_dl = cm.getLast_file_download(tbl, 'satellite')
 
-wget_search = 'wget -q --post-data="sensor=aqua&sdate=2022-01-01&dtype=L3b&addurl=1&results_as_file=0&search=*L3m_DAY_PAR_par_9km*" -O - https://oceandata.sci.gsfc.nasa.gov/api/file_search'
-## https://oceandata.sci.gsfc.nasa.gov/directaccess/MODIS-Aqua/Mapped/Daily/9km/par/
-
-def get_PAR(year, day):
+year = 2022
+month = 3
+day = 7
+def get_PAR(year, month, day):
     wget_str = (
-        "wget --load-cookies ~/.urs_cookies --save-cookies ~/.urs_cookies --auth-no-challenge=on --keep-session-cookies --content-disposition https://oceandata.sci.gsfc.nasa.gov/cgi/getfile/A"
+        "wget --user=dharing --password=Earthdata11! --auth-no-challenge=on  https://oceandata.sci.gsfc.nasa.gov/ob/getfile/AQUA_MODIS."
         + str(year)
-        + str(day).zfill(3)
-        + ".L3m_DAY_PAR_par_9km.nc"
+        + str(month).zfill(2)
+        + str(day).zfill(2)
+        + ".L3m.DAY.PAR.par.9km.nc"
     )
-    file_name = ("A"+ str(year)
-       + str(day).zfill(3)
-        + ".L3m_DAY_PAR_par_9km.nc")
+    file_name = ("AQUA_MODIS."+ str(year)
+        + str(month).zfill(2)
+        + str(day).zfill(2)
+        + ".L3m.DAY.PAR.par.9km.nc")
     downloaded = os.path.isfile(base_folder + file_name) 
     if not downloaded:
         try:
             os.system(wget_str)
             time.sleep(3)
         except:
-            print("No file found for date: " + str(year) + str(day).zfill(3))
+            print("No file found for date: " + str(year) + str(month).zfill(2)+ str(day).zfill(2))
     else:
-        print("Already downloaded: " + str(year) + str(day).zfill(3))
+        print("Already downloaded: " + str(year) + str(month).zfill(2)+ str(day).zfill(2))
 
 year_list = range(2020, 2021, 1)
 

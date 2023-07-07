@@ -16,7 +16,7 @@ base_folder = f'{vs.satellite}/{tbl}/raw/'
 yr_list = ['2020','2021','2022']
 
 ## wget downloaded all of /MYD08_M3, not just 2019
-yr='2022'
+yr='2023'
 for yr in yr_list:
     wget_str = f'wget -e robots=off -m -np -R .html,.tmp -nH --cut-dirs=3 "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/61/MYD08_M3/{yr}/" --header "Authorization: Bearer {cr.nasa_earthdata_token}" -P .'
 

@@ -35,6 +35,7 @@ DB.queryExecute(server, 'ALTER INDEX IX_tblSSS_NRT_dayofyear_lat_lon on dbo.tblS
 
 for fil in tqdm(flist_all):
     x = xr.open_dataset(fil)
+    x = x['sss_smap']
     df_raw = x.to_dataframe().reset_index()
     x.close()
     df = dc.add_day_week_month_year_clim(df_raw)
