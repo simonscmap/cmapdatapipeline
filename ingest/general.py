@@ -34,6 +34,7 @@ import stats
 import common as cmn
 import cruise
 import data_checks as dc
+import api_checks as api
 
 
 def getBranch_Path(args):
@@ -58,6 +59,21 @@ def addServer(tableName,db_name,server):
 def addAllServers(tableName):
     """Wrapper function for metadata.addServerAlias"""
     metadata.addServerAlias(tableName)
+
+def getClusterStats(tableName, depth_flag):
+    """Wrapper function for api_checks.statsCluster"""
+    api.statsCluster(tableName, depth_flag)
+
+def getStatsFolder(tableName, make):
+    """Wrapper function for pull_from_stats_folder"""
+    min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth = stats.pull_from_stats_folder(tableName, make)
+    return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth 
+
+
+def getTableStats(tableName):
+    """Wrapper function for common.getStats_TblName to Rossby"""
+    min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth = cmn.getStats_TblName(tableName,'rossby')
+    return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth
 
 def validator_to_vault(
     staging_filename, branch, tableName, data_missing_flag
@@ -342,7 +358,10 @@ def insertMetadata(data_dict, tableName, DOI_link_append, DOI_download_link, DOI
 
 def insert_small_stats(data_dict, tableName, db_name, server):
     """Wrapper function for stats.updateStats_Small"""
-    stats.updateStats_Small(tableName, db_name, server, data_dict["data_df"])
+    if data_dict == None:
+        stats.updateStats_Small(tableName, db_name, server, None)
+    else:
+        stats.updateStats_Small(tableName, db_name, server, data_dict["data_df"])
 
 
 def insert_large_stats(tableName, db_name, server, data_server):
@@ -419,7 +438,7 @@ def full_ingestion(args):
         data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.branch
     )
     insert_small_stats(data_dict, args.tableName, args.Database, args.Server)
-    if args.Server == "Rainier":
+    if args.Server.lower() == "rainier":
         addAllServers(args.tableName)
         if args.icon_filename =="":
             createIcon(data_dict, args.tableName)
@@ -443,33 +462,55 @@ def dataless_ingestion(args):
     org_check_passed = insertMetadata_no_data(
         data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch, args.depth_flag
     )
-    if args.Server == "Rainier":
+    if args.Server.lower() == "rainier":
         if len(args.data_server) > 0:
             addServer(args.tableName,args.Database,args.data_server)
         else:
             addAllServers(args.tableName)   
     if args.data_server.lower() =='cluster':
-        Yn = input("Read min/max lat lon from parquet? y or n \n")
-        if Yn:
-            fil = input("Input parquet path (ex /rep/tblModis_2020.parquet) \n")
-            df_fil = pd.read_parquet(getBranch_Path(args)+args.tableName+fil)
-            min_lat = df_fil.lat.min()
-            max_lat = df_fil.lat.max()
-            min_lon = df_fil.lon.min()
-            max_lon = df_fil.lon.max()
+        Yns =input("Pull stats from stats folder? [y or n] \n") 
+        if Yns == 'y':
+            min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth =getStatsFolder(args.tableName,getBranch_Path(args))
+            min_time = min_time.strftime("%Y:%m:%dT%H:%M:%S.000Z")
+            max_time = max_time.strftime("%Y:%m:%dT%H:%M:%S.000Z")
         else:
-            min_lat = input("Enter min latitude (ex -57.5)\n")      
-            max_lat = input("Enter max latitude (ex -57.5)\n")    
-            min_lon = input("Enter min longitude (ex -57.5)\n")      
-            max_lon = input("Enter max longitude (ex -57.5)\n")  
-        min_date = input("Enter min date (ex 2011-09-13 00:00:00.000)\n")        
-        max_date = input("Enter max date (ex 2021-09-13 00:00:00.000)\n")
-        if args.depth_flag ==0:
-            dpt1, dpt2 = None, None
-        else:
-            dpt1 = input("Enter min depth (ex 0)\n")      
-            dpt2 = input("Enter max depth (ex 1000)\n")  
-        insert_stats_manual(min_date,max_date,min_lat,max_lat,min_lon,max_lon,dpt1,dpt2,args.tableName,args.Database,args.Server)
+            ps = input("Pull stats from Rossby? [y or n] \n")
+            if ps == 'y':
+                min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth = getTableStats(args.tableName)
+            else:
+                rC = input("Calc stats from cluster? [y or n] \n")
+                if rC=='y':
+                    if args.depth_flag == 0:
+                        min_time, max_time, min_lat, max_lat, min_lon, max_lon = getClusterStats(args.tableName,args.depth_flag)
+                        min_depth, max_depth = None, None
+                    else: 
+                        min_time, max_time, min_lat, max_lat, min_lon, max_lon = getClusterStats(args.tableName,args.depth_flag)
+                    if len(min_time)==10:
+                        min_time=min_time+'T00:00:00.000Z'
+                    if len(max_time)==10:
+                        max_time=max_time+'T00:00:00.000Z'    
+                else:
+                    Yn = input("Read min/max lat lon from parquet? [y or n] \n")
+                    if Yn=='y':
+                        fil = input("Input parquet path (ex /rep/tblModis_2020.parquet) \n")
+                        df_fil = pd.read_parquet(getBranch_Path(args)+args.tableName+fil)
+                        min_lat = df_fil.lat.min()
+                        max_lat = df_fil.lat.max()
+                        min_lon = df_fil.lon.min()
+                        max_lon = df_fil.lon.max()
+                    else:
+                        min_lat = input("Enter min latitude (ex -57.5)\n")      
+                        max_lat = input("Enter max latitude (ex -57.5)\n")    
+                        min_lon = input("Enter min longitude (ex -57.5)\n")      
+                        max_lon = input("Enter max longitude (ex -57.5)\n")  
+                    min_time = input("Enter min date (ex 2011-09-13T00:00:00.000Z\n")        
+                    max_time = input("Enter max date (ex 2021-09-13T00:00:00.000Z)\n")
+                    if args.depth_flag ==0:
+                        min_depth, max_depth = None, None
+                    else:
+                        min_depth = input("Enter min depth (ex 0)\n")      
+                        max_depth = input("Enter max depth (ex 1000)\n")  
+        insert_stats_manual(min_time, max_time,min_lat,max_lat,min_lon,max_lon,min_depth,max_depth,args.tableName,args.Database,args.Server)
     else:
         insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
 
@@ -491,37 +532,55 @@ def update_metadata(args):
     org_check_pass = insertMetadata_no_data(
         data_dict, args.tableName, args.DOI_link_append, args.DOI_download_link, args.DOI_download_file, args.DOI_CMAP_template, args.icon_filename, args.Server, args.Database, args.process_level, args.data_server, args.branch, args.depth_flag
     )
-    if args.Server == "Rainier":
+    if args.Server.lower() == "rainier":
         if len(args.data_server) > 0:
             addServer(args.tableName,args.Database,args.data_server)
         else:
             addAllServers(args.tableName)
     if args.data_server.lower() =='cluster':
-        Yn = input("Read min/max lat lon from parquet? y or n \n")
-        if Yn:
-            fil = input("Input parquet path (ex /rep/tblModis_2020.parquet) \n")
-            df_fil = pd.read_parquet(getBranch_Path(args)+args.tableName+fil)
-            min_lat = df_fil.lat.min()
-            max_lat = df_fil.lat.max()
-            min_lon = df_fil.lon.min()
-            max_lon = df_fil.lon.max()
+        ps = input("Pull stats from Rossby? [y or n] \n")
+        if ps == 'y':
+            min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth = getTableStats(args.tableName)
         else:
-            min_lat = input("Enter min latitude (ex -57.5)\n")      
-            max_lat = input("Enter max latitude (ex -57.5)\n")    
-            min_lon = input("Enter min longitude (ex -57.5)\n")      
-            max_lon = input("Enter max longitude (ex -57.5)\n")  
-        min_date = input("Enter min date (ex 2011-09-13 00:00:00.000)\n")        
-        max_date = input("Enter max date (ex 2021-09-13 00:00:00.000)\n")
-        if args.depth_flag ==0:
-            dpt1, dpt2 = None, None
-        else:
-            dpt1 = input("Enter min depth (ex 0)\n")      
-            dpt2 = input("Enter max depth (ex 1000)\n")  
-        insert_stats_manual(min_date,max_date,min_lat,max_lat,min_lon,max_lon,dpt1,dpt2,args.tableName,args.Database,args.Server)
+            rC = input("Calc stats from cluster? [y or n] \n")
+            if rC=='y':
+                if args.depth_flag == 0:
+                    min_time, max_time, min_lat, max_lat, min_lon, max_lon = getClusterStats(args.tableName,args.depth_flag)
+                    min_depth, max_depth = None, None
+                else: 
+                    min_time, max_time, min_lat, max_lat, min_lon, max_lon = getClusterStats(args.tableName,args.depth_flag)
+                if len(min_time)==10:
+                    min_time=min_time+'T00:00:00.000Z'
+                if len(max_time)==10:
+                    max_time=max_time+'T00:00:00.000Z'    
+            else:
+                Yn = input("Read min/max lat lon from parquet? [y or n] \n")
+                if Yn=='y':
+                    fil = input("Input parquet path (ex /rep/tblModis_2020.parquet) \n")
+                    df_fil = pd.read_parquet(getBranch_Path(args)+args.tableName+fil)
+                    min_lat = df_fil.lat.min()
+                    max_lat = df_fil.lat.max()
+                    min_lon = df_fil.lon.min()
+                    max_lon = df_fil.lon.max()
+                else:
+                    min_lat = input("Enter min latitude (ex -57.5)\n")      
+                    max_lat = input("Enter max latitude (ex -57.5)\n")    
+                    min_lon = input("Enter min longitude (ex -57.5)\n")      
+                    max_lon = input("Enter max longitude (ex -57.5)\n")  
+                min_time = input("Enter min date (ex 2011-09-13T00:00:00.000Z\n")        
+                max_time = input("Enter max date (ex 2021-09-13T00:00:00.000Z)\n")
+                if args.depth_flag ==0:
+                    min_depth, max_depth = None, None
+                else:
+                    min_depth = input("Enter min depth (ex 0)\n")      
+                    max_depth = input("Enter max depth (ex 1000)\n")  
+        insert_stats_manual(min_time, max_time,min_lat,max_lat,min_lon,max_lon,min_depth,max_depth,args.tableName,args.Database,args.Server)
     else:
-        insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
-    #     transfer.df_to_parquet(data_dict["variable_metadata_df"],'variable_metadata',args.branch, args.tableName,'metadata')
-    #     transfer.df_to_parquet(data_dict["dataset_metadata_df"],'dataset_metadata',args.branch, args.tableName,'metadata')
+        statsYn = input("Run small stats? Data must live on server updating. [y/n]")
+        if statsYn == 'y':
+            insert_small_stats(None, args.tableName, args.Database, args.Server)
+        else:
+            insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
 
 
 def main():

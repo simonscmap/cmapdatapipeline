@@ -25,6 +25,8 @@ import cruise
 import data
 import DB
 import vault_structure as vs
+import api_checks as api
+import stats
 
 
 def ID_Var_Map(series_to_map, res_col, tableName, server):
@@ -195,7 +197,8 @@ def tblDataset_Single_Reference_Insert(ref, table_name, server, db_name, data_do
 
 def tblDataset_Vault_Insert(tableName, server, db_name, make):
     Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
-    full_vault_path = getattr(vs,make)+tableName
+    # full_vault_path = getattr(vs,make)+tableName
+    full_vault_path = cmn.vault_struct_retrieval(make)+tableName
     vault_path = full_vault_path.split('vault/')[1]+'/'
     vault_url = cmn.dropbox_public_link(full_vault_path.split('Simons CMAP')[1])
     columnList = "(Dataset_ID, Vault_Path, Vault_URL)"
@@ -301,21 +304,27 @@ def tblVariables_Insert(
             has_depth_list = [has_depth] * len(variable_metadata_df)
     
     elif data_server.lower() == 'cluster':
-        Yn = input("Read min/max lat lon from parquet? y or n \n")
-        if Yn:
-            fil = input("Input *full* parquet path after vault (ex satellite/tblModis/rep/tblModis_2020.parquet) \n")
-            df_fil = pd.read_parquet(vs.vault+fil)
-            min_lat = df_fil.lat.min()
-            max_lat = df_fil.lat.max()
-            min_lon = df_fil.lon.min()
-            max_lon = df_fil.lon.max()
-        else:
-            min_lat = input("Enter min latitude (ex -57.5)\n")      
-            max_lat = input("Enter max latitude (ex -57.5)\n")    
-            min_lon = input("Enter min longitude (ex -57.5)\n")      
-            max_lon = input("Enter max longitude (ex -57.5)\n")  
-        min_date = input("Enter min date (ex 2011-09-13 00:00:00.000)\n")        
-        max_date = input("Enter max date (ex 2021-09-13 00:00:00.000)\n")      
+        try:
+            # min_date, max_date, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth = api.statsCluster(Table_Name, has_depth)
+            min_date, max_date, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth =stats.pull_from_stats_folder(Table_Name,vs.float_dir)
+            min_date = min_date.strftime("%Y-%m-%dT%H:%M:%S")
+            max_date = max_date.strftime("%Y-%m-%dT%H:%M:%S")
+        except:
+            Yn = input("Read min/max lat lon from parquet? y or n \n")
+            if Yn:
+                fil = input("Input *full* parquet path after vault (ex satellite/tblModis/rep/tblModis_2020.parquet) \n")
+                df_fil = pd.read_parquet(vs.vault+fil)
+                min_lat = df_fil.lat.min()
+                max_lat = df_fil.lat.max()
+                min_lon = df_fil.lon.min()
+                max_lon = df_fil.lon.max()
+            else:
+                min_lat = input("Enter min latitude (ex -57.5)\n")      
+                max_lat = input("Enter max latitude (ex -57.5)\n")    
+                min_lon = input("Enter min longitude (ex -57.5)\n")      
+                max_lon = input("Enter max longitude (ex -57.5)\n")  
+            min_date = input("Enter min date (ex 2011-09-13 00:00:00.000)\n")        
+            max_date = input("Enter max date (ex 2021-09-13 00:00:00.000)\n")      
         Temporal_Coverage_Begin_list = [min_date] * int(len(variable_metadata_df))
         Temporal_Coverage_End_list = [max_date] * int(len(variable_metadata_df))
         Lat_Coverage_Begin_list = [min_lat] * int(len(variable_metadata_df))
@@ -330,7 +339,7 @@ def tblVariables_Insert(
                 Temporal_Coverage_Begin_list,
                 Temporal_Coverage_End_list,
             ) = cmn.getColBounds_from_DB(
-                Table_Name, "month", server, list_multiplier=len(variable_metadata_df)
+                Table_Name, "month", server, data_server, list_multiplier=len(variable_metadata_df)
             )
         else:
             (
@@ -370,11 +379,15 @@ def tblVariables_Insert(
     )
     Comment_list = cmn.nanToNA(variable_metadata_df["var_comment"]).tolist()
     Visualize_list = cmn.nanToNA(variable_metadata_df["visualize"]).tolist()
-    if data_server.lower() == 'cluster':
-        data_type = input("Enter data type, one for all variables (ex. float) \n")          
-        Data_Type_list = [data_type] * int(len(variable_metadata_df))
-    else:        
-        Data_Type_list = cmn.getTableName_Dtypes(Table_Name, server, data_server)["DATA_TYPE"].tolist()
+    if data_server.lower() == 'cluster':      
+        Data_Type_list = cmn.getTableName_Dtypes_Cluster(Table_Name, Short_Name_list)
+    else: 
+        ## cmn function returns time, lat, lon, etc as well       
+        Data_Type_qry = cmn.getTableName_Dtypes(Table_Name, server, data_server).set_index('COLUMN_NAME')
+        ## with index on COLUMN_NAME, df can be sorted and filtered by short_name_list 
+        ## this covers case when vars in meta sheet don't match the order of the data sheet
+        Data_Type_qry_1 = Data_Type_qry.loc[Short_Name_list]
+        Data_Type_list = Data_Type_qry_1["DATA_TYPE"].tolist()
     if 'org_id' in variable_metadata_df.columns.tolist():
         Org_list = cmn.nanToNA(variable_metadata_df["org_id"]).tolist()
         ## Replace naToNA result ' ' with NULL due to FK on org table

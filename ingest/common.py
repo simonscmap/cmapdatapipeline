@@ -15,7 +15,7 @@ import dropbox
 import DB
 import vault_structure as vs
 import credentials as cr
-
+import api_checks as api
 
 def getMax_SQL_date(table, server):
     """Returns the max date in a SQL table
@@ -282,7 +282,19 @@ def get_last_ID(tableName, server):
     last_ID = DB.dbRead(last_ID_qry, server).iloc[0][0]
     return last_ID
 
-
+def getSensorID_SensorName(sensor, db_name, server):
+    """Get SensorID from input sensor name"""
+    cur_str = (
+        """select [ID] FROM """
+        + db_name
+        + """.[dbo].[tblSensors] WHERE [Sensor] = '"""
+        + sensor
+        + """'"""
+    )
+    query_return = DB.dbRead(cur_str, server)
+    sID = query_return.iloc[0][0]
+    return sID   
+        
 def getDatasetID_DS_Name(datasetName, db_name, server):
     """Get DatasetID from input dataset name"""
     cur_str = (
@@ -372,8 +384,16 @@ def getTableName_Dtypes(tableName, server, data_server):
         query_return = DB.dbRead(query, data_server)
     else:
         query_return = DB.dbRead(query, server)
-
     return query_return
+
+def getTableName_Dtypes_Cluster(tableName, var_list):
+    """Get data types from input table name for variables in var_list"""
+    qry = f'DESCRIBE TABLE {tableName}'
+    df = api.query(qry)
+    dlist = []
+    for v in var_list:
+        dlist.append(df.loc[df['col_name']==v,'data_type'].item())
+    return dlist
 
 def getCruiseID_Cruise_Name(cruiseName, server):
     """Get cruise ID from cruise name"""
@@ -611,10 +631,33 @@ def get_numeric_cols_in_table_excluding_climatology(tableName, server):
         tableName (string): CMAP table name
         Server (string): Valid CMAP server name
     """
-    qry = f"""select COLUMN_NAME from Information_schema.columns where Table_name = '{tableName}' and( DATA_TYPE = 'float' or DATA_TYPE = 'int') and COLUMN_NAME NOT IN ('year','month','week','dayofyear')"""
+    qry = f"""select COLUMN_NAME from Information_schema.columns where Table_name = '{tableName}' and( DATA_TYPE = 'float' or DATA_TYPE like '%int') and COLUMN_NAME NOT IN ('year','month','week','dayofyear')"""
     df = DB.dbRead(qry, server)
     col_list = df["COLUMN_NAME"].to_list()
     return col_list
+
+def getStats_TblName(tableName, server):
+        ds_id = getDatasetID_Tbl_Name(tableName, 'Opedia', server)
+        qry = f"""  SELECT 
+        JSON_VALUE(JSON_stats,'$.time.min') AS [Time_Min],
+        JSON_VALUE(JSON_stats,'$.time.max') AS [Time_Max],
+        CAST(JSON_VALUE(JSON_stats,'$.lat.min') AS float) AS [Lat_Min],
+        CAST(JSON_VALUE(JSON_stats,'$.lat.max') AS float) AS [Lat_Max],
+        CAST(JSON_VALUE(JSON_stats,'$.lon.min') AS float) AS [Lon_Min],
+        CAST(JSON_VALUE(JSON_stats,'$.lon.max') AS float) AS [Lon_Max],
+        CAST(JSON_VALUE(JSON_stats,'$.depth.min') AS float) AS [Depth_Min],
+        CAST(JSON_VALUE(JSON_stats,'$.depth.max') AS float) AS [Depth_Max]
+        from tblDataset_Stats where Dataset_ID = {ds_id} """
+        df_stat = DB.dbRead(qry, server)
+        min_time = df_stat['Time_Min'][0]
+        max_time = df_stat['Time_Max'][0]
+        min_lat = df_stat['Lat_Min'][0]
+        max_lat = df_stat['Lat_Max'][0]
+        min_lon =  df_stat['Lon_Min'][0]
+        max_lon = df_stat['Lon_Max'][0]    
+        min_depth = df_stat['Depth_Min'][0]   
+        max_depth = df_stat['Depth_Max'][0]   
+        return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth
 
 
 def built_meta_DataFrame():

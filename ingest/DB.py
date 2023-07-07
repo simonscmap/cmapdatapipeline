@@ -92,7 +92,6 @@ def server_select_credentials(server):
     else:
         print("invalid server selected. exiting...")
         sys.exit()
-
     return usr, psw, ip, port, db_name, TDS_Version
 
 
@@ -273,7 +272,7 @@ def toSQLbcp(export_path, tableName, server):
             + """'"""
             + export_path
             + """'"""
-            + """ -e error -F 2 -c -t, -b 50000 -h'TABLOCK' -U """
+            + """ -F 2 -c -t, -b 50000 -h'TABLOCK' -U """
             + usr
             + """ -P """
             + psw

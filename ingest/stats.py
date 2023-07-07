@@ -11,12 +11,15 @@ from tqdm import tqdm
 import dask.dataframe as dd
 import pandas as pd
 import numpy as np
+import glob
+from tqdm import tqdm
 
 import credentials as cr
 import common as cmn
 import DB
 import transfer
 import data
+import vault_structure as vs
 
 
 def updateStatsTable(ID, json_str, server):
@@ -57,7 +60,10 @@ def updateStats_Small(tableName, db_name, server, data_df=None):
     stats_df = data_df.describe()
     if "_Climatology" in tableName:
         return
-
+    ## Include empty rows for non-numeric columns
+    for var in data_df.columns.to_list():
+        if var not in stats_df and var not in ['time','year','month','week','dayofyear','hour']:
+            stats_df[var] = np.nan
     min_max_df = pd.DataFrame(
         {"time": [data_df["time"].min(), data_df["time"].max()]}, index=["min", "max"]
     )
@@ -270,3 +276,41 @@ def update_stats_large(tableName, stats_df, db_name, server):
     json_str = stats_df.to_json(date_format="iso")
     sql_df = pd.DataFrame({"Dataset_ID": [Dataset_ID], "JSON": [json_str]})
     updateStatsTable(Dataset_ID, json_str, server)
+
+def build_stats_from_parquet(tableName, make, nrt):
+    base_path = getattr(vs,make)
+    flist = glob.glob(base_path+f'{tableName}/{nrt}/*.parquet')
+    df_stats = pd.DataFrame()
+    for fil in tqdm(flist):
+        df = pd.read_parquet(fil)
+        # df = df.query('POSITION_QC!="4" & JULD_QC!="4"')
+        min_time = df['time'].min()
+        max_time = df['time'].max()
+        df_sp = df[['lat','lon','depth']]
+        df_sp_d = df_sp.describe()
+        d = {'min_time':[min_time], 'max_time':[max_time], 'min_lat':[df_sp_d['lat']['min']], 'max_lat':[df_sp_d['lat']['max']], 'min_lon':[df_sp_d['lon']['min']], 'max_lon':[df_sp_d['lon']['max']], 'min_depth':[df_sp_d['depth']['min']], 'max_depth':[df_sp_d['depth']['max']]}    
+        temp_df = pd.DataFrame(data=d)
+        df_stats = df_stats.append(temp_df, ignore_index = True)
+        del df, df_sp,df_sp_d
+    min_time = df_stats['time'].min()
+    max_time = df_stats['time'].max()
+    min_lat = df_stats['lat'].min()
+    max_lat = df_stats['lat'].max()
+    min_lon = df_stats['lon'].min()
+    max_lon = df_stats['lon'].max()
+    min_depth = df_stats['depth'].min()
+    max_depth = df_stats['depth'].max()
+    return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth
+
+def pull_from_stats_folder(tableName, make):
+    df_stats = pd.read_excel(f'{make}{tableName}/stats/{tableName}_stats.xlsx')
+    df_stats = df_stats.query('max_depth < 20000 and min_lat >=-90.0')
+    min_time = df_stats['min_time'].min()
+    max_time = df_stats['max_time'].max()
+    min_lat = df_stats['min_lat'].min()
+    max_lat = df_stats['max_lat'].max()
+    min_lon = df_stats['min_lon'].min()
+    max_lon = df_stats['max_lon'].max()
+    min_depth = df_stats['min_depth'].min()
+    max_depth = df_stats['max_depth'].max()
+    return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth
