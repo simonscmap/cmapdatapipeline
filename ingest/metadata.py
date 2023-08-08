@@ -14,7 +14,7 @@ from geopandas.tools import sjoin
 from matplotlib.pyplot import table
 import pandas as pd
 import numpy as np
-import xarray as xr
+# import xarray as xr
 import datetime
 from pytz import timezone
 
@@ -389,19 +389,19 @@ def tblVariables_Insert(
         Data_Type_qry_1 = Data_Type_qry.loc[Short_Name_list]
         Data_Type_list = Data_Type_qry_1["DATA_TYPE"].tolist()
     if 'org_id' in variable_metadata_df.columns.tolist():
-        Org_list = cmn.nanToNA(variable_metadata_df["org_id"]).tolist()
-        ## Replace naToNA result ' ' with NULL due to FK on org table
-        Org_ID_list = [x if ' ' not in str(x) else 'NULL' for x in Org_list]
+        Org_ID_list = variable_metadata_df["org_id"].replace('', 'NULL', regex=True).tolist()
+        ## Replace n'' with NULL due to FK on org table
+        # Org_ID_list = [x if ' ' not in str(x) else 'NULL' for x in Org_list]
     else:
         Org_ID_list = ['NULL'] * len(variable_metadata_df)
         
     if 'conversion_coefficient' in variable_metadata_df.columns.tolist():
-        Conversion_Coefficient = cmn.nanToNA(variable_metadata_df["conversion_coefficient"]).tolist()
-        Conversion_Coefficient_list = [x if ' ' not in str(x) else 'NULL' for x in Conversion_Coefficient]
+        # Conversion_Coefficient = cmn.nanToNA(variable_metadata_df["conversion_coefficient"]).tolist()
+        Conversion_Coefficient_list = variable_metadata_df["conversion_coefficient"].replace('', 'NULL', regex=True).tolist()
+        # Conversion_Coefficient_list = [x if '' not in str(x) else 'NULL' for x in Conversion_Coefficient]
     else:
         Conversion_Coefficient_list = ['NULL'] * len(variable_metadata_df)
     columnList = "(ID,DB, Dataset_ID, Table_Name, Short_Name, Long_Name, Unit, Temporal_Res_ID, Spatial_Res_ID, Temporal_Coverage_Begin, Temporal_Coverage_End, Lat_Coverage_Begin, Lat_Coverage_End, Lon_Coverage_Begin, Lon_Coverage_End, Grid_Mapping, Make_ID, Sensor_ID, Process_ID, Study_Domain_ID, Comment, Visualize, Data_Type, Org_ID, Conversion_Coefficient, Has_Depth)"
-
     for (
         Db,
         IDvar,
@@ -968,36 +968,36 @@ def export_metadata_to_parquet(tableName, db_name, server, branch):
 
 
 
-def pullNetCDFMetadata(ncdf_path,meta_csv):
-    """Pulls out metadata for all variables in a NetCDF file and saves as csv in staging/combined
+# def pullNetCDFMetadata(ncdf_path,meta_csv):
+#     """Pulls out metadata for all variables in a NetCDF file and saves as csv in staging/combined
 
-    Args:
-        ncdf_path (string): Folder structure for location of NetCDF (ex. model/ARGO_MLD_Climatology/ )
-        meta_csv (string): File name for csv (ex. Argo_MLD_meta)
-    Returns:
-        csv: Saved in staging/combined
-    """   
-    nc_dir = vs.collected_data + ncdf_path
-    flist_all = np.sort(glob.glob(os.path.join(nc_dir, '*.nc')))
-    nc = sorted(flist_all, reverse=True)[:1][0]
-    xdf = xr.open_dataset(nc)
+#     Args:
+#         ncdf_path (string): Folder structure for location of NetCDF (ex. model/ARGO_MLD_Climatology/ )
+#         meta_csv (string): File name for csv (ex. Argo_MLD_meta)
+#     Returns:
+#         csv: Saved in staging/combined
+#     """   
+#     nc_dir = vs.collected_data + ncdf_path
+#     flist_all = np.sort(glob.glob(os.path.join(nc_dir, '*.nc')))
+#     nc = sorted(flist_all, reverse=True)[:1][0]
+#     xdf = xr.open_dataset(nc)
 
-    cols = []
-    for varname, da in xdf.data_vars.items():
-        cols = cols + list(da.attrs.keys())
+#     cols = []
+#     for varname, da in xdf.data_vars.items():
+#         cols = cols + list(da.attrs.keys())
     
-    col_list = list(set(cols + ['var_name']))
+#     col_list = list(set(cols + ['var_name']))
 
-    df_meta = pd.DataFrame(columns=col_list)
-    for varname, da in xdf.data_vars.items():
-        s = pd.DataFrame(da.attrs, index=[0])
-        s['var_name'] = varname     
-        df_meta = df_meta.append(s)
+#     df_meta = pd.DataFrame(columns=col_list)
+#     for varname, da in xdf.data_vars.items():
+#         s = pd.DataFrame(da.attrs, index=[0])
+#         s['var_name'] = varname     
+#         df_meta = df_meta.append(s)
 
-    df_meta.to_csv(
-        vs.staging + 'combined/' + meta_csv + '.csv',
-        sep=",",
-        index=False)
+#     df_meta.to_csv(
+#         vs.staging + 'combined/' + meta_csv + '.csv',
+#         sep=",",
+#         index=False)
 
 """
 ###############################################
@@ -1121,6 +1121,22 @@ def ocean_region_classification(data_df, dataset_name, db_name, server):
 
     print("Dataset matched to the following Regions: ", region_set)
 
+def ocean_region_names(data_df):
+    """This function geographically classifies a sparse dataset into a specific ocean region
+
+    Args:
+        df (Pandas DataFrame): Input CMAP formatted DataFrame (ST Index: time,lat,lon,<depth>)
+    Returns:
+        region_set (list): List of region names associated with dataset
+    """
+
+    data_gdf = geopandas_load_gpkg(data_df)
+    region_gdf = load_gpkg_ocean_region(
+        vs.spatial_data + "World_Seas_IHO_v1_simplified/World_Seas_Simplifed.gpkg"
+    )
+    classified_gdf = classify_gdf_with_gpkg_regions(data_gdf, region_gdf)
+    region_set = classified_gdf_to_list(classified_gdf)
+    return region_set
 
 def if_exists_dataset_region(dataset_name, db_name, server):
     """Checks if dataset ID is already in tblDatasets_Regions
@@ -1129,7 +1145,7 @@ def if_exists_dataset_region(dataset_name, db_name, server):
         dataset_name (string): The short name of the dataset in CMAP tblDatasets.
     Returns: Boolean
     """
-    ds_ID = cmn.getDatasetID_DS_Name(dataset_name, server)
+    ds_ID = cmn.getDatasetID_DS_Name(dataset_name, db_name, server)
     cur_str = """SELECT * FROM {db_name}.[dbo].[tblDataset_Regions] WHERE [Dataset_ID] = {Dataset_ID}""".format(
         db_name=db_name,Dataset_ID=ds_ID
     )

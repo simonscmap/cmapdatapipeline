@@ -337,7 +337,7 @@ def getTbl_Name_DatasetID(Dataset_ID, db_name, server):
     return tableName    
 
 def getRefID_Tbl_Name_Ref(ref, tableName, db_name, server):
-    """Get DatasetID from input table name"""
+    """Get RefID from input reference and table name"""
     dsID = getDatasetID_Tbl_Name(tableName, db_name, server)
     cur_str = (
         """select distinct [Reference_ID], [Dataset_ID] FROM """

@@ -32,8 +32,9 @@ def write_SQL_file(sql_str, tableName, make="observation"):
 
 def build_SQL_suggestion_df(df):
     """Builds a dataframe of colulmn name and datatype for an input data specific dataframe"""
-    sug_df = pd.DataFrame(columns=["column_name", "dtype"])
+    sug_df = pd.DataFrame(columns=["column_name", "dtype", "max_len"])
     exclude_list = [1, "", " ", np.nan, "nan", "NaN", "NAN"]
+    max_len = None
     for cn in list(df):
         if cn == "time":
             col_dtype = "datetime"
@@ -43,8 +44,10 @@ def build_SQL_suggestion_df(df):
                 col_convert = pd.to_numeric(col_clean)
             except:
                 col_convert = col_clean
+                ## Get longest string length
+                max_len = df[cn].map(len).max()
             col_dtype = col_convert.dtype
-        sug_list = [cn, col_dtype]
+        sug_list = [cn, col_dtype, max_len]
         sug_df.loc[len(sug_df)] = sug_list
     return sug_df
 
@@ -99,10 +102,12 @@ def SQL_tbl_suggestion_formatter(sdf, tableName, server, db_name, FG="Primary"):
         sdf.loc[sdf["column_name"] == "depth", "null_status"] = "NOT NULL,"
     sdf["null_status"].iloc[-1] = sdf["null_status"].iloc[-1].replace(",", "")
     sdf["column_name"] = "[" + sdf["column_name"].astype(str) + "]"
-    sdf["dtype"] = sdf["dtype"].replace("object", "[nvarchar](200)")
+    ## was 200, fixed to be generated from df
+    sdf["max_len"] = "[nvarchar]("+ sdf["max_len"].astype(str) + ")"
+    sdf.loc[sdf["dtype"] == "object", "dtype"] = sdf.loc[sdf["dtype"] == "object", "max_len"]
     sdf["dtype"] = sdf["dtype"].replace("float64", "[float]")
     sdf["dtype"] = sdf["dtype"].replace("int64", "[int]")
-
+    sdf = sdf.drop('max_len', axis=1)
     var_string = sdf.to_string(header=False, index=False)
 
     """ Print table as SQL format """

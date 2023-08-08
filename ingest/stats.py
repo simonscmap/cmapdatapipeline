@@ -8,7 +8,7 @@ cmapdata - stats - cmap summary stats functionallity.
 
 import os
 from tqdm import tqdm
-import dask.dataframe as dd
+# import dask.dataframe as dd
 import pandas as pd
 import numpy as np
 import glob
@@ -260,7 +260,10 @@ def build_stats_df_from_db_calls(tableName, server, data_server):
         stats_DF.at["count", var] = var_df.iloc[:, 0][0] 
         stats_DF.at["max", var] = var_df.iloc[:, 1][0]
         stats_DF.at["min", var] = var_df.iloc[:, 2][0]
-
+    ## Include empty rows for non-numeric columns
+    for var in cmn.get_var_list_dataset(tableName, stats_server):
+        if var not in stats_DF and var not in ['time','year','month','week','dayofyear','hour']:
+            stats_DF[var] = np.nan
     return stats_DF
 
 
