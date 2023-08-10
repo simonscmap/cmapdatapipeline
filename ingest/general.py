@@ -66,8 +66,8 @@ def getClusterStats(tableName, depth_flag):
 
 def getStatsFolder(tableName, make):
     """Wrapper function for pull_from_stats_folder"""
-    min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth = stats.pull_from_stats_folder(tableName, make)
-    return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth 
+    min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth, row_count = stats.pull_from_stats_folder(tableName, make)
+    return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth, row_count 
 
 
 def getTableStats(tableName):
@@ -369,9 +369,9 @@ def insert_large_stats(tableName, db_name, server, data_server):
     stats_df = stats.build_stats_df_from_db_calls(tableName, server, data_server)
     stats.update_stats_large(tableName, stats_df, db_name, server)
 
-def insert_stats_manual(dt1,dt2,lat1,lat2,lon1,lon2,dpt1,dpt2,tableName,db_name,server):
+def insert_stats_manual(dt1,dt2,lat1,lat2,lon1,lon2,dpt1,dpt2,row_count,tableName,db_name,server):
     """Wrapper function for stats.build_stats_df_from_db_calls and stats.update_stats_large"""
-    stats.updateStats_Manual(dt1,dt2,lat1,lat2,lon1,lon2,dpt1,dpt2,tableName,db_name,server)
+    stats.updateStats_Manual(dt1,dt2,lat1,lat2,lon1,lon2,dpt1,dpt2,row_count,tableName,db_name,server)
 
 def createIcon(data_dict, tableName):
     """Wrapper function for mapping.folium_map"""
@@ -470,7 +470,7 @@ def dataless_ingestion(args):
     if args.data_server.lower() =='cluster':
         Yns =input("Pull stats from stats folder? [y or n] \n") 
         if Yns == 'y':
-            min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth =getStatsFolder(args.tableName,getBranch_Path(args))
+            min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth, row_count =getStatsFolder(args.tableName,getBranch_Path(args))
             min_time = min_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
             max_time = max_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
         else:

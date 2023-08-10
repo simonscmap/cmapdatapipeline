@@ -77,7 +77,6 @@ def return_cruise_trajectory_from_df(df, Cruise_ID):
 def resample_trajectory(df, interval="1min"):
     """Resamples a cruise trajectory dataframe based on given interval. Default is one minute. Use cases are downsampling super high temporal resolution. ex. GPS.
 
-
     Args:
         df (Pandas DataFrame): Input dataset dataframe with time/lat/lon.
         interval (str, optional): valid pandas resample() interval. Defaults to "1min".
@@ -89,6 +88,8 @@ def resample_trajectory(df, interval="1min"):
     rs_df = df.resample(interval).mean()
     rs_df = rs_df.dropna()
     rs_df.reset_index(inplace=True)
+    if "Cruise_ID" not in rs_df.columns.to_list():
+        rs_df["Cruise_ID"] = None
     rs_df = rs_df[["Cruise_ID", "time", "lat", "lon"]]
     return rs_df
 
@@ -115,7 +116,7 @@ def delete_cruise_trajectory(cruise_name, db_name, server):
     cur_str = (
         """DELETE FROM """
         + db_name 
-        + """.[dbo].[dbo.tblCruise_Regions] WHERE [Cruise_ID] = """
+        + """.[dbo].[tblCruise_Regions] WHERE [Cruise_ID] = """
         + str(cruise_id)
     )
     DB.DB_modify(cur_str, server)
@@ -143,11 +144,11 @@ def trim_returned_link(link_str):
 def download_cruise_data_from_url(cruise_name, download_url_str, dataset_category):
     """webscraping helper function for downloading from url"""
     cruise_base_path = vs.r2r_cruise
-    vs.makedir(cruise_base_path + cruise_name + "/")
+    vs.cruise_leaf_structure(vs.r2r_cruise+cruise_name)
     transfer.requests_Download(
         download_url_str,
         cruise_name + "_" + dataset_category + ".csv",
-        cruise_base_path + cruise_name + "/",
+        cruise_base_path + cruise_name + "/raw/",
     )
 
 
@@ -219,13 +220,13 @@ def ST_bounds_from_df(df):
 
 def fill_ST_bounds_metadata(cruise_name):
     """ST filler func for webscraping - old"""
-    traj_path = vs.r2r_cruise + cruise_name + "/" + cruise_name + "_trajectory.parquet"
-    meta_path = vs.r2r_cruise + cruise_name + "/" + cruise_name + "_cruise_metadata.parquet"
+    traj_path = vs.r2r_cruise + cruise_name + "/raw/" + cruise_name + "_trajectory.parquet"
+    meta_path = vs.r2r_cruise + cruise_name + "/raw/" + cruise_name + "_cruise_metadata.parquet"
     meta_df = pd.read_parquet(meta_path)
     try:
         traj_df = pd.read_parquet(traj_path)
         traj_df["time"] = pd.to_datetime(traj_df["time"]).dt.strftime(
-            "%Y-%m-%d %H:%M:%S"
+            "%Y-%m-%dT%H:%M:%S"
         )
     except:
         pass
@@ -237,7 +238,7 @@ def fill_ST_bounds_metadata(cruise_name):
     meta_df.at[0, "Lat_Max"] = lat_max
     meta_df.at[0, "Lon_Min"] = lon_min
     meta_df.at[0, "Lon_Max"] = lon_max
-    meta_df.to_csv(meta_path, sep=",", index=False)
+    meta_df.to_parquet(meta_path, index=False)
 
 
 def update_tblCruises(server):
@@ -268,19 +269,19 @@ def update_tblCruises(server):
             print(ex, cruise, " not ingested...")
 
 
-def get_cruise_data(cmdf, cruise_name):
-    """old webscraping script"""
-    try:
-        cruise_data_links = retrieve_id_search(cmdf, "isr2r:hasCruiseof")
-        trim_data_links = trim_returned_link(cruise_data_links)
+# def get_cruise_data(cmdf, cruise_name):
+#     """old webscraping script"""
+#     try:
+#         cruise_data_links = retrieve_id_search(cmdf, "isr2r:hasCruiseof")
+#         trim_data_links = trim_returned_link(cruise_data_links)
 
-        for data_link in trim_data_links:
-            print(data_link)
+#         for data_link in trim_data_links:
+#             print(data_link)
 
-            data = parse_r2r_page(data_link)
-            return data
-    except:
-        pass
+#             data = parse_r2r_page(data_link)
+#             return data
+#     except:
+#         pass
 
 
 ##############################################
@@ -312,7 +313,7 @@ def get_cruise_traj(cmdf, cruise_name):
 
 def clean_cruise_traj(cruise_name):
     """cleans cruise trajectory from r2r"""
-    fpath = vs.r2r_cruise + cruise_name + "/" + cruise_name + "_trajectory.csv"
+    fpath = vs.r2r_cruise + cruise_name + "/raw/" + cruise_name + "_trajectory.csv"
     try:
         df = pd.read_csv(
             fpath,
@@ -326,18 +327,19 @@ def clean_cruise_traj(cruise_name):
             ],
             sep="\t",
         )
+        df = df[["time", "lat", "lon"]]
+        df["time"] = pd.to_datetime(df["time"]).dt.strftime(
+            "%Y-%m-%dT%H:%M:%S"
+        )
+        df["Cruise_ID"]=None
+        dfr = resample_trajectory(df, interval="1min")
+        dfr = dfr[["time", "lat", "lon","Cruise_ID"]]
+        dfr.to_parquet(fpath.replace('.csv','.parquet'), index=False)
     except:
         print(
-            "Trajectory CSV download invalid or corrupted. Please manually check download link. Removing ship directory"
+            f"Trajectory CSV download invalid or corrupted. Please manually check download link for {cruise_name}"
         )
-        shutil.rmtree(vs.r2r_cruise + cruise_name + "/")
-
-    df = df[["time", "lat", "lon"]]
-    df["time"] = pd.to_datetime(df["time"]).dt.strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
-    dfr = resample_trajectory(df, interval="1min")
-    dfr.to_csv(fpath, sep=",", index=False)
+        # shutil.rmtree(vs.r2r_cruise + cruise_name + "/")
 
 
 ##############################################
@@ -383,7 +385,7 @@ def format_cruise_metadata(cruise_name, cruise_nickname, cruise_shipname, chief_
     cruise_nickname = cmn.empty_list_2_empty_str(cruise_nickname)
     cruise_shipname = cmn.empty_list_2_empty_str(cruise_shipname)
 
-    fpath = vs.r2r_cruise + cruise_name + "/" + cruise_name + "_cruise_metadata.csv"
+    fpath = vs.r2r_cruise + cruise_name + "/raw/" + cruise_name + "_cruise_metadata.parquet"
     tblCruise_df = pd.DataFrame(
         {
             "Nickname": [cruise_nickname],
@@ -396,25 +398,26 @@ def format_cruise_metadata(cruise_name, cruise_nickname, cruise_shipname, chief_
             "Lon_Min": "",
             "Lon_Max": "",
             "Chief_Name": [chief_sci],
+            "Cruise_Series":""
         }
     )
     vs.makedir(vs.r2r_cruise + cruise_name + "/")
-    tblCruise_df.to_csv(fpath, sep=",", index=False)
+    tblCruise_df.to_parquet(fpath, index=False)
 
 
-def gather_cruise_links():
-    """webscraping"""
-    all_cruise_url = "http://data.rvdata.us/directory/Cruise"
-    page = requests.get(all_cruise_url)
-    soup = BeautifulSoup(page.content, "html.parser")
-    table_rows = soup.findAll("a")
-    all_cruise_df = pd.DataFrame(columns=["cruise_name", "cruise_link"])
-    for row in table_rows:
-        if "/cruise/" in str(row):
-            cruise_link = str(row).split("""href=\"""")[1].split('">')[0]
-            cruise_name = cruise_link.split("cruise/")[1]
-            all_cruise_df.loc[len(all_cruise_df)] = [cruise_name, cruise_link]
-    return all_cruise_df
+# def gather_cruise_links():
+#     """webscraping"""
+#     all_cruise_url = "http://data.rvdata.us/directory/Cruise"
+#     page = requests.get(all_cruise_url)
+#     soup = BeautifulSoup(page.content, "html.parser")
+#     table_rows = soup.findAll("a")
+#     all_cruise_df = pd.DataFrame(columns=["cruise_name", "cruise_link"])
+#     for row in table_rows:
+#         if "/cruise/" in str(row):
+#             cruise_link = str(row).split("""href=\"""")[1].split('">')[0]
+#             cruise_name = cruise_link.split("cruise/")[1]
+#             all_cruise_df.loc[len(all_cruise_df)] = [cruise_name, cruise_link]
+#     return all_cruise_df
 
 
 def parse_r2r_page(url):
@@ -439,59 +442,77 @@ def parse_cruise_metadata(cruise_name="", cruise_url=""):
     try:
         cmdf = parse_r2r_page(cruise_url)
         return cmdf
-
     except Exception as e:
         print(e)
 
-
-def download_hot_cruises():
-    """webscraping"""
-    cruise_links = gather_cruise_links()
-    for cruise_name, cruise_link in zip(
-        cruise_links["cruise_name"], cruise_links["cruise_link"]
-    ):
-
-        try:
-            cmdf = parse_cruise_metadata(cruise_name)
-            cruise_name_str = (
-                cmdf[cmdf["id_col"] == "dcterms:title"]["info_col"].iloc[0].lower()
-            )
-            if "hot" in cruise_name_str:
+def download_single_cruise(cruise_name):
+    try:
+        cmdf = parse_cruise_metadata(cruise_name)
+        if not cmdf.empty:
+            try:
+                get_cruise_traj(cmdf, cruise_name)
                 get_cruise_metadata(cmdf, cruise_name)
+                fill_ST_bounds_metadata(cruise_name)
+                print(cruise_name, " Downloaded")
 
-            else:
-                print(cruise_name_str, " NOT HOT")
-        except:
-            print("##########################")
-            print(cruise_name, " No applicable cruise data -- cmdf empty")
-            print("##########################")
+            except:
+                print(
+                    cruise_name,
+                    " cruise data not downloaded b/c trajectory or metadata mising...",
+                )
+    except:
+        print("##########################")
+        print(cruise_name, " No applicable cruise data -- cmdf empty")
+        print("##########################")
+
+# def download_hot_cruises():
+#     """webscraping"""
+#     cruise_links = gather_cruise_links()
+#     for cruise_name, cruise_link in zip(
+#         cruise_links["cruise_name"], cruise_links["cruise_link"]
+#     ):
+
+#         try:
+#             cmdf = parse_cruise_metadata(cruise_name)
+#             cruise_name_str = (
+#                 cmdf[cmdf["id_col"] == "dcterms:title"]["info_col"].iloc[0].lower()
+#             )
+#             if "hot" in cruise_name_str:
+#                 get_cruise_metadata(cmdf, cruise_name)
+
+#             else:
+#                 print(cruise_name_str, " NOT HOT")
+#         except:
+#             print("##########################")
+#             print(cruise_name, " No applicable cruise data -- cmdf empty")
+#             print("##########################")
 
 
-def download_all_cruises():
-    """webscraping"""
-    cruise_links = gather_cruise_links()
-    for cruise_name, cruise_link in zip(
-        cruise_links["cruise_name"], cruise_links["cruise_link"]
-    ):
+# def download_all_cruises():
+#     """webscraping"""
+#     cruise_links = gather_cruise_links()
+#     for cruise_name, cruise_link in zip(
+#         cruise_links["cruise_name"], cruise_links["cruise_link"]
+#     ):
 
-        try:
-            cmdf = parse_cruise_metadata(cruise_name)
-            if not cmdf.empty:
-                try:
-                    get_cruise_traj(cmdf, cruise_name)
-                    get_cruise_metadata(cmdf, cruise_name)
-                    fill_ST_bounds_metadata(cruise_name)
-                    print(cruise_name, " Downloaded")
+#         try:
+#             cmdf = parse_cruise_metadata(cruise_name)
+#             if not cmdf.empty:
+#                 try:
+#                     get_cruise_traj(cmdf, cruise_name)
+#                     get_cruise_metadata(cmdf, cruise_name)
+#                     fill_ST_bounds_metadata(cruise_name)
+#                     print(cruise_name, " Downloaded")
 
-                except:
-                    print(
-                        cruise_name,
-                        " cruise data not downloaded b/c trajectory or metadata mising...",
-                    )
-        except:
-            print("##########################")
-            print(cruise_name, " No applicable cruise data -- cmdf empty")
-            print("##########################")
+#                 except:
+#                     print(
+#                         cruise_name,
+#                         " cruise data not downloaded b/c trajectory or metadata mising...",
+#                     )
+#         except:
+#             print("##########################")
+#             print(cruise_name, " No applicable cruise data -- cmdf empty")
+#             print("##########################")
 
 
 def fill_ST_meta(cruise_meta_df, cruise_traj_df):

@@ -77,11 +77,12 @@ def updateStats_Small(tableName, db_name, server, data_df=None):
     updateStatsTable(Dataset_ID, json_str, server)
     print("Updated stats for " + tableName)
 
-def updateStats_Manual(dt1, dt2, lat1, lat2, lon1, lon2, dpt1, dpt2, tableName, db_name, server):
+def updateStats_Manual(dt1, dt2, lat1, lat2, lon1, lon2, dpt1, dpt2, row_count, tableName, db_name, server):
     """Updates entry for tblDataset_Stats, wraps around updateStatsTable, but with common inputs.
     Args:
         dt1, dt1, lat1, lat2, lon1, lon2: Min/Max stats of dataset
         dpt1, dpt2: Mix/max depth of dataset. If no depth in dataset, set to None
+        row_count: Total row count for dataset
         tableName (str): CMAP table name
         db_name (str): CMAP database name (Opedia)
         Server (str): Valid CMAP server name
@@ -93,11 +94,11 @@ def updateStats_Manual(dt1, dt2, lat1, lat2, lon1, lon2, dpt1, dpt2, tableName, 
         stats_df[var] = np.nan
     if dpt1 is None:
         min_max_df = pd.DataFrame(
-            {"time": [dt1, dt2], "lat":[lat1, lat2], "lon":[lon1, lon2]}, index=["min", "max"]
+            {"time": [dt1, dt2, row_count], "lat":[lat1, lat2, row_count], "lon":[lon1, lon2, row_count]}, index=["min", "max", "count"]
         )
     else:
         min_max_df = pd.DataFrame(
-            {"time": [dt1, dt2], "lat":[lat1, lat2], "lon":[lon1, lon2], "depth":[dpt1, dpt2]}, index=["min", "max"]
+            {"time": [dt1, dt2, row_count], "lat":[lat1, lat2, row_count], "lon":[lon1, lon2, row_count], "depth":[dpt1, dpt2, row_count]}, index=["min", "max", "count"]
         )        
     df = pd.concat([min_max_df, stats_df], axis=1, sort=True)
     # if 'datetime' in df.time.dtype.name:
@@ -316,4 +317,5 @@ def pull_from_stats_folder(tableName, make):
     max_lon = df_stats['max_lon'].max()
     min_depth = df_stats['min_depth'].min()
     max_depth = df_stats['max_depth'].max()
-    return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth
+    row_count = df_stats['row_count'].sum()
+    return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth, row_count

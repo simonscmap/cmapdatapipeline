@@ -13,6 +13,8 @@ import numpy as np
 import glob
 import dropbox
 import DB
+import pyarrow.parquet as pq
+import pyarrow as pa
 import vault_structure as vs
 import credentials as cr
 import api_checks as api
@@ -106,6 +108,18 @@ def decode_xarray_bytes(xdf):
                 xdf[col] = xdf[col].str.decode("cp1252").str.strip()
     return xdf
 
+
+def read_parquet_schema(fil):
+    """Reads schema from a parquet files
+    Args:
+        fil {str}: Full data path of parquet file
+    Returns:
+        sch {list}: List of column names and data types
+    """    
+    parquet_file = pq.ParquetFile(fil)
+    sch = pa.schema(
+        [f.remove_metadata() for f in parquet_file.schema_arrow])
+    return sch
 
 def strip_whitespace_data(df):
     """Strips leading and trailing whitespace from dataframe
