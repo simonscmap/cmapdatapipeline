@@ -31,7 +31,7 @@ By calling this function **deleteCatalogTables(tableName, server)**, we can remo
 
    >>> deleteCatalogTables('tblFalkor_2018','Rainier')
 
-Continue this function for any other existing servers. ex. 'Mariana','Rossby'
+Continue this function for any other existing servers. ex. 'Mariana', 'Rossby'
 
 
 

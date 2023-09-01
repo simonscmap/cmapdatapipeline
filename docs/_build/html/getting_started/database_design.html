@@ -1,89 +1,49 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Database Design and Table Structure &mdash; cmapdata 0.0.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Compute Resources and Data Storage" href="compute_and_storage.html" />
     <link rel="prev" title="Installation and Setup" href="installation.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../index.html" class="icon icon-home"> cmapdata
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            cmapdata
           </a>
-
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Setup</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Database Design and Table Structure</a><ul>
@@ -94,7 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compute_and_storage.html">Compute Resources and Data Storage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pitfalls.html">Pitfalls</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Dataset Ingestion Examples</span></p>
+<p class="caption" role="heading"><span class="caption-text">Dataset Ingestion Examples</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/workflow.html">Workflow</a></li>
@@ -104,18 +64,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Package Overview</span></p>
+<p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../subpackages/DB.html">DB</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../subpackages/collect.html">collect</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../subpackages/process.html">process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../subpackages/ingest.html">ingest</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Future Improvements</span></p>
+<p class="caption" role="heading"><span class="caption-text">Future Improvements</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../future/code_changes.html">Code Changes</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Ref</span></p>
+<p class="caption" role="heading"><span class="caption-text">API Ref</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../API/API_common.html">API Ref common.py</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../API/API_cruise.html">API Ref cruise.py</a></li>
@@ -131,77 +91,38 @@
 <li class="toctree-l1"><a class="reference internal" href="../API/API_vault_structure.html">API Ref vault_structure.py</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">cmapdata</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-      <li>Database Design and Table Structure</li>
-    
-    
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Database Design and Table Structure</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/getting_started/database_design.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="database-design-and-table-structure">
-<h1>Database Design and Table Structure<a class="headerlink" href="#database-design-and-table-structure" title="Permalink to this headline">¶</a></h1>
-<div class="figure align-default" id="id1">
+             
+  <section id="database-design-and-table-structure">
+<h1>Database Design and Table Structure<a class="headerlink" href="#database-design-and-table-structure" title="Link to this heading"></a></h1>
+<figure class="align-default" id="id1">
 <img alt="CMAP DB metadata specific table database diagram" src="../_images/DB_diagram.png" />
-<p class="caption"><span class="caption-text">CMAP DB metadata specific table database diagram</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
+<figcaption>
+<p><span class="caption-text">CMAP DB metadata specific table database diagram</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 <p>Simons CMAP currently has three servers that contain near replicates of the SQL Server database. The names of these three are: Rainier, Mariana and Rossby.
 Rainier was the first dedicated server to host the database and currently serves as the main ‘source of truth’.</p>
 <div class="admonition warning">
@@ -212,8 +133,8 @@ Rainier was the first dedicated server to host the database and currently serves
 Data tables are independent of one another. The dataset table name is stored as a column in the metadata table <em>tblVariables</em>.
 This key links the data tables to the rest of the metadata.</p>
 <p>Metadata tables are listed below with a brief description of each:</p>
-<div class="section" id="variable-level-metadata">
-<h2>Variable Level Metadata<a class="headerlink" href="#variable-level-metadata" title="Permalink to this headline">¶</a></h2>
+<section id="variable-level-metadata">
+<h2>Variable Level Metadata<a class="headerlink" href="#variable-level-metadata" title="Link to this heading"></a></h2>
 <p><strong>tblVariables</strong> links the data tables to the metadata through the column [Table_Name].
 Columns with an _ID suffix are linked to other metadata tables. For example, Dataset level information in tblDatasets in linked through [Dataset_ID].
 Each data variable in a dataset has a row in this table, containing the following columns:</p>
@@ -250,9 +171,9 @@ tblKeywords contains an ID column, where each value which corresponds to a uniqu
 </ul>
 <p><strong>tblTemporal_Resolution</strong>, <strong>tblSpatial_Resolution</strong>, <strong>tblMake</strong>, <strong>tblSensor</strong>, <strong>tblProcess_Stages</strong> and <strong>tblStudy_Domains</strong> are all
 variable level tables that contain links between the ID’s in tblVariables and their respective tables.</p>
-</div>
-<div class="section" id="dataset-level-metadata">
-<h2>Dataset Level Metadata<a class="headerlink" href="#dataset-level-metadata" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="dataset-level-metadata">
+<h2>Dataset Level Metadata<a class="headerlink" href="#dataset-level-metadata" title="Link to this heading"></a></h2>
 <p><strong>tblDatasets</strong> contains dataset level information and has links to tblVariables as well as links to cruise and region level information.</p>
 <ul class="simple">
 <li><p>ID</p></li>
@@ -281,51 +202,35 @@ The region tables in CMAP share a similar schema to the cruise tables layout. <s
 (this can be expanded).
 <strong>tblDataset_Regions</strong> is similar to <strong>tblDataset_Cruises</strong> because it acts as the linking table between the region and dataset tables.
 <strong>tblCruise_Regions</strong> is a linking table between cruise IDs and region IDs.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Norland Raphael Hagen.
-
-    </p>
+    <p>&#169; Copyright 2021, Norland Raphael Hagen.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
