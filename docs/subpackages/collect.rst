@@ -22,7 +22,9 @@ In the vault_structure, a top level folder is named **collected_data/**. This
         │   ├── cruise
         |   |   |── cruise_name
         |   |       |── collect_{cruise_name}.py
-        │   ├── float
+        │   ├── drifter
+        │   ├── float        
+        │   ├── mixed          
         │   └── station
         └── remote
             └── satellite
