@@ -121,7 +121,7 @@
 <p>For this example, we are going to be using the dataset: <strong>Falkor_2018 - 2018 SCOPE Falkor Cruise Water Column Data</strong></p>
 <section id="removal-of-previously-existing-dataset">
 <h2>Removal of Previously Existing Dataset<a class="headerlink" href="#removal-of-previously-existing-dataset" title="Link to this heading"></a></h2>
-<p>This dataset was an early submitted dataset and has recently been revised to bring it up to line with the current CMAP data submission guidelines. The dataset was reviewed by CMAP data curators, which means the finalized updated dataset will be found in the /final folder <strong>Dropbox/Apps/&lt;dataset_short_name&gt;/final</strong></p>
+<p>This dataset was an early submitted dataset and has recently been revised to bring it up to line with the current CMAP data submission guidelines. The dataset was reviewed by CMAP data curators, which means the finalized updated dataset will be found in the /final folder: <strong>Dropbox/Apps/&lt;dataset_short_name&gt;/final</strong></p>
 <p>Because this dataset already exists in the database, we must first remove the old version.</p>
 <p>To do this, we can use some of the functionality in cmapdata/ingest/metadata.py</p>
 <p>By calling this function <strong>deleteCatalogTables(tableName, db_name, server)</strong>, we can remove any metadata and data tables from a given server.</p>
@@ -163,9 +163,11 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="n">tblFalkor_2018</span> <span class="n">cruise</span> <span class="s1">&#39;Falkor_2018.xlsx&#39;</span> <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;https://doi.org/10.5281/zenodo.5208854&#39;</span> <span class="o">-</span><span class="n">l</span> <span class="s1">&#39;https://zenodo.org/record/5208854/files/tblFalkor_2018</span><span class="si">%20%</span><span class="s1">282%29.xlsx?download=1&#39;</span> <span class="o">-</span><span class="n">f</span> <span class="s1">&#39;tblFalkor_2018 (2).xlsx&#39;</span> <span class="o">-</span><span class="n">S</span> <span class="s1">&#39;Rainier&#39;</span>
 </pre></div>
 </div>
-<p>There are two additional arguments if you are only updating the metadata, and not reingesting the data table.
-* {<strong>-U</strong>}: Optional flag for specifying updates to metadata only
-* {<strong>-F</strong>}: Optional boolean depth flag. Default value is 0. Set to 1 if the data has a depth column</p>
+<p>There are two additional arguments if you are only updating the metadata, and not reingesting the data table.</p>
+<ul class="simple">
+<li><p>{<strong>-U</strong>}: Optional flag for specifying updates to metadata only</p></li>
+<li><p>{<strong>-F</strong>}: Optional boolean depth flag. Default value is 0. Set to 1 if the data has a depth column</p></li>
+</ul>
 <p>An example string for metadata update would be:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="n">tblFalkor_2018</span> <span class="n">cruise</span> <span class="s1">&#39;Falkor_2018.xlsx&#39;</span> <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;https://doi.org/10.5281/zenodo.5208854&#39;</span> <span class="o">-</span><span class="n">l</span> <span class="s1">&#39;https://zenodo.org/record/5208854/files/tblFalkor_2018</span><span class="si">%20%</span><span class="s1">282%29.xlsx?download=1&#39;</span> <span class="o">-</span><span class="n">f</span> <span class="s1">&#39;tblFalkor_2018 (2).xlsx&#39;</span> <span class="o">-</span><span class="n">S</span> <span class="s1">&#39;Rainier&#39;</span> <span class="o">-</span><span class="n">F</span> <span class="mi">1</span> <span class="o">-</span><span class="n">U</span>
 </pre></div>

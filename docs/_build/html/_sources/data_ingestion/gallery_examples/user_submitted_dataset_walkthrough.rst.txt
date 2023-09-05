@@ -10,7 +10,7 @@ For this example, we are going to be using the dataset: **Falkor_2018 - 2018 SCO
 Removal of Previously Existing Dataset 
 --------------------------------------
 
-This dataset was an early submitted dataset and has recently been revised to bring it up to line with the current CMAP data submission guidelines. The dataset was reviewed by CMAP data curators, which means the finalized updated dataset will be found in the /final folder **Dropbox/Apps/<dataset_short_name>/final**
+This dataset was an early submitted dataset and has recently been revised to bring it up to line with the current CMAP data submission guidelines. The dataset was reviewed by CMAP data curators, which means the finalized updated dataset will be found in the /final folder: **Dropbox/Apps/<dataset_short_name>/final**
 
 Because this dataset already exists in the database, we must first remove the old version.
 
@@ -71,6 +71,7 @@ An example string for full ingest would be:
    python general.py tblFalkor_2018 cruise 'Falkor_2018.xlsx' -d 'https://doi.org/10.5281/zenodo.5208854' -l 'https://zenodo.org/record/5208854/files/tblFalkor_2018%20%282%29.xlsx?download=1' -f 'tblFalkor_2018 (2).xlsx' -S 'Rainier'
 
 There are two additional arguments if you are only updating the metadata, and not reingesting the data table.
+
 * {**-U**}: Optional flag for specifying updates to metadata only
 * {**-F**}: Optional boolean depth flag. Default value is 0. Set to 1 if the data has a depth column
 
