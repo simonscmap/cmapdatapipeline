@@ -129,10 +129,8 @@ The ip address is for the workstation is 128.208.238.117</p>
 </figure>
 <section id="data-flow">
 <h2>Data Flow<a class="headerlink" href="#data-flow" title="Link to this heading"></a></h2>
-<p>There is currently a disconnect between where the web validator stores validated datasets (<strong>Dropbox/Apps/&lt;dataset_short_name&gt;/&lt;dataset_short_name_timestamp.xlsx&gt;</strong>)
-vs where the data ingestion pipeline starts (<strong>Dropbox/staging/combined/&lt;dataset_name.xlsx&gt;</strong>).
-In addition, there is a directory <strong>Dropbox/Collected_Data/../&lt;table_name&gt;/</strong> that contains collected raw data from outside sources.</p>
-<p>Ideally, it would be good to integrate the <strong>collected_data/</strong> directory within the <strong>vault/</strong> directory in a ‘raw’ or ‘collected’ leaf level. Additionally, the disconnect between staging/combined and Apps should be sorted out.</p>
+<p>The web validator stores submitted datasets to Dropbox (<strong>Dropbox/Apps/&lt;dataset_short_name&gt;/&lt;dataset_short_name_timestamp.xlsx&gt;</strong>). After submission the CMAP data team runs the dataset through the QC API. The outputs from the QC API are saved in Dropbox (<strong>Dropbox/Apps/&lt;dataset_short_name&gt;/iterations/1/propose</strong>). When changes are approved by the submitter, a copy of the finalized dataset is added to the accept folder within the iteration folder structure, as well as to the final folder where ingestion will pull from (<strong>Dropbox/Apps/&lt;dataset_short_name&gt;/final</strong>). Only one file should be saved in the final folder for ingestion.</p>
+<p>Ingesting a dataset submitted through the validator pulls from the final folder and creates a folder based on the table name in the <strong>vault/</strong> directory based on the data type ().</p>
 </section>
 <section id="data-storage">
 <h2>Data Storage<a class="headerlink" href="#data-storage" title="Link to this heading"></a></h2>
@@ -141,7 +139,7 @@ we can use dropbox to store all our pre-DB data. In addition to dropbox, the <st
 <strong>~/data/CMAP Data Submission Dropbox/Simons CMAP/vault/</strong></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Ideally this path should be changed to remove any spaces. The one potential hold-up is where the web app is writing files.</p>
+<p>Ideally this path should be changed to remove any spaces. The hold-up is unlimited account is grandfathered in at its current naming convention.</p>
 </div>
 <p>Dropbox’s CLI tools are installed on the workstation. Using the selective sync feature of dropbox, the <strong>/vault</strong> stored on disk can be synced with the cloud.
 By reading/writing to disk, IO speeds for data processing should be improved.</p>

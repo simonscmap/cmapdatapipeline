@@ -57,7 +57,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../indexing_strategies.html">Table Creation and Indexing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">User Submitted Dataset Walkthrough</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#removal-of-previously-existing-dataset">Removal of Previously Existing Dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#transferring-the-dataset-to-staging">Transferring the Dataset to Staging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#specifying-the-ingestion-arguments">Specifying the Ingestion Arguments</a></li>
 </ul>
 </li>
@@ -122,10 +121,10 @@
 <p>For this example, we are going to be using the dataset: <strong>Falkor_2018 - 2018 SCOPE Falkor Cruise Water Column Data</strong></p>
 <section id="removal-of-previously-existing-dataset">
 <h2>Removal of Previously Existing Dataset<a class="headerlink" href="#removal-of-previously-existing-dataset" title="Link to this heading"></a></h2>
-<p>This dataset was an early submitted dataset and has recently been revised to being it up to line with the current CMAP data submission guidelines.
-Because this dataset already exists in the database, we must first remove the old version.</p>
+<p>This dataset was an early submitted dataset and has recently been revised to bring it up to line with the current CMAP data submission guidelines. The dataset was reviewed by CMAP data curators, which means the finalized updated dataset will be found in the /final folder <strong>Dropbox/Apps/&lt;dataset_short_name&gt;/final</strong></p>
+<p>Because this dataset already exists in the database, we must first remove the old version.</p>
 <p>To do this, we can use some of the functionality in cmapdata/ingest/metadata.py</p>
-<p>By calling this function <strong>deleteCatalogTables(tableName, server)</strong>, we can remove any metadata and data tables from a given server.</p>
+<p>By calling this function <strong>deleteCatalogTables(tableName, db_name, server)</strong>, we can remove any metadata and data tables from a given server.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This function has drop privileges! Make sure you want to wipe the dataset metadata and table.</p>
@@ -137,54 +136,59 @@ Because this dataset already exists in the database, we must first remove the ol
 </pre></div>
 </div>
 <p>Continue this function for any other existing servers. ex. ‘Mariana’, ‘Rossby’</p>
-</section>
-<section id="transferring-the-dataset-to-staging">
-<h2>Transferring the Dataset to Staging<a class="headerlink" href="#transferring-the-dataset-to-staging" title="Link to this heading"></a></h2>
-<p>Currently there is a disconnect from where the web validator places datasets and where the ingestion pipeline starts.
-The temporary workaround is to download the completed and QA’ed dataset with the <strong>download dataset</strong> button.
-Transfer the dataset to the shared dropbox vault of ‘/CMAP Data Submission Dropbox/Simons CMAP/staging/combined/’
-From here, the data ingestion pipeline can begin.</p>
-<figure class="align-default">
-<a class="reference internal image-reference" href="../../_images/dataset_download.png"><img alt="Dataset Download Button" src="../../_images/dataset_download.png" style="width: 296.8px; height: 169.60000000000002px;" /></a>
-</figure>
+<p>If only the metadata needs updating, calling the function <strong>deleteTableMetadata(tableName, db_name, server)</strong> will remove all metadata associated with the dataset, but will not delete the data table.</p>
 </section>
 <section id="specifying-the-ingestion-arguments">
 <h2>Specifying the Ingestion Arguments<a class="headerlink" href="#specifying-the-ingestion-arguments" title="Link to this heading"></a></h2>
-<p>Using ingest/general.py, you can pass command line arguments to specify which server you wish to add the dataset to as well as including a DOI.
-This dataset does not have a user submitted DOI link, so it is excluded in the example.</p>
+<p>Using ingest/general.py, you can pass command line arguments to specify which server you wish to add the dataset to as well as including a DOI. Because the DOI is a CMAP template, the optional flag -t is not necessary to include as the default is true.</p>
 <p>Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="p">{</span><span class="n">table_name</span><span class="p">}</span> <span class="p">{</span><span class="n">branch</span><span class="p">}</span> <span class="p">{</span><span class="n">filename</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">d</span><span class="p">}</span> <span class="p">{</span><span class="n">DOI</span> <span class="n">link</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">S</span><span class="p">}</span> <span class="p">{</span><span class="n">server</span><span class="p">}</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="p">{</span><span class="n">table_name</span><span class="p">}</span> <span class="p">{</span><span class="n">branch</span><span class="p">}</span> <span class="p">{</span><span class="n">filename</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">d</span><span class="p">}</span> <span class="p">{</span><span class="n">DOI</span> <span class="n">link</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">l</span><span class="p">}</span> <span class="p">{</span><span class="n">DOI</span> <span class="n">download</span> <span class="n">link</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">f</span><span class="p">}</span> <span class="p">{</span><span class="n">DOI</span> <span class="n">file</span> <span class="n">name</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">S</span><span class="p">}</span> <span class="p">{</span><span class="n">server</span><span class="p">}</span>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>{<strong>branch</strong>}: Branch where dataset should be placed in Vault. Ex’s: cruise, float, station, satellite, model, assimilation]</p></li>
-<li><p>{<strong>filename</strong>}: Base file name in vault/staging/combined/. Ex.: ‘global_diazotroph_nifH.xlsx’</p></li>
+<li><p>{<strong>branch</strong>}: Branch where dataset should be placed in Vault. Ex’s: cruise, float, station, satellite, model, assimilation</p></li>
+<li><p>{<strong>filename</strong>}: Base file name in vault/staging/combined/. Ex.: ‘Falkor_2018.xlsx’</p></li>
 <li><p>{<strong>-d</strong>}: Optional flag for including DOI with dataset in tblReferences. DOI link string follows flag arg.</p></li>
-<li><p>{<strong>DOI link</strong>}: String for full web address of CMAP specific DOI. Ex. “<a class="reference external" href="http://doi.org/10.5281/zenodo.4968554">http://doi.org/10.5281/zenodo.4968554</a>”</p></li>
+<li><p>{<strong>DOI link</strong>}: String for full web address of CMAP specific DOI. Ex. “<a class="reference external" href="https://doi.org/10.5281/zenodo.5208854">https://doi.org/10.5281/zenodo.5208854</a>”</p></li>
+<li><p>{<strong>-l</strong>}: Optional flag for including the DOI download link in tblDataset_DOI_Download. DOI dowload link string follows flag.</p></li>
+<li><p>{<strong>DOI download link</strong>}: String for DOI download link of CMAP specific DOI. Ex. “<a class="reference external" href="https://zenodo.org/record/5208854/files/tblFalkor_2018%20%282%29.xlsx?download=1">https://zenodo.org/record/5208854/files/tblFalkor_2018%20%282%29.xlsx?download=1</a>”</p></li>
+<li><p>{<strong>-f</strong>}:  Optional flag for DOI file name. DOI file name string follows flag.</p></li>
+<li><p>{<strong>DOI file name</strong>}:  String for filename of CMAP specific DOI. Ex. “tblFalkor_2018 (2).xlsx”</p></li>
+<li><p>{<strong>-t</strong>}: Optional flag for denoting if DOI is a web validator template. Default value is 1.</p></li>
+<li><p>{<strong>DOI in CMAP template</strong>}:  Boolean if DOI is a web validator template.</p></li>
 <li><p>{<strong>-S</strong>}: Required flag for specifying server choice. Server name string follows flag.</p></li>
 <li><p>{<strong>server</strong>}: Valid server name string.  Ex. “Rainier”, “Mariana” or “Rossby”</p></li>
 </ul>
-<p>An example string would be:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="n">tblFalkor_2018</span> <span class="n">cruise</span> <span class="s1">&#39;Falkor_2018.xlsx&#39;</span>  <span class="o">-</span><span class="n">S</span> <span class="s2">&quot;Rainier&quot;</span>
+<p>An example string for full ingest would be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="n">tblFalkor_2018</span> <span class="n">cruise</span> <span class="s1">&#39;Falkor_2018.xlsx&#39;</span> <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;https://doi.org/10.5281/zenodo.5208854&#39;</span> <span class="o">-</span><span class="n">l</span> <span class="s1">&#39;https://zenodo.org/record/5208854/files/tblFalkor_2018</span><span class="si">%20%</span><span class="s1">282%29.xlsx?download=1&#39;</span> <span class="o">-</span><span class="n">f</span> <span class="s1">&#39;tblFalkor_2018 (2).xlsx&#39;</span> <span class="o">-</span><span class="n">S</span> <span class="s1">&#39;Rainier&#39;</span>
+</pre></div>
+</div>
+<p>There are two additional arguments if you are only updating the metadata, and not reingesting the data table.
+* {<strong>-U</strong>}: Optional flag for specifying updates to metadata only
+* {<strong>-F</strong>}: Optional boolean depth flag. Default value is 0. Set to 1 if the data has a depth column</p>
+<p>An example string for metadata update would be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="n">tblFalkor_2018</span> <span class="n">cruise</span> <span class="s1">&#39;Falkor_2018.xlsx&#39;</span> <span class="o">-</span><span class="n">d</span> <span class="s1">&#39;https://doi.org/10.5281/zenodo.5208854&#39;</span> <span class="o">-</span><span class="n">l</span> <span class="s1">&#39;https://zenodo.org/record/5208854/files/tblFalkor_2018</span><span class="si">%20%</span><span class="s1">282%29.xlsx?download=1&#39;</span> <span class="o">-</span><span class="n">f</span> <span class="s1">&#39;tblFalkor_2018 (2).xlsx&#39;</span> <span class="o">-</span><span class="n">S</span> <span class="s1">&#39;Rainier&#39;</span> <span class="o">-</span><span class="n">F</span> <span class="mi">1</span> <span class="o">-</span><span class="n">U</span>
 </pre></div>
 </div>
 <p>Behind the scenes, the script is doing:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><p>parsing the user supplied arguments.</p></li>
-<li><p>Splitting the data template into data, dataset_metadata and vars_metadata files.</p></li>
-<li><p>Transfering the files to <strong>vault/</strong>.</p></li>
+<li><p>Parsing the user supplied arguments.</p></li>
+<li><p>Creates <strong>vault/</strong> folder structure, syncs Dropbox, and transfers the files to <strong>vault/</strong>.</p></li>
+<li><p>Splitting the data template into data, dataset_metadata and vars_metadata files. Saves metadata as parquet files in /metadata folder.</p></li>
 <li><p>Importing into memory the data, dataset_metadata and vars_metadata sheets as pandas dataframes.</p></li>
+<li><p>Checks for presence of variables describing organism abundance based on units, short name, and long name. If Org_ID is present in the variable metadata sheet, checks that Conversion_Coefficient aligns with units.</p></li>
+<li><p>Checks values in data for outliers (+/- five times standard deviation) or invalid ranges for lat, lon, depth.</p></li>
 <li><p>Creating a suggested SQL table and index based on the infered data.</p></li>
 <li><p>Insert data into newly created table.</p></li>
 <li><p>Insert metadata into various metadata tables, match cruises and classify ocean region(s).</p></li>
-<li><p>Create summary stats and insert into tblDataset_Stats</p></li>
+<li><p>Create summary stats and insert into tblDataset_Stats.</p></li>
+<li><p>Add server alias to tblDataset_Servers.</p></li>
 <li><p>Create dataset icon and push to github.</p></li>
 </ol>
 </div></blockquote>
-<p>Once the first server ingestion completes without any errors, check the catalog to see if the table is visable.
-It is also advisable to try to plot one or more variables.
-When you are satisfied with the ingestion, continue adding to any remaining servers.</p>
+<p>Once the ingestion completes without any errors, check the catalog to see if the table is visable.
+It is also advisable to try to plot one or more variables, download the full datasets, as well as a subset.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>See the future code changes section for ideas on improvements.</p>

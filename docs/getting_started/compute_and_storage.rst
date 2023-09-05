@@ -17,11 +17,9 @@ The ip address is for the workstation is 128.208.238.117
 Data Flow 
 ---------
 
-There is currently a disconnect between where the web validator stores validated datasets (**Dropbox/Apps/<dataset_short_name>/<dataset_short_name_timestamp.xlsx>**)
-vs where the data ingestion pipeline starts (**Dropbox/staging/combined/<dataset_name.xlsx>**). 
-In addition, there is a directory **Dropbox/Collected_Data/../<table_name>/** that contains collected raw data from outside sources.
+The web validator stores submitted datasets to Dropbox (**Dropbox/Apps/<dataset_short_name>/<dataset_short_name_timestamp.xlsx>**). After submission the CMAP data team runs the dataset through the QC API. The outputs from the QC API are saved in Dropbox (**Dropbox/Apps/<dataset_short_name>/iterations/1/propose**). When changes are approved by the submitter, a copy of the finalized dataset is added to the accept folder within the iteration folder structure, as well as to the final folder where ingestion will pull from (**Dropbox/Apps/<dataset_short_name>/final**). Only one file should be saved in the final folder for ingestion.
 
-Ideally, it would be good to integrate the **collected_data/** directory within the **vault/** directory in a 'raw' or 'collected' leaf level. Additionally, the disconnect between staging/combined and Apps should be sorted out.
+Ingesting a dataset submitted through the validator pulls from the final folder and creates a folder based on the table name in the **vault/** directory based on the data type ().
 
 
 Data Storage
@@ -32,7 +30,7 @@ we can use dropbox to store all our pre-DB data. In addition to dropbox, the **v
 **~/data/CMAP Data Submission Dropbox/Simons CMAP/vault/**
 
 .. note::
-    Ideally this path should be changed to remove any spaces. The one potential hold-up is where the web app is writing files. 
+    Ideally this path should be changed to remove any spaces. The hold-up is unlimited account is grandfathered in at its current naming convention. 
 
 Dropbox's CLI tools are installed on the workstation. Using the selective sync feature of dropbox, the **/vault** stored on disk can be synced with the cloud.
 By reading/writing to disk, IO speeds for data processing should be improved.

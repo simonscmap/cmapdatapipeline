@@ -9,6 +9,8 @@ Database Design and Table Structure
 Simons CMAP currently has three servers that contain near replicates of the SQL Server database. The names of these three are: Rainier, Mariana and Rossby. 
 Rainier was the first dedicated server to host the database and currently serves as the main 'source of truth'. 
 
+In addition to the three SQL Servers there is a a Spark SQL Warehouse cluster with Apache Hive ANSI SQL:2003 interface. Its alias is: Cluster. This is used for large datasets (i.e. satellite data and Darwin) or continuously updated datasets (i.e. Argo data).
+
 .. warning::
    Rainier is currently the production database and 'source of truth'. If you want to test features, use Mariana or Rossby. 
 
@@ -49,6 +51,9 @@ Each data variable in a dataset has a row in this table, containing the followin
 * Comment
 * Visualize
 * Data_Type
+* Org_ID
+* Conversion_Coefficient
+* Has_Depth
 
 
 **tblKeywords** contains user submitted keywords used in the searching of a variable. 
@@ -58,7 +63,7 @@ tblKeywords contains an ID column, where each value which corresponds to a uniqu
 * keywords
 
 
-**tblTemporal_Resolution**, **tblSpatial_Resolution**, **tblMake**, **tblSensor**, **tblProcess_Stages** and **tblStudy_Domains** are all 
+**tblTemporal_Resolution**, **tblSpatial_Resolution**, **tblMake**, **tblSensor**, **tblProcess_Stages**, **tblStudy_Domains**, and **tblVariables_JSON_Metadata** are all 
 variable level tables that contain links between the ID's in tblVariables and their respective tables. 
 
 
@@ -89,7 +94,13 @@ Dataset Level Metadata
 * Dataset_Release_Date
 * Dataset_History
 
+**tblDatasets_JSON_Metadata** contains additional dataset metadata that is unstructured to allow users to include any information that does not fall within the information in tblDatasets.
 
+**tblDataset_References** holds references associated with the dataset, typically a DOI, paper citation, or website. References that are true DOIs with data frozen in time are linked by Reference_ID to **tblDataset_DOI_Download**. This table is used for automating the download of DOI data (DOI_Download_Link) and includes a flag for whether the DOI download is the CMAP template used for submission via the validator (CMAP_Format)
+
+**tblDataset_Vault** contains the relative path to the dataset leaf directory as well as a public link to the dataset leaf directory (read-only permission). In the future this may be joined to the catalog.
+
+**tblDataset_Servers** holds the alias names of each server the dataset can be found on. This was implemented to allow for replication across some but not all servers, and free up space on Rainier.
 
 **Cruise Metadata**
 The metadata for cruises in CMAP is separated into multiple tables. A core **tblCruise** links 

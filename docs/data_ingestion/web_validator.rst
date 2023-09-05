@@ -1,8 +1,8 @@
 Web Validator
 =============
 
-Colaborator datasets are submitted through our online web validator. 
-This system checks the integrity of the data, dataset metaddata and variable metadata sheets, 
+Collaborator datasets are submitted through our online web validator. 
+This system checks the integrity of the data, dataset metadata and variable metadata sheets, 
 looking for missing information and invalid data types.
 The status of the dataset is available to the curation team as well as the submitter on the data submission dashboard (https://simonscmap.com/datasubmission/admindashboard)
 
@@ -37,7 +37,6 @@ Once all the dataset changes are complete, the submitter should register a DOI f
 
 .. note::
    Datasets submitted through the web validator are currently stored in dropbox:
-   'CMAP Data Submission Dropbox/Simons CMAP/Apps/Simons CMAP Web Data Submission/{dataset_name}/{dataset_name_datestring.xlsx}
-   The data ingest pipeline starts at 'CMAP Data Submission Dropbox/Simons CMAP/staging/combined/{dataset_name}.xlsx
-   This path disconnect should be remedied.
+   'CMAP Data Submission Dropbox/Simons CMAP/Apps/Simons CMAP Web Data Submission/{dataset_name}/{dataset_name_datestring.xlsx}. Validator folders are currently based on dataset short name. This means it is possible a submitted dataset will be saved to a folder that already exists, if a user reuses a dataset short name. A fix for this should be implemented in the future 
+
 

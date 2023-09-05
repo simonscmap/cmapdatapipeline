@@ -125,6 +125,7 @@
 </figure>
 <p>Simons CMAP currently has three servers that contain near replicates of the SQL Server database. The names of these three are: Rainier, Mariana and Rossby.
 Rainier was the first dedicated server to host the database and currently serves as the main ‘source of truth’.</p>
+<p>In addition to the three SQL Servers there is a a Spark SQL Warehouse cluster with Apache Hive ANSI SQL:2003 interface. Its alias is: Cluster. This is used for large datasets (i.e. satellite data and Darwin) or continuously updated datasets (i.e. Argo data).</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Rainier is currently the production database and ‘source of truth’. If you want to test features, use Mariana or Rossby.</p>
@@ -162,6 +163,9 @@ Each data variable in a dataset has a row in this table, containing the followin
 <li><p>Comment</p></li>
 <li><p>Visualize</p></li>
 <li><p>Data_Type</p></li>
+<li><p>Org_ID</p></li>
+<li><p>Conversion_Coefficient</p></li>
+<li><p>Has_Depth</p></li>
 </ul>
 <p><strong>tblKeywords</strong> contains user submitted keywords used in the searching of a variable.
 tblKeywords contains an ID column, where each value which corresponds to a unique variable entry in tblVariables.</p>
@@ -169,7 +173,7 @@ tblKeywords contains an ID column, where each value which corresponds to a uniqu
 <li><p>var_ID</p></li>
 <li><p>keywords</p></li>
 </ul>
-<p><strong>tblTemporal_Resolution</strong>, <strong>tblSpatial_Resolution</strong>, <strong>tblMake</strong>, <strong>tblSensor</strong>, <strong>tblProcess_Stages</strong> and <strong>tblStudy_Domains</strong> are all
+<p><strong>tblTemporal_Resolution</strong>, <strong>tblSpatial_Resolution</strong>, <strong>tblMake</strong>, <strong>tblSensor</strong>, <strong>tblProcess_Stages</strong>, <strong>tblStudy_Domains</strong>, and <strong>tblVariables_JSON_Metadata</strong> are all
 variable level tables that contain links between the ID’s in tblVariables and their respective tables.</p>
 </section>
 <section id="dataset-level-metadata">
@@ -193,6 +197,10 @@ variable level tables that contain links between the ID’s in tblVariables and 
 <li><p>Dataset_Release_Date</p></li>
 <li><p>Dataset_History</p></li>
 </ul>
+<p><strong>tblDatasets_JSON_Metadata</strong> contains additional dataset metadata that is unstructured to allow users to include any information that does not fall within the information in tblDatasets.</p>
+<p><strong>tblDataset_References</strong> holds references associated with the dataset, typically a DOI, paper citation, or website. References that are true DOIs with data frozen in time are linked by Reference_ID to <strong>tblDataset_DOI_Download</strong>. This table is used for automating the download of DOI data (DOI_Download_Link) and includes a flag for whether the DOI download is the CMAP template used for submission via the validator (CMAP_Format)</p>
+<p><strong>tblDataset_Vault</strong> contains the relative path to the dataset leaf directory as well as a public link to the dataset leaf directory (read-only permission). In the future this may be joined to the catalog.</p>
+<p><strong>tblDataset_Servers</strong> holds the alias names of each server the dataset can be found on. This was implemented to allow for replication across some but not all servers, and free up space on Rainier.</p>
 <p><strong>Cruise Metadata</strong>
 The metadata for cruises in CMAP is separated into multiple tables. A core <strong>tblCruise</strong> links
 together metadata tables for cruise trajectories, cruise keywords, cruise region links and cruise dataset links.
