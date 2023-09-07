@@ -140,3 +140,23 @@ The following datasets are to be ingested monthly. Due to the nature of updates 
    * - Argo REP BGC
      - Cluster 
      - Monthly                 
+
+
+
+Continuous Ingestion Badge on Website
+----------------------------------
+The CMAP Catalog page includes a filter for Continuously Updated datasets and displays badges for each applicable dataset.
+
+
+.. figure:: ../_static/CI_screenshot.png
+   :scale: 70 %
+   :alt: CMAP Catalog Continuous Ingestion Filter
+
+
+The badges and filter call the uspDatasetBadges stored procedure, which in turn calls the udfDatasetBadges() function. As Argo datasets are a batch ingestion, they are not included in tblProcess_Queue. In order to have the badges display for Argo datasets, a union was done for any Argo REP table, regardless of month.
+
+.. code-block:: SQL
+
+  select distinct table_name, ci = 1 from tblProcess_Queue 
+	union all
+	select distinct table_name, ci = 1  from tblvariables where Table_Name like 'tblArgo%_REP_%'
