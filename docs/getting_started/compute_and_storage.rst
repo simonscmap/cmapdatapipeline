@@ -43,6 +43,12 @@ If dropbox has stopped syncing, you can start the CLI by typing in terminal:
    dropbox status 
 
 
+Workstation Repositories
+------------
+Scripts for new SQL tables and indicies are written to the DB repository found here: **~/Documents/CMAP/DB/**
+
+Python scripts for collection, ingestion, and processing are written to the cmapdata repository found here: **~/Documents/CMAP/cmapdata/**. The dataingest branch contains the most recent updates. 
+
 
 
 Synology NAS and Drobo Storage
