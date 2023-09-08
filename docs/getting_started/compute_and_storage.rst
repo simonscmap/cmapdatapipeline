@@ -49,7 +49,8 @@ Scripts for new SQL tables and indicies are written to the DB repository found h
 
 Python scripts for collection, ingestion, and processing are written to the cmapdata repository found here: **~/Documents/CMAP/cmapdata/**. The dataingest branch contains the most recent updates. 
 
-
+The vault directory that syncs with Dropbox is found here: **/data/CMAP\ Data\ Submission\ Dropbox/Simons\ CMAP/vault/**
+Note there are spaces in the directories "CMAP Data Submission" and "Simons CMAP"
 
 Synology NAS and Drobo Storage
 ------------------------------

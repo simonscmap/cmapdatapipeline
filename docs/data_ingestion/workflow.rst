@@ -14,7 +14,7 @@ User submitted datasets that pass through the web validator must be <150MB.
 
 User Submitted Datasets
 -----------------------
-User submitted datasets are submitted through the web validator. Once the QA/QC checks are completed and a DOI is received, the dataset can be ingested into CMAP.
+User submitted datasets are submitted through the web validator. Once the QA/QC checks are completed and a DOI is received, the dataset can be ingested into CMAP. Details on the QC process can be found here: https://simonscmap.atlassian.net/browse/CMAP-621. An additional step of adding org_id and conversion_coefficient columns to the variable metadata sheet in the submitted template is done only for variables describing organism abundance. 
 
 
 Using general.py, you can pass command line arguments to specify which server you wish to add the dataset to as well as including a DOI.
@@ -25,7 +25,7 @@ Where we have:
 
    python general.py {table_name} {branch} {filename} {-d} {DOI link} {-l} {DOI download link} {-f} {DOI file name} {-S} {server}
 
-* {**branch**}: Branch where dataset should be placed in Vault. Ex's: cruise, float, station, satellite, model, assimilation]
+* {**branch**}: Branch where dataset should be placed in Vault. Ex's: cruise, float, station, satellite, model, assimilation
 * {**filename**}: Base file name in vault/staging/combined/. Ex.: 'global_diazotroph_nifH.xlsx'
 * {**-d**}: Optional flag for including DOI with dataset in tblReferences. DOI link string follows flag arg. 
 * {**DOI link**}: String for full web address of CMAP specific DOI. Ex. "https://doi.org/10.5281/zenodo.8306724"

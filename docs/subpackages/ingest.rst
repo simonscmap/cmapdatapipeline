@@ -87,10 +87,11 @@ vault_structure contains the relative paths of vault as well as some directory c
     ├── observation
         ├── in-situ
         │   ├── cruise
+        │   ├── drifter        
         │   ├── float
+        │   ├── mixed        
         │   └── station
         └── remote
             └── satellite
-
-
+    ├── r2r_cruise
 
