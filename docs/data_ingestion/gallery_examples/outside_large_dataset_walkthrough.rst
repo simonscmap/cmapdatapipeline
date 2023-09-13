@@ -145,6 +145,12 @@ Before passing off for ingestion to the cluster, run through each processed parq
    Any schema error in a single parquet file will cause the bulk ingestion to fail 
 
   
+The last step for all process scripts is to copy the GitHub URL for the script to the /code folder in the vault. The example below calls the metadata.export_script_to_vault function and saves a text file named "process" in the dataset's code folder in the vault.
+
+.. code-block:: python
+
+    metadata.export_script_to_vault(tbl,'float_dir',f'process/insitu/float/ARGO/process_Argo_BGC_{date_string}.py','process.txt')
+
 
 Bulk Ingestion to the Cluster
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
