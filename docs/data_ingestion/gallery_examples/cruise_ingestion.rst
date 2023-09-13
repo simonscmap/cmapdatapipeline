@@ -68,13 +68,12 @@ Behind the scenes, the script is doing:
 
  1. parsing the user supplied arguments. 
  2. Splitting the data template into cruise_metadata and cruise_trajectory files. 
- 3. Transfering the files to **vault/**.
- 4. Importing into memory the cruise_metadata and cruise_trajectory sheets as pandas dataframes. 
- 5. Filling in the ST bounds for the cruise_metdata dataframe with min/max's from the trajectory dataframe.
- 6. Inserting the metadata dataframe into tblCruise. 
- 7. Inserting the trajectory dataframe into tblCruise_Trajectory. 
- 8. Using the trajectory dataframe to classify the cruise by ocean region(s).
- 9. Inserting the cruise_ID and region_ID's into tblCruise_Regions.
+ 3. Importing into memory the cruise_metadata and cruise_trajectory sheets as pandas dataframes. 
+ 4. Filling in the ST bounds for the cruise_metdata dataframe with min/max's from the trajectory dataframe.
+ 5. Inserting the metadata dataframe into tblCruise. 
+ 6. Inserting the trajectory dataframe into tblCruise_Trajectory. 
+ 7. Using the trajectory dataframe to classify the cruise by ocean region(s).
+ 8. Inserting the cruise_ID and region_ID's into tblCruise_Regions.
 
 
 
