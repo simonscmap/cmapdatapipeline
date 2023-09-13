@@ -177,6 +177,7 @@ Navigate to the ingest/ submodule of cmapdata. From there, run the following in 
 
    python general.py {table_name} {branch} {filename} {-S} {server} {-a} {data_server} {-i} {icon_filename} {-F} {-N}
 
+* {**table_name**}: Table name for the dataset. Must start with prefix "tbl". Ex. tblArgoBGC_REP_Sep2023
 * {**branch**}: Branch where dataset should be placed in Vault. Ex's: cruise, float, station, satellite, model, assimilation
 * {**filename**}: Base file name in vault/staging/combined/. Ex.: 'global_diazotroph_nifH.xlsx'
 * {**-S**}: Required flag for specifying server choice for metadata. Server name string follows flag. 
