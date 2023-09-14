@@ -171,7 +171,7 @@ After submitting through the validator, create a folder named final in **dropbox
 To ingest the metadata only, you can use ingest/general.py 
 
 
-Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal. 
+Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal. Because the DOI for the Argo datasets is already in the references column in the **dataset_meta_data** tab of the metadata template, you do not need to use the {-d} flag with ingestion.
 
 .. code-block:: python
 
@@ -196,3 +196,10 @@ An example string for the September 2023 BGC dataset is:
     python general.py tblArgoBGC_REP_Sep2023 float 'ARGO_BGC_Sep2023.xlsx' -i 'argo_small.jpg' -S 'Rossby' -N -a 'cluster' -F 1
 
 
+Removing Old Argo Data
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Once a new month of Argo data is accessible on the CMAP website, a previous month can be retired. The current plan is to keep three months of Argo data available to users. For example, with the addition of September data, the June data can be deleted from the vault. The data needs to be removed from the cluster **before** the parquet files are deleted from Dropbox. Metadata for the retired month can be removed from the CMAP catalog before the parquet files are deleted, if need be. This can be done using the following function in metadata.py:
+
+.. code-block:: python
+    metadata.deleteCatalogTables("tblArgo_Core_Jun2023", "Opedia", "Rainier")

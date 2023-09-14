@@ -19,7 +19,7 @@ Data Flow
 
 The web validator stores submitted datasets to Dropbox (**Dropbox/Apps/<dataset_short_name>/<dataset_short_name_timestamp.xlsx>**). After submission the CMAP data team runs the dataset through the QC API. The outputs from the QC API are saved in Dropbox (**Dropbox/Apps/<dataset_short_name>/iterations/1/propose**). When changes are approved by the submitter, a copy of the finalized dataset is added to the accept folder within the iteration folder structure, as well as to the final folder where ingestion will pull from (**Dropbox/Apps/<dataset_short_name>/final**). Only one file should be saved in the final folder for ingestion.
 
-Ingesting a dataset submitted through the validator pulls from the final folder and creates a folder based on the table name in the **vault/** directory based on the data type ().
+Ingesting a dataset submitted through the validator pulls from the final folder and creates a folder based on the table name in the **vault/** directory.
 
 
 Data Storage
@@ -52,11 +52,15 @@ Python scripts for collection, ingestion, and processing are written to the cmap
 The vault directory that syncs with Dropbox is found here: **/data/CMAP\ Data\ Submission\ Dropbox/Simons\ CMAP/vault/**
 Note there are spaces in the directories "CMAP Data Submission" and "Simons CMAP"
 
+Thumbnails for the catalog page are saved here: **/data/CMAP\ Data\ Submission\ Dropbox/Simons\ CMAP/static/mission_icons**
+
+
+
 Synology NAS and Drobo Storage
 ------------------------------
 
 
 Before storing data on Dropbox, two non-cloud storage methods were tried. Both the Drobo and Synology NAS are desktop size hard disk storage. Each contains ~40-50TB of disk space. 
-There are limitations to each of these. The Drobo requires a connection through usb-c/thunderbolt. The Synology NAS can be accessed over the internet, ie ((Network Attached Storage).
+There are limitations to each of these. The Drobo requires a connection through usb-c/thunderbolt. The Synology NAS can be accessed over the internet, ie (Network Attached Storage).
 They read/write speed for both is quite slow compared to the disks on the workstation. Perhaps one or both could be used as another backup?
 

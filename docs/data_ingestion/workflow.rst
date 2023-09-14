@@ -61,7 +61,7 @@ Outside 'Small' Datasets
 These datasets usually need quite a bit of data munging to make them match the CMAP data format. Additionally, metadata needs to be collected and created.
 To keep a record of data transformations, any processing scripts should be placed in **/process/../process_datasetname.py**. Additionally, any relevant collection information should be placed in **/collect/../collect_datasetname.py**. A text file containing a link to the process and collect scripts in GitHub should be saved in the vault to **{dataset table name}/code/**
 
-With the addition of the QC API, it is suggested to submit the final, cleaned dataset to the validator. 
+With the addition of the QC API, it is suggested to submit the final, cleaned dataset to the validator. Once QC is complete and the /final folder is populated with the finalized template, ingestion can be done as if it was a user submitted dataset as described above.
 
 
 Outside 'Large' Datasets
@@ -78,3 +78,25 @@ In this data processing script, data should be read from the vault /raw folder, 
 
 After the data has been inserted and the indices successfully created, metadata will need to be created and added to the databases. A standard excel template should be used for the dataset and vars metadata sheets. Submit a template to the validator with a dummy data sheet that holds all variables, but only needs one row of data to make it through the validator. This allows the data curation team to run the QC API checks and create the /final folder needed for ingesting the metadata. 
 
+There are additional arguments you can use for large datasets:
+
+* {**-a**}: Optional flag for specifying server name where data is located
+* {**data_server**}: Valid server name string.  Ex. "Rainier", "Mariana", "Rossby", or "Cluster"
+* {**-i**}: Optional flag for specifying icon name instead of creating a map thumbnail of the data
+* {**icon_filename**}: Filename for icon in Github instead of creating a map thumbnail of data. Ex: argo_small.jpg
+* {**-p**}: Optional flag for defining process level
+* {**process_level**}: Default value is "rep". Change to "nrt" for near-real-time datasets
+* {**-F**}: Optional flag for specifying a dataset has a valid depth column. Default value is 0
+* {**-N**}: Optional flag for specifying a 'dataless' ingestion or a metadata only ingestion
+
+The {-a} flag can be used if the data is not present on all on-prem servers (Rainier, Rossby, and Mariana), and has to be used if the data is only on the cluster. It can also help speed up the calculation of stats when ingesting metadata to Mariana or Rainier, if you use Rossby as the data_server. Rossby is the fastest on-prem server. 
+
+The {-i} flag is used if you want to display a logo instead of creating a map of the data for the thumbnail on the catalog page. The icon_filename needs to include the file extension, and should reference a logo or icon already saved in /static/mission_icons
+
+The {-F} flag is needed when adding metadata that doesn't include the full dataset in the excel template. When ingesting a template with data in it, the ingestion code checks for the presence of a depth field automatically. The depth flag is needed for the viz page to know which chart types to display. If a large dataset has a "depth" field (which should only be named as such if there are no rows with missing depth values), include **-F 1** in your ingestion command.
+
+
+Metadata Updates
+----------------
+
+There are times when a dataset is already ingested, but updates to the metadata are needed. The **-U** argument will delete all metadata present for the dataset, but will retain the data table. The **-F** depth flag will need to be included if the dataset has depth. All flags related to a DOI will need to be included if the DOI link is not in the dataset_references column of the dataset_meta_data tab.  
