@@ -233,7 +233,9 @@ The get_SSS function formats the date into the necessary day of year format and 
 
 After the retry function is run, the last date that was successfully downloaded is retrieved by checking tblIngestion_Queue, tblProcess_Queue, and max date from the cluster. 
 
+
 .. code-block:: python
+
   def getMaxDate(tbl):
     ## Check tblIngestion_Queue for downloaded but not ingested
     qry = f"SELECT Path from dbo.tblIngestion_Queue WHERE Table_Name = '{tbl}' AND Ingested IS NULL"
@@ -271,7 +273,9 @@ Process SSS Data
 
 The first step of **process_REMSS_SSS_cl1_continuous.py** is to pull the list of all newly downloaded files. The tblProcess_Queue and tblIngestion_Queue tables only live on Rainier, so that server needs to be specified when retrieving the new files ready for processing:
 
+
 .. code-block:: python
+
   qry = f"SELECT Original_Name from tblProcess_Queue WHERE Table_Name = '{tbl}' AND Path IS NULL AND Error_Str IS NULL"
   flist_imp = DB.dbRead(qry,'Rainier')
   flist = flist_imp['Original_Name'].str.strip().to_list()
@@ -284,7 +288,9 @@ A single parquet file is ingested into on-prem servers simultaneously using Pool
 
 The list of original file names is looped through for processing: 
 
+
 .. code-block:: python
+
   for fil in tqdm(flist):
     x = xr.open_dataset(base_folder+fil)
     df_keys = list(x.keys())
