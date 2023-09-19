@@ -25,12 +25,35 @@ Ingesting a dataset submitted through the validator pulls from the final folder 
 Data Storage
 ------------
 
-Both the web application and the data ingestion pipeline share storage over dropbox. With an unlimited account, 
-we can use dropbox to store all our pre-DB data. In addition to dropbox, the **vault/** also is synced on the workstation under:
+Both the web application and the data ingestion pipeline share storage over dropbox. With an unlimited account, we can use dropbox to store all our pre-DB data. In addition to dropbox, the **vault/** also is synced on the workstation under:
 **~/data/CMAP Data Submission Dropbox/Simons CMAP/vault/**
 
-.. note::
-    Ideally this path should be changed to remove any spaces. The hold-up is unlimited account is grandfathered in at its current naming convention. 
+For details on the vault structure, see Jira ticket 329 (https://simonscmap.atlassian.net/browse/CMAP-329)
+
+::
+
+    ├── assimilation
+    ├── r2r_cruise    
+    ├── model
+    ├── observation
+        ├── in-situ
+        │   ├── cruise
+        |   |   |── {table_name}
+        |   |       |── code
+        |   |       |── doc
+        |   |       |── metadata   
+        |   |       |── nrt
+        |   |       |── raw
+        |   |       |── rep
+        |   |       |── stats         
+        │   ├── drifter
+        │   ├── float        
+        │   ├── mixed          
+        │   └── station
+        └── remote
+            └── satellite
+
+
 
 Dropbox's CLI tools are installed on the workstation. Using the selective sync feature of dropbox, the **/vault** stored on disk can be synced with the cloud.
 By reading/writing to disk, IO speeds for data processing should be improved.
@@ -44,7 +67,7 @@ If dropbox has stopped syncing, you can start the CLI by typing in terminal:
 
 
 Workstation Repositories
-------------
+------------------------
 Scripts for new SQL tables and indicies are written to the DB repository found here: **~/Documents/CMAP/DB/**
 
 Python scripts for collection, ingestion, and processing are written to the cmapdata repository found here: **~/Documents/CMAP/cmapdata/**. The dataingest branch contains the most recent updates. 

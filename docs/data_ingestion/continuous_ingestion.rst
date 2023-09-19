@@ -3,7 +3,13 @@ Continuous Ingestion
 
 There are currently 13 datasets processed and ingested continuously. For details on the project, see Jira ticket 688 (https://simonscmap.atlassian.net/browse/CMAP-688)
 
-All near real time (NRT) datasets are only ingested to the cluster. Note that dataset replication can be done across any of our servers. See Jira ticket 582 for details on the distributed dataset project (https://simonscmap.atlassian.net/browse/CMAP-582). The following datasets are downloaded, processed, and ingested utilizing run_cont_ingestion.py
+All near real time (NRT) datasets are only ingested to the cluster. Note that dataset replication can be done across any of our servers. See Jira ticket 582 for details on the distributed dataset project (https://simonscmap.atlassian.net/browse/CMAP-582). The following datasets are downloaded, processed, and ingested utilizing run_cont_ingestion.py. This can run via the terminal:
+
+.. code-block:: console
+
+  cd ~/Documents/CMAP/cmapdata
+  python run_cont_ingestion.py
+
 
 .. list-table:: Datasets Collected and Processed Daily
    :widths: 25 25 50
@@ -161,6 +167,7 @@ The badges and filter call the uspDatasetBadges stored procedure, which in turn 
   select distinct table_name, ci = 1 from tblProcess_Queue 
 	union all
 	select distinct table_name, ci = 1  from tblvariables where Table_Name like 'tblArgo%_REP_%'
+
 
 
 Sea Surface Salinity Walkthrough

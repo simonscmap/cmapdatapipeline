@@ -2,6 +2,7 @@ Workflow
 ========
 
 .. warning::
+   
    Rainier is currently the production database and 'source of truth'. If you want to test features, use Mariana or Rossby. 
 
    
@@ -74,6 +75,7 @@ Once data has been transfered, the next step is any data processing. This should
 In this data processing script, data should be read from the vault /raw folder, cleaned, sorted and inserted into the database(s). 
 
 .. note::
+
    You will need to create a SQL table and add it to the databases prior to ingestion. Any SQL table creation script should be recorded in DB/ (repository is on Simons CMAP github). Adding indexes once the ingestion has completed will likely speed up ingestion.
 
 After the data has been inserted and the indices successfully created, metadata will need to be created and added to the databases. A standard excel template should be used for the dataset and vars metadata sheets. Submit a template to the validator with a dummy data sheet that holds all variables, but only needs one row of data to make it through the validator. This allows the data curation team to run the QC API checks and create the /final folder needed for ingesting the metadata. 
