@@ -25,8 +25,8 @@ Where we have:
 
    python general.py {table_name} {branch} {filename} {-d} {DOI link} {-l} {DOI download link} {-f} {DOI file name} {-S} {server}
 
-* {**branch**}: Branch where dataset should be placed in Vault. Ex's: cruise, float, station, satellite, model, assimilation]
-* {**filename**}: Base file name in vault/staging/combined/. Ex.: 'global_diazotroph_nifH.xlsx'
+* {**branch**}: Branch where dataset should be placed in Vault. Ex's: cruise, float, station, satellite, model, assimilation
+* {**filename**}: Base file name in Apps/Simons CMAP Web Data Submission/dataset_shortname/final. Ex.: 'global_diazotroph_nifH.xlsx'
 * {**-d**}: Optional flag for including DOI with dataset in tblReferences. DOI link string follows flag arg. 
 * {**DOI link**}: String for full web address of CMAP specific DOI. Ex. "https://doi.org/10.5281/zenodo.8306724"
 * {**-l**}: Optional flag for including the DOI download link in tblDataset_DOI_Download. DOI dowload link string follows flag. 

@@ -42,7 +42,7 @@ All post-ingestion tests are run when the ingestion server is Rainier. As Rainie
 
 **compareDOI** downloads a CMAP template from a DOI link and checks the data against what is in SQL. Checks numeric columns with math.isclose() as the number of significant digits can change on import. Deletes downloaded template after checks.
 
-**pycmapChecks** calls various pycmap functions. Skips tests on stats if the dataset is larger than 2 million rows (included to stop SELECT * FROM running on the cluster, specifically for Argo). Note: due to a 
+**pycmapChecks** calls various pycmap functions. Skips tests on stats if the dataset is larger than 2 million rows (included to stop SELECT * FROM running on the cluster, specifically for Argo). Note: due to a server-side cache of the dataset IDs, it's possible the pycmap tests will fail if the cache has not reset after ingestion.
 
 **fullIngestPostChecks** runs all checks listed above, with the optional argument to check the DOI data. Also runs **api_checks.postIngestAPIChecks()** on every 10th dataset (see DB API Endpoints below for details on this). This is called in **general.py** with each ingestion to Rainier.
 
