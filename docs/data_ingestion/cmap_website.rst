@@ -12,9 +12,9 @@ The functionality on the catalog page relies on multiple core tables.
 * The download data dialog populates the subset values from tblDataset_Stats.
 
 
-.. figure:: ../_static/catlog_page.png
+.. figure:: ../_static/catalog_page.png
    :scale: 70 %
-   :alt: CMAP Catalog Web Page
+
 
 
 The top of the dataset page uses a stored procedure to join data from three core SQL tables: 
