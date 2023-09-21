@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>collect &mdash; cmapdata 0.0.1 documentation</title>
+  <title>collect &mdash; cmapdata 0.1.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -14,7 +14,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../_static/documentation_options.js?v=01f34227"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -55,16 +55,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/data_validation.html">Data Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/continuous_ingestion.html">Continuous Ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="DB.html">DB</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">collect</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#relation-to-vault">relation to vault</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#collection-strategies">collection strategies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ftp-servers">FTP Servers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#zipped-file-links">Zipped File Links</a></li>
@@ -123,9 +126,6 @@
 <p>This submodule contains various scripts for collecting outside data. Methods include FTP, curl, wget and others.
 Scripts are usually one-off and are a record of the method used to collect the data.
 They are organized hierarchically in a similar fashion to <strong>/vault</strong>.</p>
-<section id="relation-to-vault">
-<h2>relation to vault<a class="headerlink" href="#relation-to-vault" title="Link to this heading"></a></h2>
-<p>In the vault_structure, a top level folder is named <strong>collected_data/</strong>. This</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── assimilation
 ├── model
 ├── observation
@@ -141,7 +141,6 @@ They are organized hierarchically in a similar fashion to <strong>/vault</strong
         └── satellite
 </pre></div>
 </div>
-</section>
 <section id="collection-strategies">
 <h2>collection strategies<a class="headerlink" href="#collection-strategies" title="Link to this heading"></a></h2>
 <p>The oceanography data in CMAP comes from multiple sources which vary in the amount of data processing required and available metadata.
@@ -176,7 +175,7 @@ it is a good idea to still create a collect_datasetname.py file with the zipped 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, Norland Raphael Hagen.</p>
+    <p>&#169; Copyright 2023, Diana Haring.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

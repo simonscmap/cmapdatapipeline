@@ -20,11 +20,11 @@ sys.path.insert(0, os.path.abspath("../ingest/"))
 # -- Project information -----------------------------------------------------
 
 project = "cmapdata"
-copyright = "2021, Norland Raphael Hagen"
-author = "Norland Raphael Hagen"
+copyright = "2023, Diana Haring"
+author = "Diana Haring"
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.1"
+release = "0.1.0"
 
 
 # -- General configuration ---------------------------------------------------
