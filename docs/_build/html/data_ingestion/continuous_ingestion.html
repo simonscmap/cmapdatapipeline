@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Continuous Ingestion &mdash; cmapdata 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="User Submitted Dataset Walkthrough" href="gallery_examples/user_submitted_dataset_walkthrough.html" />
+    <link rel="prev" title="Data Validation" href="data_validation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmapdata
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installation and Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/database_design.html">Database Design and Table Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/compute_and_storage.html">Compute Resources and Data Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/pitfalls.html">Pitfalls</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dataset Ingestion Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="web_validator.html">Web Validator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_validation.html">Data Validation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Continuous Ingestion</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#collection-scripts">Collection Scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#process-scripts">Process Scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#batch-ingestion">Batch Ingestion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#continuous-ingestion-badge-on-website">Continuous Ingestion Badge on Website</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sea-surface-salinity-walkthrough">Sea Surface Salinity Walkthrough</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#download-sss-data">Download SSS Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#process-sss-data">Process SSS Data</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/DB.html">DB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/collect.html">collect</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/process.html">process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/ingest.html">ingest</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Future Improvements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../future/code_changes.html">Code Changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Ref</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_common.html">API Ref common.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_cruise.html">API Ref cruise.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_data.html">API Ref data.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_DB.html">API Ref DB.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_general.html">API Ref general.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_mapping.html">API Ref mapping.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_metadata.html">API Ref metadata.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_region_classifcation.html">API/API_region_classification.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_SQL.html">API Ref SQL.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_stats.html">API Ref stats.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_transfer.html">API Ref transfer.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_vault_structure.html">API Ref vault_structure.py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmapdata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Continuous Ingestion</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/data_ingestion/continuous_ingestion.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="continuous-ingestion">
+<h1>Continuous Ingestion<a class="headerlink" href="#continuous-ingestion" title="Link to this heading"></a></h1>
+<p>There are currently 13 datasets processed and ingested continuously. For details on the project, see Jira ticket 688 (<a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-688">https://simonscmap.atlassian.net/browse/CMAP-688</a>)</p>
+<p>All near real time (NRT) datasets are only ingested to the cluster. Note that dataset replication can be done across any of our servers. See Jira ticket 582 for details on the distributed dataset project (<a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-582">https://simonscmap.atlassian.net/browse/CMAP-582</a>). The following datasets are downloaded, processed, and ingested utilizing run_cont_ingestion.py. This can run via the terminal:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cd ~/Documents/CMAP/cmapdata</span>
+<span class="go">python run_cont_ingestion.py</span>
+</pre></div>
+</div>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Datasets Collected and Processed Daily</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Dataset</p></th>
+<th class="head"><p>Target Servers</p></th>
+<th class="head"><p>New Data Available</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Sattelite SST</p></td>
+<td><p>Rainier, Mariana, Rossby, Cluster</p></td>
+<td><p>Daily</p></td>
+</tr>
+<tr class="row-odd"><td><p>Satellite SSS</p></td>
+<td><p>Rainier, Mariana, Rossby, Cluster</p></td>
+<td><p>Daily, ~2 week lag</p></td>
+</tr>
+<tr class="row-even"><td><p>Satellite CHL</p></td>
+<td><p>Mariana, Rossby, Cluster</p></td>
+<td><p>~Weekly, ~2 month lag</p></td>
+</tr>
+<tr class="row-odd"><td><p>Satellite CHL NRT</p></td>
+<td><p>Cluster</p></td>
+<td><p>~Weekly</p></td>
+</tr>
+<tr class="row-even"><td><p>Satellite POC</p></td>
+<td><p>Mariana, Rossby, Cluster</p></td>
+<td><p>~Weekly, ~2 month lag</p></td>
+</tr>
+<tr class="row-odd"><td><p>Satellite POC NRT</p></td>
+<td><p>Cluster</p></td>
+<td><p>~Weekly</p></td>
+</tr>
+<tr class="row-even"><td><p>Satellite AOD</p></td>
+<td><p>Mariana, Rossby, Cluster</p></td>
+<td><p>Monthly</p></td>
+</tr>
+<tr class="row-odd"><td><p>Satellite Altimetry NRT (Signal)</p></td>
+<td><p>Cluster</p></td>
+<td><p>Daily</p></td>
+</tr>
+<tr class="row-even"><td><p>Satellite Altimetry (Signal)</p></td>
+<td><p>Mariana, Rossby, Cluster</p></td>
+<td><p>~4x a year</p></td>
+</tr>
+<tr class="row-odd"><td><p>Satellite PAR (Daily)</p></td>
+<td><p>Cluster</p></td>
+<td><p>Daily, ~1 month lag</p></td>
+</tr>
+<tr class="row-even"><td><p>Satellite PAR NRT (Daily)</p></td>
+<td><p>Cluster</p></td>
+<td><p>Daily</p></td>
+</tr>
+</tbody>
+</table>
+<p>Each dataset has a collect and process script.</p>
+<section id="collection-scripts">
+<h2>Collection Scripts<a class="headerlink" href="#collection-scripts" title="Link to this heading"></a></h2>
+<p>Collection scripts can be found in cmapdata/collect/model and in cmapdata/collect/sat within the dataingest branch of the GitHub repository (<a class="reference external" href="https://github.com/simonscmap/cmapdata">https://github.com/simonscmap/cmapdata</a>). Each dataset (with the exception of Argo) adds an entry per file downloaded to tblProcess_Queue.</p>
+<p><strong>tblProcess_Queue</strong> contains information for each file downloaded for continuous ingestion. It holds the original naming convention for each file, the file’s relative path in the vault, the table name it will be ingested to, the date and time it was downloaded and processed, and a column to take note of download errors.</p>
+<ul class="simple">
+<li><p>ID</p></li>
+<li><p>Original_Name</p></li>
+<li><p>Path</p></li>
+<li><p>Table_Name</p></li>
+<li><p>Downloaded</p></li>
+<li><p>Processed</p></li>
+<li><p>Error_Str</p></li>
+</ul>
+<p>Each collection script does the following:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Retries download for any file previously attempted that includes and error message</p></li>
+<li><p>Get the date of the last succesful download</p></li>
+<li><p>Attempts to download the next available date range. Start and end dates are specific to each dataset’s temporal resolution and new data availability (see New Data Available column in table above)</p></li>
+<li><p>Entries for each date a download is attempted for are writted to tblProcess_Queue, with successful downloads denoted by a NULL Error_Str</p></li>
+</ol>
+</div></blockquote>
+<p>Dataset-specific logic:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>tblPisces_Forecast_cl1 updates the data on a rolling schedule. Each week new data is available, and ~2 weeks of previous data is overwritten by the data producer. GetCMEMS_NRT_MERCATOR_PISCES_continuous.py will re-download these files, and if successfully downloaded, will delete the existing data for that day from the cluster. Simply creating new parquet files and pushing to S3 does not update the data in the cluster, so it is necessary to delete the data first.</p></li>
+<li><p>The NRT datasets should not overlap with the matching REP datasets. For example, when new data is successfully ingested for tblModis_PAR_cl1, data for that date is deleted from tblModis_PAR_NRT.</p></li>
+<li><p>A successful download for one day of tblWind_NRT_hourly data results in 24 files. An additional check is in place when finding the last successful date downloaded by including there need to be 24 files for that date. If it is less than 24, it will retry downloading that date.</p></li>
+<li><p>Data for tblAltimetry_REP_Signal is updated by the data provider sporadically throughout the year. New data is checked weekly. Date range for downloads is based on latest files in the FTP server. See /collect/sat/CMEMS/GetCMEMS_REP_ALT_SIGNAL_continuous.py for details.</p></li>
+</ol>
+</div></blockquote>
+<p>If a file download is attempted but fails because no data is available yet, the Original_Name will be the date where data wasn’t available (ex. “2023_08_09”) and the Error_Str will be populated. Each collection script has a retryError function that queries dbo.tblProcess_Queue for any entries where Error_Str is not null. If a file is successfully downloaded on a retry, tblProcess_Queue will be updated with the original file name and date of successful download.</p>
+</section>
+<section id="process-scripts">
+<h2>Process Scripts<a class="headerlink" href="#process-scripts" title="Link to this heading"></a></h2>
+<p>Each process script does the following:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Pulls newly downloaded files from tblProcess_Queue where Error_Str is NULL.</p></li>
+<li><p>Does a schema check on the new downloaded file against the oldest NetCDF in the vault</p></li>
+<li><p>Processes file and adds climatology fields (year, month, week, dayofyear)</p></li>
+<li><p>Does a schema check on the processed file against the oldest parquet file in the vault</p></li>
+<li><p>Ingests to on-prem servers (see Target Servers column in table above)</p></li>
+<li><p>Copies parquet file to S3 bucket for ingestion to the cluster</p></li>
+<li><p>Updates Processed column in tblProcess_Queue</p></li>
+<li><p>Adds new entry to tblIngestion_Queue</p></li>
+</ol>
+</div></blockquote>
+<p><strong>tblIngestion_Queue</strong> contains information for each file processed for continuous ingestion. It holds the file’s relative path in the vault, the table name it will be ingested to, the date and time it was moved to S3 (Staged), and the date and time it was added to the cluster (Started and Ingested).</p>
+<ul class="simple">
+<li><p>ID</p></li>
+<li><p>Path</p></li>
+<li><p>Table_Name</p></li>
+<li><p>Staged</p></li>
+<li><p>Started</p></li>
+<li><p>Ingested</p></li>
+</ul>
+<p>Once all new files have been processed from tblProcess_Queue and added to tblIngestion_Queue, trigger the ingestion API. The URL is saved in ingest/credentials.py as S3_ingest. It is best to only trigger the ingestion API once, which is why the snippet below is run after files for all datasets have been processed. See Jira ticket 688 for additional details: (<a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-688">https://simonscmap.atlassian.net/browse/CMAP-688</a>)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cr</span><span class="o">.</span><span class="n">S3_ingest</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After all files have successfully ingested to the cluster (Ingested will be filled with the date and time it was completed), each dataset will need updates to tblDataset_Stats. In run_cont_ingestion.py, updateCIStats(tbl) formats the min and max times to ensure the download subsetting and viz page works properly. In short, time must be included, along with the ‘.000Z’ suffix.</p>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
+<p>Occasionally datasets will have days missing, resulting in a date being retried on each new run of run_cont_ingestion.py. In some cases, data will never be provided for these dates. This information can be found in the documentation provided by each data provider. For example, the SMAP instrument used for SSS data experienced downtime between Aug 6 - Sept 23 2022 (see Missing Data section: <a class="reference external" href="https://remss.com/missions/smap/salinity/">https://remss.com/missions/smap/salinity/</a>). That date range was deleted from tblProcess_Queue to prevent those dates from being rechecked each run.</p>
+<p>If there are known issues of data already ingested that the data producer has fixed, the entry for the impacted dates should be deleted from tblProcess_Queue and tblIngestion_Queue and redownloaded. Data should be delete from impacted on-prem servers and the cluster as applicable before reingestion.</p>
+<p>Each dataset’s processing script has checks for changes in schema. Some data providers will change the dataset name when a new version is processed, but not all. If a processing script finds a schema change for a dataset that has the same name / ID / version number, a new dataset should be made in CMAP with a suffix denoting a new change log iteration. For example, tblModis_CHL_cl1 is a reprocessed version of tblModis_CHL.</p>
+</section>
+<section id="batch-ingestion">
+<h2>Batch Ingestion<a class="headerlink" href="#batch-ingestion" title="Link to this heading"></a></h2>
+<p>The following datasets are to be ingested monthly. Due to the nature of updates done by the data provider, each month of Argo is a new dataset. These datasets will be ingested via batch ingestion instead of appending to existing tables like the datasets described above. See the outside large dataset walkthrough for details on Argo processing.</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Datasets Collected and Processed Monthly</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Dataset</p></th>
+<th class="head"><p>Target Servers</p></th>
+<th class="head"><p>New Data Available</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Argo REP Core</p></td>
+<td><p>Cluster</p></td>
+<td><p>Monthly</p></td>
+</tr>
+<tr class="row-odd"><td><p>Argo REP BGC</p></td>
+<td><p>Cluster</p></td>
+<td><p>Monthly</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="continuous-ingestion-badge-on-website">
+<h2>Continuous Ingestion Badge on Website<a class="headerlink" href="#continuous-ingestion-badge-on-website" title="Link to this heading"></a></h2>
+<p>The CMAP Catalog page includes a filter for Continuously Updated datasets and displays badges for each applicable dataset.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="../_images/CI_screenshot.png"><img alt="CMAP Catalog Continuous Ingestion Filter" src="../_images/CI_screenshot.png" style="width: 918.4px; height: 445.2px;" /></a>
+</figure>
+<p>The badges and filter call the uspDatasetBadges stored procedure, which in turn calls the udfDatasetBadges() function. As Argo datasets are a batch ingestion, they are not included in tblProcess_Queue. In order to have the badges display for Argo datasets, a union was done for any Argo REP table, regardless of month.</p>
+<div class="highlight-SQL notranslate"><div class="highlight"><pre><span></span><span class="k">select</span><span class="w"> </span><span class="k">distinct</span><span class="w"> </span><span class="k">table_name</span><span class="p">,</span><span class="w"> </span><span class="n">ci</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">tblProcess_Queue</span>
+<span class="w">      </span><span class="k">union</span><span class="w"> </span><span class="k">all</span>
+<span class="w">      </span><span class="k">select</span><span class="w"> </span><span class="k">distinct</span><span class="w"> </span><span class="k">table_name</span><span class="p">,</span><span class="w"> </span><span class="n">ci</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w">  </span><span class="k">from</span><span class="w"> </span><span class="n">tblvariables</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="k">Table_Name</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="s1">&#39;tblArgo%_REP_%&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="sea-surface-salinity-walkthrough">
+<h2>Sea Surface Salinity Walkthrough<a class="headerlink" href="#sea-surface-salinity-walkthrough" title="Link to this heading"></a></h2>
+<p>There are two version of Sea Surface Salinity (SSS) data. For details on the differences see Jira ticket 754 (<a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-754">https://simonscmap.atlassian.net/browse/CMAP-754</a>). Continuous ingestion downloads the REMSS SMAP data. The previous version of SSS data in CMAP was collected from V4.0 provided by REMSS. The updates in the V5.0 release recalculated historic data (details can be found here: <a class="reference external" href="https://remss.com/missions/smap/salinity/">https://remss.com/missions/smap/salinity/</a>), which meant we could no longer append new data to the existing table.</p>
+<p>Due to the release of V5.0, a new table was made with a “change log” suffix of 1. New SSS data is currently ingested into <strong>tblSSS_NRT_cl1</strong>. The tblSSS_NRT table can be retired and removed from the databases after users have been notified via a news update on the homepage. A typical wait time has been one month after publishing a news story before a dataset can be removed.</p>
+<section id="download-sss-data">
+<h3>Download SSS Data<a class="headerlink" href="#download-sss-data" title="Link to this heading"></a></h3>
+<p>The data is downloaded using wget, calling the data.remss URL with the year and day of year of the data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">file_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://data.remss.com/smap/SSS/V05.0/FINAL/L3/8day_running/</span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1">/RSS_smap_SSS_L3_8day_running_</span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">dayn_str</span><span class="si">}</span><span class="s1">_FNL_V05.0.nc&#39;</span>
+</pre></div>
+</div>
+<p>As with each continuously ingested dataset, there is a function to retry any previous dates that resulted in an error. Errors are generated by either a successful, but empty download, or a failed download attempt.</p>
+<p>The first function run in the <strong>GetREMSS_SSS_cl1_continuous.py</strong> script is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">retryError</span><span class="p">(</span><span class="n">tbl</span><span class="p">):</span>
+    <span class="n">qry</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT Original_Name from dbo.tblProcess_Queue WHERE Table_Name = &#39;</span><span class="si">{</span><span class="n">tbl</span><span class="si">}</span><span class="s2">&#39; AND Error_Str IS NOT NULL&quot;</span>
+    <span class="n">df_err</span> <span class="o">=</span> <span class="n">DB</span><span class="o">.</span><span class="n">dbRead</span><span class="p">(</span><span class="n">qry</span><span class="p">,</span> <span class="s1">&#39;Rainier&#39;</span><span class="p">)</span>
+    <span class="n">dt_list</span> <span class="o">=</span> <span class="n">df_err</span><span class="p">[</span><span class="s1">&#39;Original_Name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt_list</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="n">dt_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s1">&#39;%Y_%m_</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dt_list</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">dt_list</span><span class="p">:</span>
+            <span class="n">get_SSS</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This function checks tblProcess_Queue for any previous errors and runs a retry on the download.</p>
+<p>The get_SSS function formats the date into the necessary day of year format and attempts a download via wget. If the download is a retry, the entry for that date in tblProcess_Queue will be updated with the original file name and the date of the successful download. If the download is not a retry, a new entry will be added to tblProcess_Queue. If any failure occurs, the error_str will be populated and the original file name will be populated with the date of the data that failed to download (ie “2023_08_26”). This string is converted to a date for future retries.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_SSS</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">retry</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">yr</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">year</span>
+    <span class="n">dayn</span> <span class="o">=</span> <span class="nb">format</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="s2">&quot;%j&quot;</span><span class="p">)</span>
+    <span class="n">dayn_str</span> <span class="o">=</span> <span class="n">dayn</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">file_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://data.remss.com/smap/SSS/V05.0/FINAL/L3/8day_running/</span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1">/RSS_smap_SSS_L3_8day_running_</span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">dayn_str</span><span class="si">}</span><span class="s1">_FNL_V05.0.nc&#39;</span>
+    <span class="n">save_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">vs</span><span class="o">.</span><span class="n">satellite</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tbl</span><span class="si">}</span><span class="s1">/raw/RSS_smap_SSS_L3_8day_running_</span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">dayn_str</span><span class="si">}</span><span class="s1">_FNL_V05.0.nc&#39;</span>
+    <span class="n">wget_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;wget --no-check-certificate &quot;</span><span class="si">{</span><span class="n">file_url</span><span class="si">}</span><span class="s1">&quot; -O &quot;</span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">wget_str</span><span class="p">)</span>
+        <span class="n">Error_Date</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y_%m_</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">Original_Name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;RSS_smap_SSS_L3_8day_running_</span><span class="si">{</span><span class="n">yr</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">dayn_str</span><span class="si">}</span><span class="s1">_FNL_V05.0.nc&#39;</span>
+            <span class="c1">## Remove empty downloads</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;empty download for </span><span class="si">{</span><span class="n">Error_Date</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">retry</span><span class="p">:</span>
+                <span class="n">metadata</span><span class="o">.</span><span class="n">tblProcess_Queue_Download_Insert</span><span class="p">(</span><span class="n">Error_Date</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="s1">&#39;Opedia&#39;</span><span class="p">,</span> <span class="s1">&#39;Rainier&#39;</span><span class="p">,</span><span class="s1">&#39;Download Error&#39;</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">retry</span><span class="p">:</span>
+                <span class="n">metadata</span><span class="o">.</span><span class="n">tblProcess_Queue_Download_Error_Update</span><span class="p">(</span><span class="n">Error_Date</span><span class="p">,</span> <span class="n">Original_Name</span><span class="p">,</span>  <span class="n">tbl</span><span class="p">,</span> <span class="s1">&#39;Opedia&#39;</span><span class="p">,</span> <span class="s1">&#39;Rainier&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successful retry for </span><span class="si">{</span><span class="n">Error_Date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">metadata</span><span class="o">.</span><span class="n">tblProcess_Queue_Download_Insert</span><span class="p">(</span><span class="n">Original_Name</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="s1">&#39;Opedia&#39;</span><span class="p">,</span> <span class="s1">&#39;Rainier&#39;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No file found for date: &quot;</span> <span class="o">+</span> <span class="n">Error_Date</span> <span class="p">)</span>
+        <span class="n">metadata</span><span class="o">.</span><span class="n">tblProcess_Queue_Download_Insert</span><span class="p">(</span><span class="n">Error_Date</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="s1">&#39;Opedia&#39;</span><span class="p">,</span> <span class="s1">&#39;Rainier&#39;</span><span class="p">,</span><span class="s1">&#39;No data&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After the retry function is run, the last date that was successfully downloaded is retrieved by checking tblIngestion_Queue, tblProcess_Queue, and max date from the cluster.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">getMaxDate</span><span class="p">(</span><span class="n">tbl</span><span class="p">):</span>
+  <span class="c1">## Check tblIngestion_Queue for downloaded but not ingested</span>
+  <span class="n">qry</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT Path from dbo.tblIngestion_Queue WHERE Table_Name = &#39;</span><span class="si">{</span><span class="n">tbl</span><span class="si">}</span><span class="s2">&#39; AND Ingested IS NULL&quot;</span>
+  <span class="n">df_ing</span> <span class="o">=</span> <span class="n">DB</span><span class="o">.</span><span class="n">dbRead</span><span class="p">(</span><span class="n">qry</span><span class="p">,</span> <span class="s1">&#39;Rainier&#39;</span><span class="p">)</span>
+  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_ing</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">qry</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT max(path) mx from dbo.tblIngestion_Queue WHERE Table_Name = &#39;</span><span class="si">{</span><span class="n">tbl</span><span class="si">}</span><span class="s2">&#39; AND Ingested IS NOT NULL&quot;</span>
+      <span class="n">mx_path</span> <span class="o">=</span> <span class="n">DB</span><span class="o">.</span><span class="n">dbRead</span><span class="p">(</span><span class="n">qry</span><span class="p">,</span><span class="s1">&#39;Rainier&#39;</span><span class="p">)</span>
+      <span class="n">path_date</span> <span class="o">=</span> <span class="n">mx_path</span><span class="p">[</span><span class="s1">&#39;mx&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.parquet&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">tbl</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+      <span class="n">yr</span><span class="p">,</span> <span class="n">mo</span><span class="p">,</span> <span class="n">day</span> <span class="o">=</span> <span class="n">path_date</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+      <span class="n">max_path_date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">yr</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">mo</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">day</span><span class="p">))</span>
+      <span class="n">qry</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT max(original_name) mx from dbo.tblProcess_Queue WHERE Table_Name = &#39;</span><span class="si">{</span><span class="n">tbl</span><span class="si">}</span><span class="s2">&#39; AND Error_str IS NOT NULL&quot;</span>
+      <span class="n">mx_name</span> <span class="o">=</span> <span class="n">DB</span><span class="o">.</span><span class="n">dbRead</span><span class="p">(</span><span class="n">qry</span><span class="p">,</span><span class="s1">&#39;Rainier&#39;</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">mx_name</span><span class="p">[</span><span class="s1">&#39;mx&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+          <span class="n">max_name_date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">1900</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+          <span class="n">yr</span><span class="p">,</span> <span class="n">mo</span><span class="p">,</span> <span class="n">day</span> <span class="o">=</span> <span class="n">mx_name</span><span class="p">[</span><span class="s1">&#39;mx&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+          <span class="n">max_name_date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">yr</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">mo</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">day</span><span class="p">))</span>
+      <span class="n">max_data_date</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">maxDateCluster</span><span class="p">(</span><span class="n">tbl</span><span class="p">)</span>
+      <span class="n">max_date</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">max_path_date</span><span class="p">,</span><span class="n">max_name_date</span><span class="p">,</span><span class="n">max_data_date</span><span class="p">])</span>
+  <span class="k">else</span><span class="p">:</span>
+      <span class="n">last_path</span> <span class="o">=</span> <span class="n">df_ing</span><span class="p">[</span><span class="s1">&#39;Path&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+      <span class="n">path_date</span> <span class="o">=</span> <span class="n">last_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.parquet&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="n">tbl</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+      <span class="n">yr</span><span class="p">,</span> <span class="n">mo</span><span class="p">,</span> <span class="n">day</span> <span class="o">=</span> <span class="n">path_date</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+      <span class="n">max_date</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">yr</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">mo</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">day</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">max_date</span>
+</pre></div>
+</div>
+<p>The date range to check data for is specific to each dataset depending on the temporal scale and typical delay in new data availability from the data producer. For SSS data from REMSS, there is a NetCDF file for each day (timedelta(days=1)), and new data is generally available on a two week delay.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If new data has not been published by REMSS for a month or so, emailing their support account (<a class="reference external" href="mailto:support&#37;&#52;&#48;remss&#46;com">support<span>&#64;</span>remss<span>&#46;</span>com</a>) has been helpful to restart their processing job.</p>
+</div>
+</section>
+<section id="process-sss-data">
+<h3>Process SSS Data<a class="headerlink" href="#process-sss-data" title="Link to this heading"></a></h3>
+<p>The first step of <strong>process_REMSS_SSS_cl1_continuous.py</strong> is to pull the list of all newly downloaded files. The tblProcess_Queue and tblIngestion_Queue tables only live on Rainier, so that server needs to be specified when retrieving the new files ready for processing:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">qry</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT Original_Name from tblProcess_Queue WHERE Table_Name = &#39;</span><span class="si">{</span><span class="n">tbl</span><span class="si">}</span><span class="s2">&#39; AND Path IS NULL AND Error_Str IS NULL&quot;</span>
+<span class="n">flist_imp</span> <span class="o">=</span> <span class="n">DB</span><span class="o">.</span><span class="n">dbRead</span><span class="p">(</span><span class="n">qry</span><span class="p">,</span><span class="s1">&#39;Rainier&#39;</span><span class="p">)</span>
+<span class="n">flist</span> <span class="o">=</span> <span class="n">flist_imp</span><span class="p">[</span><span class="s1">&#39;Original_Name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The schema of the newly downloaded NetCDF is compared against the oldest NetCDF in the vault. If any new columns are added or renamed, the processing will exit and the data will not be ingested. After the NetCDF has gone through all the processing steps, the schema of the finalized parquet file is checked against the oldest parquet file in the vault. Again, if there are any differences the processing will exit and the data will not be ingested. This logic is present in all continuously ingested (CI) datasets. Additional steps done for all CI datasets include: adding climatology columns, updating tblProcessQueue with processing datetime, saving parquet file to vault, pushing parquet from vault to S3 bucket, and adding a new entry to tblIngestion_Queue.</p>
+<p>Processing logic specific to SSS includes: pulling time from NetCDF coordinate, extracting single variable from NetCDF (sss_smap), and mapping longitude from 0, 360 to -180, 180. Because SSS data is frequently accessed, it is ingested into all on-prem servers, as well as the cluster.</p>
+<p>A single parquet file is ingested into on-prem servers simultaneously using Pool. The current BCP wrapper creates a temporary csv file with the table name and server name in it, to allow for multiple ingestions at once. The multiprocessing is not done on multiple files for the same dataset across servers as the current file naming convention could cause clashes if overwritten.</p>
+<p>The list of original file names is looped through for processing:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">fil</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">flist</span><span class="p">):</span>
+  <span class="n">x</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">base_folder</span><span class="o">+</span><span class="n">fil</span><span class="p">)</span>
+  <span class="n">df_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+  <span class="n">df_dims</span> <span class="o">=</span>  <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">df_keys</span> <span class="o">!=</span> <span class="n">test_keys</span> <span class="ow">or</span> <span class="n">df_dims</span><span class="o">!=</span> <span class="n">test_dims</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Check columns in </span><span class="si">{</span><span class="n">fil</span><span class="si">}</span><span class="s2">. New: </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span><span class="si">}</span><span class="s2">, Old: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+  <span class="n">x_time</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;sss_smap&#39;</span><span class="p">]</span>
+  <span class="n">df_raw</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+  <span class="n">df_raw</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_time</span>
+  <span class="n">x</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+  <span class="n">df</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">add_day_week_month_year_clim</span><span class="p">(</span><span class="n">df_raw</span><span class="p">)</span>
+  <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span><span class="s1">&#39;sss_smap&#39;</span><span class="p">,</span><span class="s1">&#39;year&#39;</span><span class="p">,</span><span class="s1">&#39;month&#39;</span><span class="p">,</span><span class="s1">&#39;week&#39;</span><span class="p">,</span><span class="s1">&#39;dayofyear&#39;</span><span class="p">]]</span>
+  <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="s2">&quot;lat&quot;</span><span class="p">,</span><span class="s2">&quot;lon&quot;</span><span class="p">],</span> <span class="n">ascending</span> <span class="o">=</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span><span class="kc">True</span><span class="p">))</span>
+  <span class="n">df</span> <span class="o">=</span> <span class="n">dc</span><span class="o">.</span><span class="n">mapTo180180</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="o">!=</span> <span class="n">test_dtype</span><span class="p">:</span>
+      <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Check data types in </span><span class="si">{</span><span class="n">fil</span><span class="si">}</span><span class="s2">. New: </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+      <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+  <span class="n">fil_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fil</span><span class="p">)</span>
+  <span class="n">fil_date</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y_%m_</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+  <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">nrt_folder</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;vault/&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="si">}{</span><span class="n">tbl</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">fil_date</span><span class="si">}</span><span class="s2">.parquet&quot;</span>
+  <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">nrt_folder</span><span class="si">}{</span><span class="n">tbl</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">fil_date</span><span class="si">}</span><span class="s2">.parquet&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+  <span class="n">metadata</span><span class="o">.</span><span class="n">tblProcess_Queue_Process_Update</span><span class="p">(</span><span class="n">fil_name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="s1">&#39;Opedia&#39;</span><span class="p">,</span> <span class="s1">&#39;Rainier&#39;</span><span class="p">)</span>
+  <span class="n">s3_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;aws s3 cp </span><span class="si">{</span><span class="n">tbl</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">fil_date</span><span class="si">}</span><span class="s2">.parquet s3://cmap-vault/observation/remote/satellite/</span><span class="si">{</span><span class="n">tbl</span><span class="si">}</span><span class="s2">/nrt/&quot;</span>
+  <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">s3_str</span><span class="p">)</span>
+  <span class="n">metadata</span><span class="o">.</span><span class="n">tblIngestion_Queue_Staged_Update</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">tbl</span><span class="p">,</span> <span class="s1">&#39;Opedia&#39;</span><span class="p">,</span> <span class="s1">&#39;Rainier&#39;</span><span class="p">)</span>
+  <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="p">,</span><span class="n">df</span><span class="p">,</span><span class="n">df</span><span class="p">]</span>
+  <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="n">tbl</span><span class="p">,</span><span class="n">tbl</span><span class="p">,</span><span class="n">tbl</span><span class="p">]</span>
+  <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mariana&#39;</span><span class="p">,</span><span class="s1">&#39;rossby&#39;</span><span class="p">,</span><span class="s1">&#39;rainier&#39;</span><span class="p">]</span>
+  <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">DB</span><span class="o">.</span><span class="n">toSQLbcp_wrapper</span><span class="p">,</span> <span class="nb">zip</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">))</span>
+      <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+      <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Norland Raphael Hagen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -59,9 +59,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/data_validation.html">Data Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/continuous_ingestion.html">Continuous Ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
@@ -118,14 +122,14 @@
   <section id="database-design-and-table-structure">
 <h1>Database Design and Table Structure<a class="headerlink" href="#database-design-and-table-structure" title="Link to this heading"></a></h1>
 <figure class="align-default" id="id1">
-<img alt="CMAP DB metadata specific table database diagram" src="../_images/DB_diagram.png" />
+<img alt="CMAP DB metadata specific table database diagram" src="../_images/SQL_diagram.png" />
 <figcaption>
 <p><span class="caption-text">CMAP DB metadata specific table database diagram</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>Simons CMAP currently has three servers that contain near replicates of the SQL Server database. The names of these three are: Rainier, Mariana and Rossby.
 Rainier was the first dedicated server to host the database and currently serves as the main ‘source of truth’.</p>
-<p>In addition to the three SQL Servers there is a a Spark SQL Warehouse cluster with Apache Hive ANSI SQL:2003 interface. Its alias is: Cluster. This is used for large datasets (i.e. satellite data and Darwin) or continuously updated datasets (i.e. Argo data).</p>
+<p>In addition to the three SQL Servers there is a a Spark SQL Warehouse cluster with Apache Hive ANSI SQL:2003 interface. Its alias is: Cluster. This is used for large datasets (i.e. satellite data and Darwin) or large, continuously updated datasets (i.e. Argo data).</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Rainier is currently the production database and ‘source of truth’. If you want to test features, use Mariana or Rossby.</p>
@@ -167,14 +171,23 @@ Each data variable in a dataset has a row in this table, containing the followin
 <li><p>Conversion_Coefficient</p></li>
 <li><p>Has_Depth</p></li>
 </ul>
+<p><strong>tblOrganism</strong> contains the organism name and the Organism_ID connects to Org_ID in tblVariables for a variable describing organism abundance. Additional tables related to the organism identification project are: <strong>tblOrgTaxon</strong>, <strong>tblOrgTrophic_Level</strong>, <strong>tblOrgSubtrophics</strong>, <strong>tblOrgTrophics</strong>, <strong>tblOrgSize_Image_Bigelow</strong>, <strong>tblOrgFunctional_Group_WORMS</strong>, <strong>tblOrgParaphyletic_Group_WORMS</strong>, <strong>tblOrgUnicellularity_WORMS</strong>. Details on the project can be found in Jira Epic 8 (<a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-8">https://simonscmap.atlassian.net/browse/CMAP-8</a>)</p>
 <p><strong>tblKeywords</strong> contains user submitted keywords used in the searching of a variable.
 tblKeywords contains an ID column, where each value which corresponds to a unique variable entry in tblVariables.</p>
 <ul class="simple">
 <li><p>var_ID</p></li>
 <li><p>keywords</p></li>
 </ul>
-<p><strong>tblTemporal_Resolution</strong>, <strong>tblSpatial_Resolution</strong>, <strong>tblMake</strong>, <strong>tblSensor</strong>, <strong>tblProcess_Stages</strong>, <strong>tblStudy_Domains</strong>, and <strong>tblVariables_JSON_Metadata</strong> are all
-variable level tables that contain links between the ID’s in tblVariables and their respective tables.</p>
+<p><strong>tblTemporal_Resolution</strong>, <strong>tblSpatial_Resolution</strong>, <strong>tblMake</strong>, <strong>tblSensor</strong>, <strong>tblProcess_Stages</strong>, and <strong>tblStudy_Domains</strong> are all variable level tables that contain links between the ID’s in tblVariables and their respective tables.</p>
+<p><strong>tblVariables_JSON_Metadata</strong> contains additional variable metadata that is unstructured to allow users to include any information that does not fall within the information in tblVariables.</p>
+<p>For details on the unstructured metadata project see Jira the following tickets: (<a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-563">https://simonscmap.atlassian.net/browse/CMAP-563</a>, <a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-572">https://simonscmap.atlassian.net/browse/CMAP-572</a>). Each unstructured metadata object includes a value array and a description array. Values and descriptions are always arrays, even if empty or single values. Also, these arrays must always have identical lengths, even if descriptions are empty strings. Descriptions are meant to be human readable, short descriptions akin to alt-text for an image online. A single variable may have multiple entries in tblVariables_JSON_Metadata. An example of a variable-level unstructured metadata is:</p>
+<div class="highlight-SQL notranslate"><div class="highlight"><pre><span></span><span class="err">{</span><span class="ss">&quot;cruise_names&quot;</span><span class="p">:</span><span class="err">{</span><span class="ss">&quot;values&quot;</span><span class="p">:[</span><span class="ss">&quot;PS71&quot;</span><span class="p">],</span><span class="ss">&quot;descriptions&quot;</span><span class="p">:[</span><span class="ss">&quot;Operators Cruise Name&quot;</span><span class="p">]</span><span class="err">}</span><span class="p">,</span><span class="ss">&quot;meta_links&quot;</span><span class="p">:</span><span class="err">{</span><span class="ss">&quot;values&quot;</span><span class="p">:[</span><span class="ss">&quot;https://www.bodc.ac.uk/data/documents/nodb/285421/&quot;</span><span class="p">],</span><span class="ss">&quot;descriptions&quot;</span><span class="p">:[</span><span class="ss">&quot;BODC documentation link&quot;</span><span class="p">]</span><span class="err">}}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As of September 2023 the only dataset with unstructured metadata is Geotraces Seawater IDP2021v2. Argo Core and Argo BGC are both good candidates for including unstructured metadata.</p>
+</div>
 </section>
 <section id="dataset-level-metadata">
 <h2>Dataset Level Metadata<a class="headerlink" href="#dataset-level-metadata" title="Link to this heading"></a></h2>
@@ -197,7 +210,6 @@ variable level tables that contain links between the ID’s in tblVariables and 
 <li><p>Dataset_Release_Date</p></li>
 <li><p>Dataset_History</p></li>
 </ul>
-<p><strong>tblDatasets_JSON_Metadata</strong> contains additional dataset metadata that is unstructured to allow users to include any information that does not fall within the information in tblDatasets.</p>
 <p><strong>tblDataset_References</strong> holds references associated with the dataset, typically a DOI, paper citation, or website. References that are true DOIs with data frozen in time are linked by Reference_ID to <strong>tblDataset_DOI_Download</strong>. This table is used for automating the download of DOI data (DOI_Download_Link) and includes a flag for whether the DOI download is the CMAP template used for submission via the validator (CMAP_Format)</p>
 <p><strong>tblDataset_Vault</strong> contains the relative path to the dataset leaf directory as well as a public link to the dataset leaf directory (read-only permission). In the future this may be joined to the catalog.</p>
 <p><strong>tblDataset_Servers</strong> holds the alias names of each server the dataset can be found on. This was implemented to allow for replication across some but not all servers, and free up space on Rainier.</p>
@@ -210,6 +222,15 @@ The region tables in CMAP share a similar schema to the cruise tables layout. <s
 (this can be expanded).
 <strong>tblDataset_Regions</strong> is similar to <strong>tblDataset_Cruises</strong> because it acts as the linking table between the region and dataset tables.
 <strong>tblCruise_Regions</strong> is a linking table between cruise IDs and region IDs.</p>
+<p><strong>tblDatasets_JSON_Metadata</strong> contains additional dataset metadata that is unstructured to allow users to include any information that does not fall within the information in tblDatasets.</p>
+<p>For details on the unstructured metadata project see Jira the following tickets: (<a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-563">https://simonscmap.atlassian.net/browse/CMAP-563</a>, <a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-572">https://simonscmap.atlassian.net/browse/CMAP-572</a>). As with the variable-level unstructured metadata, ach unstructured metadata object for datasets includes a value array and a description array. Values and descriptions are always arrays, even if empty or single values. Also, these arrays must always have identical lengths, even if descriptions are empty strings. Descriptions are meant to be human readable, short descriptions akin to alt-text for an image online. A dataset may have multiple entries in tblDatasets_JSON_Metadata. An example of a dataset-level unstructured metadata is:</p>
+<div class="highlight-SQL notranslate"><div class="highlight"><pre><span></span><span class="err">{</span><span class="ss">&quot;publication_link&quot;</span><span class="p">:</span><span class="err">{</span><span class="ss">&quot;values&quot;</span><span class="p">:[</span><span class="ss">&quot;https://www.geotraces.org/geotraces-publications-database/&quot;</span><span class="p">],</span><span class="ss">&quot;descriptions&quot;</span><span class="p">:[</span><span class="ss">&quot;Link to database of GEOTRACES publications&quot;</span><span class="p">]</span><span class="err">}}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As of September 2023 the only dataset with unstructured metadata is Geotraces Seawater IDP2021v2. Argo Core and Argo BGC are both good candidates for including unstructured metadata.</p>
+</div>
 </section>
 </section>
 

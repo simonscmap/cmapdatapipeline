@@ -20,7 +20,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Ingesting Cruise Metdata and Trajectory" href="cruise_ingestion.html" />
+    <link rel="next" title="Geotraces Seawater Walkthrough" href="geotraces_walkthrough.html" />
     <link rel="prev" title="Outside Small Dataset Walkthrough" href="outside_small_dataset_walkthrough.html" /> 
 </head>
 
@@ -55,23 +55,25 @@
 <li class="toctree-l1"><a class="reference internal" href="../web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_validation.html">Data Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../continuous_ingestion.html">Continuous Ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Outside Large Dataset Walkthrough</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#argo-float-walkthrough">Argo Float Walkthrough</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#argo-data-collection">Argo Data Collection</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#argo-data-processing">Argo Data Processing</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#creating-tables-and-indicies">Creating Tables and Indicies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#subset-testing">Subset Testing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#general-processing-steps">General Processing Steps</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ingesting-metadata">Ingesting Metadata</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#transferring-large-datasets-between-servers">Transferring Large Datasets Between Servers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bulk-ingestion-to-the-cluster">Bulk Ingestion to the Cluster</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-and-ingesting-metadata">Creating and Ingesting Metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#removing-old-argo-data">Removing Old Argo Data</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
@@ -133,6 +135,7 @@ In this section, we will outline examples of collecting, processing and ingestin
 <h2>Argo Float Walkthrough<a class="headerlink" href="#argo-float-walkthrough" title="Link to this heading"></a></h2>
 <p>The ARGO float array is a multi-country program to deploy profiling floats across the global ocean. These floats provide a 3D insitu ocean record.
 The CORE argo floats provide physical ocean parameters, while the BGC (Biogeochemical) specific floats provide Biogeochemical specific variables (nutrients, radiation etc.).</p>
+<p>These Argo datasets are a part of the continuous ingestion project, but differ in process as each month will create a new table for each dataset.</p>
 <section id="argo-data-collection">
 <h3>Argo Data Collection<a class="headerlink" href="#argo-data-collection" title="Link to this heading"></a></h3>
 <p>ARGO float data are distributed through two main DAAC’s. Individual files can be accessed directly from FTP servers from each DAAC.
@@ -144,17 +147,22 @@ Alternatively, a zipped file of all float records updated monthly can be found a
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">vault_structure</span> <span class="k">as</span> <span class="nn">vs</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="n">june_10_link</span> <span class="o">=</span> <span class="s2">&quot;https://www.seanoe.org/data/00311/42182/data/85023.tar.gz&quot;</span>
-
-<span class="n">output_dir</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">collected_data</span> <span class="o">+</span> <span class="s2">&quot;insitu/float/ARGO/&quot;</span>
-
-<span class="k">def</span> <span class="nf">wget_file</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;wget &quot;</span> <span class="o">+</span> <span class="n">fpath</span> <span class="o">+</span> <span class="s2">&quot; -P &quot;</span> <span class="o">+</span> <span class="n">output_dir</span><span class="p">)</span>
-
-<span class="n">wget_file</span><span class="p">(</span><span class="n">june_10_link</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">downloadArgo</span><span class="p">(</span><span class="n">newmonth</span><span class="p">,</span> <span class="n">tar_url</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download Argo tar file. Creates new vault tables based on newmonth stub</span>
+<span class="sd">    Args:</span>
+<span class="sd">        newmonth (string): Month and year of new data used as table suffix (ex. Sep2023)</span>
+<span class="sd">        tar_url (string): URL pointing to tar download for newest data (ex. https://www.seanoe.org/data/00311/42182/data/104707.tar.gz)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tbl_list</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;tblArgoCore_REP_</span><span class="si">{</span><span class="n">newmonth</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;tblArgoBGC_REP_</span><span class="si">{</span><span class="n">newmonth</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">tbl</span> <span class="ow">in</span> <span class="n">tbl_list</span><span class="p">:</span>
+        <span class="n">vs</span><span class="o">.</span><span class="n">leafStruc</span><span class="p">(</span><span class="n">vs</span><span class="o">.</span><span class="n">float_dir</span><span class="o">+</span><span class="n">tbl</span><span class="p">)</span>
+    <span class="n">base_folder</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">vs</span><span class="o">.</span><span class="n">float_dir</span><span class="si">}{</span><span class="n">tbl</span><span class="si">}</span><span class="s1">/raw/&#39;</span>
+    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">base_folder</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2"> &quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;wget --no-check-certificate </span><span class="si">{</span><span class="n">tar_url</span><span class="si">}</span><span class="s2"> -P </span><span class="si">{</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This file will need to be unzipped, either using python or bash. The output files will be put in <strong>dropbox/../collected_data/insitu/float/ARGO/</strong></p>
+<p>The raw data will be saved in <strong>dropbox/../vault/observation/in-situ/float/tblArgoBGC_REP_{newmonth}/raw</strong>
+This file will need to be unzipped, either using python or bash. The functions for doing so in Python are in process_ARGO_BGC_Sep2023.py</p>
 <p>Once the data has been unzipped, there are four subfolders:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── aux
 ├── dac
@@ -166,7 +174,6 @@ Alternatively, a zipped file of all float records updated monthly can be found a
 <p>The <strong>dac</strong> subfolder contains 11 daacs/distributors.  Each of these contains zipped files.</p>
 <p>To unzip and organize these by BGC and Core. The following scripts were run as part of <strong>process_ARGO.py</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">unzip_and_organize_BGC</span><span class="p">():</span>
-    <span class="c1"># 1559 files</span>
     <span class="n">vs</span><span class="o">.</span><span class="n">makedir</span><span class="p">(</span><span class="n">argo_base_path</span> <span class="o">+</span> <span class="s2">&quot;BGC/&quot;</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">argo_base_path</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">daac</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">daac_list</span><span class="p">):</span>
@@ -175,7 +182,7 @@ Alternatively, a zipped file of all float records updated monthly can be found a
         <span class="p">)</span>
 </pre></div>
 </div>
-<p>A similar function was fun for Core files. Details can be found in <strong>process_ARGO.py</strong>.</p>
+<p>A similar function is then run for the Core files.</p>
 </section>
 <section id="argo-data-processing">
 <h3>Argo Data Processing<a class="headerlink" href="#argo-data-processing" title="Link to this heading"></a></h3>
@@ -186,29 +193,19 @@ Alternatively, a zipped file of all float records updated monthly can be found a
             └── process_ARGO.py
 </pre></div>
 </div>
-<p>Since BGC specific floats and Core floats contain different sets of variables, the processing has been split into two functions.</p>
-<section id="creating-tables-and-indicies">
-<h4>Creating Tables and Indicies<a class="headerlink" href="#creating-tables-and-indicies" title="Link to this heading"></a></h4>
-<p>General SQL table creation and indexing strategies can be found in the <strong>table creation and indexing</strong> section of these docs.
-Tables and indexes have to be created on all databases before data ingestion.</p>
-</section>
-<section id="subset-testing">
-<h4>Subset Testing<a class="headerlink" href="#subset-testing" title="Link to this heading"></a></h4>
-<p>When ingesting large datasets such as models or satellite products, it can be helpful to ingest a small subset of the entire dataset, then ingest the metadata.
-This should allow you to test visualizing and retrieving the dataset before committing to GB to TB of database space.</p>
-</section>
-<section id="general-processing-steps">
-<h4>General Processing Steps<a class="headerlink" href="#general-processing-steps" title="Link to this heading"></a></h4>
-<p>Detailed processing steps for the argo core and bgc can be found in process_ARGO.py. The rough processing logic is outlined below:</p>
+<p>Since BGC specific floats and Core floats contain different sets of variables, the processing has been split into two scripts.</p>
+<p>Detailed processing steps for the argo core and bgc can be found in process_ARGO_BGC_Sep2023.py and process_ARGO_Core_Sep2023. The processing is done with Pool from the multiprocessing library. The rough processing logic is outlined below:</p>
 <ol class="arabic simple">
 <li><p>Use the glob library to create a list of all netcdf files in the BGC directory.</p></li>
 <li><p>Iterate thorough list</p>
 <ul class="simple">
 <li><p>import netcdf with xarray</p></li>
 <li><p>decode binary xarray column data</p></li>
-<li><p>convert xarray to dataframe and reset index</p></li>
+<li><p>export additional metadata cols for future unstructured metadata</p></li>
 <li><p>drop unneeded metadata cols</p></li>
-<li><p>add a depth specific column from decibars pressure column</p></li>
+<li><p>checks no new columns are present this month</p></li>
+<li><p>convert xarray to dataframe and reset index</p></li>
+<li><p>add a depth specific column calculated from pressure and latitude using python seawater library</p></li>
 <li><p>rename Space-Time columns</p></li>
 <li><p>format datetime</p></li>
 <li><p>drop any duplicates create by netcdf multilevel index</p></li>
@@ -218,39 +215,63 @@ This should allow you to test visualizing and retrieving the dataset before comm
 <li><p>reorder columns and add any missing columns</p></li>
 <li><p>replace any inf or nan string values with np.nan (will go to NULL in SQL server)</p></li>
 <li><p>strips any whitespace from string col values</p></li>
-<li><p>downcasts data if possible</p></li>
-<li><p>builds summary stats (opt. can use db stats call functionality instead)</p></li>
-<li><p>uses the BCP utility to insert dataframe into database table</p></li>
-<li><p>exports df to csv in vault</p></li>
+<li><p>removes nan strings before setting data types</p></li>
+<li><p>checks there is data in dataframe before exporting parquet file to /rep folder</p></li>
 </ul>
 </li>
 </ol>
+<p>Because the data will only live on the cluster, the fastest way to calculate stats for such a large dataset is to aggregate the values from each processed parquet file. Once all NetCDF files have been processed and parquet files saved to /rep, the following steps are completed:</p>
+<ol class="arabic simple">
+<li><p>Read each parquet file into a pandas dataframe</p></li>
+<li><p>Query the dataframe to remove space and time data flagged as “bad” (_QC = 4)</p></li>
+<li><p>Calculate min/max for each field with describe()</p></li>
+<li><p>Append min/max values for each file to a stats dataframe</p></li>
+<li><p>Export stats dataframe to /stats directory to be used during dataless ingestion</p></li>
+</ol>
+<p>Before passing off for ingestion to the cluster, run through each processed parquet file to ensure the schema matches across all files. Past errors have been caused by empty parquet files and empty columns in one profile that are string data types in other profiles. Reading a parquet file into a dataframe and checking for matches is not suffient as pandas can read data types differently than the cluster will. The most successful checks to date were completed using pyarrow and pyarrow.parquet.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Any schema error in a single parquet file will cause the bulk ingestion to fail</p>
+</div>
+<p>The last step for all process scripts is to copy the GitHub URL for the script to the /code folder in the vault. The example below calls the metadata.export_script_to_vault function and saves a text file named “process” in the dataset’s code folder in the vault.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">metadata</span><span class="o">.</span><span class="n">export_script_to_vault</span><span class="p">(</span><span class="n">tbl</span><span class="p">,</span><span class="s1">&#39;float_dir&#39;</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;process/insitu/float/ARGO/process_Argo_BGC_</span><span class="si">{</span><span class="n">date_string</span><span class="si">}</span><span class="s1">.py&#39;</span><span class="p">,</span><span class="s1">&#39;process.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="bulk-ingestion-to-the-cluster">
+<h4>Bulk Ingestion to the Cluster<a class="headerlink" href="#bulk-ingestion-to-the-cluster" title="Link to this heading"></a></h4>
+<p>Due to the size of the Argo datasets, and the monthly creation of a new dataset, both Argo Core and Argo BGC only live on the cluster. After all parquet files are created and checked for matching schemas, a bulk ingestion will be done to create the new tables on the cluster.</p>
 </section>
-<section id="ingesting-metadata">
-<h4>Ingesting Metadata<a class="headerlink" href="#ingesting-metadata" title="Link to this heading"></a></h4>
-<p>Once either a subset or the entire dataset has been ingested on a server, the metadata can be added. To do this, you can use ingest/general.py</p>
-<p>Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="p">{</span><span class="n">table_name</span><span class="p">}</span> <span class="p">{</span><span class="n">branch</span><span class="p">}</span> <span class="p">{</span><span class="n">filename</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">d</span><span class="p">}</span> <span class="p">{</span><span class="n">DOI</span> <span class="n">link</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">S</span><span class="p">}</span> <span class="p">{</span><span class="n">server</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">N</span><span class="p">}</span>
+<section id="creating-and-ingesting-metadata">
+<h4>Creating and Ingesting Metadata<a class="headerlink" href="#creating-and-ingesting-metadata" title="Link to this heading"></a></h4>
+<p>Once the bulk ingest is complete on the cluster, the metadata can be added. All dataset ingestion using general.py (see cruise ingestion for differences) pulls metadata from a folder named “final” within the validator folders in DropBox. For large datasets, you will still need to submit a template to the validator. In order to pass the validator tests you will need to include a minimum of one row of data in the data sheet. The values can all be placeholders, but must contain some value.</p>
+<p>If no new variables have been added, the data curation team does not need to re-run the QC API. Use the last month’s metadata for Argo and update the <strong>dataset_meta_data</strong> tab with new values for dataset_short_name, dataset_long_name, dataset_version, dataset_release_date, and dataset_references. In the <strong>vars_meta_data</strong> tab, replace old references of dataset names in the variable keywords to current month. These keywords are usually assigned by the QC API.</p>
+<p>After submitting through the validator, create a folder named final in <strong>dropbox../Apps/Simons CMAP Web Data Sunmission/ARGO_BGC_Sep2023</strong> and copy the submitted template into /final for ingestion.</p>
+<p>To ingest the metadata only, you can use ingest/general.py</p>
+<p>Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal. Because the DOI for the Argo datasets is already in the references column in the <strong>dataset_meta_data</strong> tab of the metadata template, you do not need to use the {-d} flag with ingestion.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="p">{</span><span class="n">table_name</span><span class="p">}</span> <span class="p">{</span><span class="n">branch</span><span class="p">}</span> <span class="p">{</span><span class="n">filename</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">S</span><span class="p">}</span> <span class="p">{</span><span class="n">server</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">a</span><span class="p">}</span> <span class="p">{</span><span class="n">data_server</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">i</span><span class="p">}</span> <span class="p">{</span><span class="n">icon_filename</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">F</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">N</span><span class="p">}</span>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>{<strong>branch</strong>}: Branch where dataset should be placed in Vault. Ex’s: cruise, float, station, satellite, model, assimilation]</p></li>
+<li><p>{<strong>table_name</strong>}: Table name for the dataset. Must start with prefix “tbl”. Ex. tblArgoBGC_REP_Sep2023</p></li>
+<li><p>{<strong>branch</strong>}: Branch where dataset should be placed in Vault. Ex’s: cruise, float, station, satellite, model, assimilation</p></li>
 <li><p>{<strong>filename</strong>}: Base file name in vault/staging/combined/. Ex.: ‘global_diazotroph_nifH.xlsx’</p></li>
-<li><p>{<strong>-d</strong>}: Optional flag for including DOI with dataset in tblReferences. DOI link string follows flag arg.</p></li>
-<li><p>{<strong>DOI link</strong>}: String for full web address of CMAP specific DOI. Ex. “<a class="reference external" href="http://doi.org/10.5281/zenodo.4968554">http://doi.org/10.5281/zenodo.4968554</a>”</p></li>
-<li><p>{<strong>-S</strong>}: Required flag for specifying server choice. Server name string follows flag.</p></li>
+<li><p>{<strong>-S</strong>}: Required flag for specifying server choice for metadata. Server name string follows flag.</p></li>
 <li><p>{<strong>server</strong>}: Valid server name string.  Ex. “Rainier”, “Mariana” or “Rossby”</p></li>
+<li><p>{<strong>-a</strong>}: Optional flag for specifying server name where data is located</p></li>
+<li><p>{<strong>data_server</strong>}: Valid server name string.  Ex. “Rainier”, “Mariana”, “Rossby”, or “Cluster”</p></li>
+<li><p>{<strong>-i</strong>}: Optional flag for specifying icon name instead of creating a map thumbnail of the data</p></li>
+<li><p>{<strong>icon_filename</strong>}: Filename for icon in Github instead of creating a map thumbnail of data. Ex: argo_small.jpg</p></li>
+<li><p>{<strong>-F</strong>}: Optional flag for specifying a dataset has a valid depth column. Default value is 0</p></li>
 <li><p>{<strong>-N</strong>}: Optional flag for specifying a ‘dataless’ ingestion or a metadata only ingestion.</p></li>
 </ul>
-<p>An example string would be:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="n">tblArgoBGC_REP</span> <span class="nb">float</span> <span class="s1">&#39;ARGO_BGC.xlsx&#39;</span> <span class="o">-</span><span class="n">S</span> <span class="s2">&quot;Rainier&quot;</span> <span class="o">-</span><span class="n">N</span>
+<p>An example string for the September 2023 BGC dataset is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="n">tblArgoBGC_REP_Sep2023</span> <span class="nb">float</span> <span class="s1">&#39;ARGO_BGC_Sep2023.xlsx&#39;</span> <span class="o">-</span><span class="n">i</span> <span class="s1">&#39;argo_small.jpg&#39;</span> <span class="o">-</span><span class="n">S</span> <span class="s1">&#39;Rossby&#39;</span> <span class="o">-</span><span class="n">N</span> <span class="o">-</span><span class="n">a</span> <span class="s1">&#39;cluster&#39;</span> <span class="o">-</span><span class="n">F</span> <span class="mi">1</span>
 </pre></div>
 </div>
 </section>
-<section id="transferring-large-datasets-between-servers">
-<h4>Transferring Large Datasets Between Servers<a class="headerlink" href="#transferring-large-datasets-between-servers" title="Link to this heading"></a></h4>
-<p>Ingesting large datasets with the BCP utility can take a long time.
-Instead of using BCP to transfer the datasets between servers, you can use the data transfer wizard in SQL Server Management Studio.</p>
+<section id="removing-old-argo-data">
+<h4>Removing Old Argo Data<a class="headerlink" href="#removing-old-argo-data" title="Link to this heading"></a></h4>
+<p>Once a new month of Argo data is accessible on the CMAP website, a previous month can be retired. The current plan is to keep three months of Argo data available to users. For example, with the addition of September data, the June data can be deleted from the vault. The data needs to be removed from the cluster <strong>before</strong> the parquet files are deleted from Dropbox. Metadata for the retired month can be removed from the CMAP catalog before the parquet files are deleted, if need be. This can be done using the following function in metadata.py:</p>
 </section>
 </section>
 </section>

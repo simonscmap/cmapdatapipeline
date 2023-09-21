@@ -50,7 +50,7 @@ For CTD we can write a download function using wget and pass the FTP link for th
 
 .. code-block:: python
 
-    odir = vs.collected_data + "insitu/cruise/misc_cruise/KM0704_CMORE_BULA/"
+    odir = vs.cruise + "tblKM0704_CMORE_BULA/raw/"
 
     def download_KM0704_data(outputdir, download_link):
         wget_str = f"""wget -P '{outputdir}' -np -R "'index.html*" robots=off -nH --cut-dirs 8 -r  {download_link}"""
@@ -71,7 +71,7 @@ Processing a small dataset
 
 Now that the CTD files have been collected, we can begin processing them. 
 Once again, we are going to create a dataset/collection specific file for a record. In this example, we will call it process_KM0704_CMORE_BULA.py
-This should be placed in the **collect/** submodule of cmapdata. 
+This should be placed in the **process/** submodule of cmapdata. 
 
 ::
 
@@ -102,7 +102,7 @@ Others were missing spatio-temporal coordinates, which had to be collected using
 
 
 
-Once all the data are processed, the can be exported to dropbox/../vault/staging/combined/ where dataset and variable metadata sheets can be added. Once these are complete, the dataset should run through the validator. 
+Once all the data are processed, the can be exported to dropbox/../vault/observation/in-situ/cruise/tblKM0704_CMORE_BULA/raw where dataset and variable metadata sheets can be added. Once these are complete, the dataset should run through the validator. 
 From here, follow the steps outlined in the **user submitted datasets walkthrough** section to ingest the data into the database. 
 
 

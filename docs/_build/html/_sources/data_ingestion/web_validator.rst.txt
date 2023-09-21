@@ -36,7 +36,8 @@ any changes in the 'phase' should be updated through the dropdown menu in the da
 Once all the dataset changes are complete, the submitter should register a DOI for their dataset and send it over via the validator.
 
 .. note::
+   
    Datasets submitted through the web validator are currently stored in dropbox:
-   'CMAP Data Submission Dropbox/Simons CMAP/Apps/Simons CMAP Web Data Submission/{dataset_name}/{dataset_name_datestring.xlsx}. Validator folders are currently based on dataset short name. This means it is possible a submitted dataset will be saved to a folder that already exists, if a user reuses a dataset short name. A fix for this should be implemented in the future 
+   'CMAP Data Submission Dropbox/Simons CMAP/Apps/Simons CMAP Web Data Submission/{dataset_name}/{dataset_name_datestring.xlsx}. Validator folders are currently based on dataset short name. This means it is possible a submitted dataset will be saved to a folder that already exists, if a user reuses a dataset short name. A fix for this should be implemented in the future by leveraging the unique ID in tblData_Submissions. 
 
 

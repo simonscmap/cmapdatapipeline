@@ -37,9 +37,7 @@ Ingesting Cruise Templates
 
 Similar to how datasets are ingested into CMAP, we can use the functionallity in the **ingest** subpackage. 
 
-Completed crusie templates should start the ingestion process in '/CMAP Data Submission Dropbox/Simons CMAP/staging/combined/{cruise_name_template.xlsx}'
-
-
+Completed crusie templates should start the ingestion process in '/CMAP Data Submission Dropbox/Simons CMAP/vault/r2r_cruise/{cruise_name}/{cruise_name_template.xlsx}'
 
 
 
@@ -56,12 +54,14 @@ Navigate to the ingest/ submodule of cmapdata. From there, run the following in 
 * {**cruise_name**}: String for official (UNOLS) cruise name Ex. TN278
 * {**-S**}: Required flag for specifying server choice. Server name string follows flag. 
 * {**server**}: Valid server name string.  Ex. "Rainier", "Mariana" or "Rossby"
+* {**-v**}: Optional flag denoting metadata template is present in the raw folder of the vault
+* {**in_vault**}: If True, pulls template from vault. Default is False, which pulls from /final folder in Apps folder created after submitting to the validator
 
 An example string would be:
 
 .. code-block:: python
 
-    python general.py 'TN278_cruise_meta_nav_data.xlsx' -C TN278 -S "Rainier"
+    python general.py 'TN278_cruise_meta_nav_data.xlsx' -C TN278 -S "Rainier" -v True
 
 
 Behind the scenes, the script is doing:

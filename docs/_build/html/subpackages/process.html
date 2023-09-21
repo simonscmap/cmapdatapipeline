@@ -55,9 +55,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/data_validation.html">Data Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/continuous_ingestion.html">Continuous Ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
@@ -121,10 +125,10 @@ It serves as a record for the data processing/cleaning steps.
 The organization roughly mirors <strong>vault/</strong>.</p>
 <section id="data-flow">
 <h2>data flow<a class="headerlink" href="#data-flow" title="Link to this heading"></a></h2>
-<p>As files are processed, they should generally pass from <strong>collected_data/</strong> to <strong>vault/</strong>.
-Smaller datasets can be exported to <strong>staging/combined/</strong> and can be run through the web validator.
-Larger datasets such as satellite, model or ARGO float data are too large to be run through the web validator.
-These datasets can be cleaned and ingested into the database in one process script. Once the data has been ingested, a cleaned version should be exported to <strong>vault/</strong>.</p>
+<p>As files are processed, retain the raw, unprocessed data in <strong>vault/../{dataset_name}/raw</strong>.
+Smaller datasets can be exported to <strong>vault/../{dataset_name}/raw</strong> to create a template for submitting to the web validator.
+Larger datasets such as satellite, model or ARGO float data are too large to be run through the web validator. Metadata should still go through the validator, including dummy data in the data tab with at least 1 row of placeholder data.
+These datasets can be cleaned and ingested into the database in one process script. Once the data has been ingested, a cleaned version should be exported to <strong>vault/</strong> as a parquet file.</p>
 </section>
 </section>
 

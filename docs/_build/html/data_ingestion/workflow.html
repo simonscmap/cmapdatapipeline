@@ -57,12 +57,17 @@
 <li class="toctree-l2"><a class="reference internal" href="#user-submitted-datasets">User Submitted Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#outside-small-datasets">Outside ‘Small’ Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#outside-large-datasets">Outside ‘Large’ Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#metadata-updates">Metadata Updates</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_validation.html">Data Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="continuous_ingestion.html">Continuous Ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gallery_examples/user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gallery_examples/outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gallery_examples/outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gallery_examples/cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
@@ -129,14 +134,15 @@ User submitted datasets that pass through the web validator must be &lt;150MB.
 <em>Outside ‘Large’ Datasets</em> are datasets collected from an outside source that have multiple data files and cannot fit into memory. Examples are satellite data, model data or large insitu collections such as ARGO or GOSHIP.</p>
 <section id="user-submitted-datasets">
 <h2>User Submitted Datasets<a class="headerlink" href="#user-submitted-datasets" title="Link to this heading"></a></h2>
-<p>User submitted datasets are submitted through the web validator. Once the QA/QC checks are completed and a DOI is received, the dataset can be ingested into CMAP.</p>
+<p>User submitted datasets are submitted through the web validator. Once the QA/QC checks are completed and a DOI is received, the dataset can be ingested into CMAP. Details on the QC process can be found here: <a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-621">https://simonscmap.atlassian.net/browse/CMAP-621</a>. An additional step of adding org_id and conversion_coefficient columns to the variable metadata sheet in the submitted template is done only for variables describing organism abundance.</p>
 <p>Using general.py, you can pass command line arguments to specify which server you wish to add the dataset to as well as including a DOI.</p>
 <p>Where we have:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="p">{</span><span class="n">table_name</span><span class="p">}</span> <span class="p">{</span><span class="n">branch</span><span class="p">}</span> <span class="p">{</span><span class="n">filename</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">d</span><span class="p">}</span> <span class="p">{</span><span class="n">DOI</span> <span class="n">link</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">l</span><span class="p">}</span> <span class="p">{</span><span class="n">DOI</span> <span class="n">download</span> <span class="n">link</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">f</span><span class="p">}</span> <span class="p">{</span><span class="n">DOI</span> <span class="n">file</span> <span class="n">name</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">S</span><span class="p">}</span> <span class="p">{</span><span class="n">server</span><span class="p">}</span>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>{<strong>branch</strong>}: Branch where dataset should be placed in Vault. Ex’s: cruise, float, station, satellite, model, assimilation]</p></li>
+<li><p>{<strong>table_name</strong>}: Table name for the dataset. Must start with prefix “tbl”. Ex. tblFalkor_2018</p></li>
+<li><p>{<strong>branch</strong>}: Branch where dataset should be placed in Vault. Ex’s: cruise, float, station, satellite, model, assimilation</p></li>
 <li><p>{<strong>filename</strong>}: Base file name in vault/staging/combined/. Ex.: ‘global_diazotroph_nifH.xlsx’</p></li>
 <li><p>{<strong>-d</strong>}: Optional flag for including DOI with dataset in tblReferences. DOI link string follows flag arg.</p></li>
 <li><p>{<strong>DOI link</strong>}: String for full web address of CMAP specific DOI. Ex. “<a class="reference external" href="https://doi.org/10.5281/zenodo.8306724">https://doi.org/10.5281/zenodo.8306724</a>”</p></li>
@@ -160,7 +166,7 @@ User submitted datasets that pass through the web validator must be &lt;150MB.
 <h2>Outside ‘Small’ Datasets<a class="headerlink" href="#outside-small-datasets" title="Link to this heading"></a></h2>
 <p>These datasets usually need quite a bit of data munging to make them match the CMAP data format. Additionally, metadata needs to be collected and created.
 To keep a record of data transformations, any processing scripts should be placed in <strong>/process/../process_datasetname.py</strong>. Additionally, any relevant collection information should be placed in <strong>/collect/../collect_datasetname.py</strong>. A text file containing a link to the process and collect scripts in GitHub should be saved in the vault to <strong>{dataset table name}/code/</strong></p>
-<p>With the addition of the QC API, it is suggested to submit the final, cleaned dataset to the validator.</p>
+<p>With the addition of the QC API, it is suggested to submit the final, cleaned dataset to the validator. Once QC is complete and the /final folder is populated with the finalized template, ingestion can be done as if it was a user submitted dataset as described above.</p>
 </section>
 <section id="outside-large-datasets">
 <h2>Outside ‘Large’ Datasets<a class="headerlink" href="#outside-large-datasets" title="Link to this heading"></a></h2>
@@ -173,6 +179,24 @@ Once data has been transfered, the next step is any data processing. This should
 <p>You will need to create a SQL table and add it to the databases prior to ingestion. Any SQL table creation script should be recorded in DB/ (repository is on Simons CMAP github). Adding indexes once the ingestion has completed will likely speed up ingestion.</p>
 </div>
 <p>After the data has been inserted and the indices successfully created, metadata will need to be created and added to the databases. A standard excel template should be used for the dataset and vars metadata sheets. Submit a template to the validator with a dummy data sheet that holds all variables, but only needs one row of data to make it through the validator. This allows the data curation team to run the QC API checks and create the /final folder needed for ingesting the metadata.</p>
+<p>There are additional arguments you can use for large datasets:</p>
+<ul class="simple">
+<li><p>{<strong>-a</strong>}: Optional flag for specifying server name where data is located</p></li>
+<li><p>{<strong>data_server</strong>}: Valid server name string.  Ex. “Rainier”, “Mariana”, “Rossby”, or “Cluster”</p></li>
+<li><p>{<strong>-i</strong>}: Optional flag for specifying icon name instead of creating a map thumbnail of the data</p></li>
+<li><p>{<strong>icon_filename</strong>}: Filename for icon in Github instead of creating a map thumbnail of data. Ex: argo_small.jpg</p></li>
+<li><p>{<strong>-p</strong>}: Optional flag for defining process level</p></li>
+<li><p>{<strong>process_level</strong>}: Default value is “rep”. Change to “nrt” for near-real-time datasets</p></li>
+<li><p>{<strong>-F</strong>}: Optional flag for specifying a dataset has a valid depth column. Default value is 0</p></li>
+<li><p>{<strong>-N</strong>}: Optional flag for specifying a ‘dataless’ ingestion or a metadata only ingestion</p></li>
+</ul>
+<p>The {-a} flag can be used if the data is not present on all on-prem servers (Rainier, Rossby, and Mariana), and has to be used if the data is only on the cluster. It can also help speed up the calculation of stats when ingesting metadata to Mariana or Rainier, if you use Rossby as the data_server. Rossby is the fastest on-prem server.</p>
+<p>The {-i} flag is used if you want to display a logo instead of creating a map of the data for the thumbnail on the catalog page. The icon_filename needs to include the file extension, and should reference a logo or icon already saved in /static/mission_icons</p>
+<p>The {-F} flag is needed when adding metadata that doesn’t include the full dataset in the excel template. When ingesting a template with data in it, the ingestion code checks for the presence of a depth field automatically. The depth flag is needed for the viz page to know which chart types to display. If a large dataset has a “depth” field (which should only be named as such if there are no rows with missing depth values), include <strong>-F 1</strong> in your ingestion command.</p>
+</section>
+<section id="metadata-updates">
+<h2>Metadata Updates<a class="headerlink" href="#metadata-updates" title="Link to this heading"></a></h2>
+<p>There are times when a dataset is already ingested, but updates to the metadata are needed. The <strong>-U</strong> argument will delete all metadata present for the dataset, but will retain the data table. The <strong>-F</strong> depth flag will need to be included if the dataset has depth. All flags related to a DOI will need to be included if the DOI link is not in the dataset_references column of the dataset_meta_data tab.</p>
 </section>
 </section>
 

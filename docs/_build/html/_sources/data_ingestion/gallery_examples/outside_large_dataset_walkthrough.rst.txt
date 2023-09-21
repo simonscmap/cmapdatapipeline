@@ -10,7 +10,7 @@ Argo Float Walkthrough
 ----------------------
 
 The ARGO float array is a multi-country program to deploy profiling floats across the global ocean. These floats provide a 3D insitu ocean record. 
-The CORE argo floats provide physical ocean parameters, while the BGC (Biogeochemical) specific floats provide Biogeochemical specific variables (nutrients, radiation etc.). 
+The CORE argo floats provide physical ocean parameters, while the BGC (Biogeochemical) specific floats provide Biogeochemical specific variables (nutrients, radiation etc.).
 
 These Argo datasets are a part of the continuous ingestion project, but differ in process as each month will create a new table for each dataset. 
 
@@ -68,7 +68,7 @@ Once the data has been unzipped, there are four subfolders:
 
 The **dac** subfolder contains 11 daacs/distributors.  Each of these contains zipped files. 
 
-To unzip and organize these by BGC and Core. The following scripts were run as part of **process_ARGO_BGC_Sep2023.py**
+To unzip and organize these by BGC and Core. The following scripts were run as part of **process_ARGO.py**
 
 .. code-block:: python
 
@@ -104,9 +104,6 @@ Once the data collection is complete, we can start processing each argo netcdf f
 
 Since BGC specific floats and Core floats contain different sets of variables, the processing has been split into two scripts. 
 
-
-General Processing Steps
-^^^^^^^^^^^^^^^^^^^^^^^^
 
 Detailed processing steps for the argo core and bgc can be found in process_ARGO_BGC_Sep2023.py and process_ARGO_Core_Sep2023. The processing is done with Pool from the multiprocessing library. The rough processing logic is outlined below:
 
@@ -148,6 +145,12 @@ Before passing off for ingestion to the cluster, run through each processed parq
    Any schema error in a single parquet file will cause the bulk ingestion to fail 
 
   
+The last step for all process scripts is to copy the GitHub URL for the script to the /code folder in the vault. The example below calls the metadata.export_script_to_vault function and saves a text file named "process" in the dataset's code folder in the vault.
+
+.. code-block:: python
+
+    metadata.export_script_to_vault(tbl,'float_dir',f'process/insitu/float/ARGO/process_Argo_BGC_{date_string}.py','process.txt')
+
 
 Bulk Ingestion to the Cluster
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -168,12 +171,13 @@ After submitting through the validator, create a folder named final in **dropbox
 To ingest the metadata only, you can use ingest/general.py 
 
 
-Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal. 
+Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal. Because the DOI for the Argo datasets is already in the references column in the **dataset_meta_data** tab of the metadata template, you do not need to use the {-d} flag with ingestion.
 
 .. code-block:: python
 
    python general.py {table_name} {branch} {filename} {-S} {server} {-a} {data_server} {-i} {icon_filename} {-F} {-N}
 
+* {**table_name**}: Table name for the dataset. Must start with prefix "tbl". Ex. tblArgoBGC_REP_Sep2023
 * {**branch**}: Branch where dataset should be placed in Vault. Ex's: cruise, float, station, satellite, model, assimilation
 * {**filename**}: Base file name in vault/staging/combined/. Ex.: 'global_diazotroph_nifH.xlsx'
 * {**-S**}: Required flag for specifying server choice for metadata. Server name string follows flag. 
@@ -192,3 +196,10 @@ An example string for the September 2023 BGC dataset is:
     python general.py tblArgoBGC_REP_Sep2023 float 'ARGO_BGC_Sep2023.xlsx' -i 'argo_small.jpg' -S 'Rossby' -N -a 'cluster' -F 1
 
 
+Removing Old Argo Data
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Once a new month of Argo data is accessible on the CMAP website, a previous month can be retired. The current plan is to keep three months of Argo data available to users. For example, with the addition of September data, the June data can be deleted from the vault. The data needs to be removed from the cluster **before** the parquet files are deleted from Dropbox. Metadata for the retired month can be removed from the CMAP catalog before the parquet files are deleted, if need be. This can be done using the following function in metadata.py:
+
+.. code-block:: python
+    metadata.deleteCatalogTables("tblArgo_Core_Jun2023", "Opedia", "Rainier")

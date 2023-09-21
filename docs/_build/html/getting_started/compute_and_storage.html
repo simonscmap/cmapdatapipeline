@@ -50,6 +50,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Compute Resources and Data Storage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#data-flow">Data Flow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-storage">Data Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#workstation-repositories">Workstation Repositories</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#synology-nas-and-drobo-storage">Synology NAS and Drobo Storage</a></li>
 </ul>
 </li>
@@ -60,9 +61,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/data_validation.html">Data Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/continuous_ingestion.html">Continuous Ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
@@ -130,16 +135,34 @@ The ip address is for the workstation is 128.208.238.117</p>
 <section id="data-flow">
 <h2>Data Flow<a class="headerlink" href="#data-flow" title="Link to this heading"></a></h2>
 <p>The web validator stores submitted datasets to Dropbox (<strong>Dropbox/Apps/&lt;dataset_short_name&gt;/&lt;dataset_short_name_timestamp.xlsx&gt;</strong>). After submission the CMAP data team runs the dataset through the QC API. The outputs from the QC API are saved in Dropbox (<strong>Dropbox/Apps/&lt;dataset_short_name&gt;/iterations/1/propose</strong>). When changes are approved by the submitter, a copy of the finalized dataset is added to the accept folder within the iteration folder structure, as well as to the final folder where ingestion will pull from (<strong>Dropbox/Apps/&lt;dataset_short_name&gt;/final</strong>). Only one file should be saved in the final folder for ingestion.</p>
-<p>Ingesting a dataset submitted through the validator pulls from the final folder and creates a folder based on the table name in the <strong>vault/</strong> directory based on the data type ().</p>
+<p>Ingesting a dataset submitted through the validator pulls from the final folder and creates a folder based on the table name in the <strong>vault/</strong> directory.</p>
 </section>
 <section id="data-storage">
 <h2>Data Storage<a class="headerlink" href="#data-storage" title="Link to this heading"></a></h2>
-<p>Both the web application and the data ingestion pipeline share storage over dropbox. With an unlimited account,
-we can use dropbox to store all our pre-DB data. In addition to dropbox, the <strong>vault/</strong> also is synced on the workstation under:
+<p>Both the web application and the data ingestion pipeline share storage over dropbox. With an unlimited account, we can use dropbox to store all our pre-DB data. In addition to dropbox, the <strong>vault/</strong> also is synced on the workstation under:
 <strong>~/data/CMAP Data Submission Dropbox/Simons CMAP/vault/</strong></p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Ideally this path should be changed to remove any spaces. The hold-up is unlimited account is grandfathered in at its current naming convention.</p>
+<p>For details on the vault structure, see Jira ticket 329 (<a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-329">https://simonscmap.atlassian.net/browse/CMAP-329</a>)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── assimilation
+├── r2r_cruise
+├── model
+├── observation
+    ├── in-situ
+    │   ├── cruise
+    |   |   |── {table_name}
+    |   |       |── code
+    |   |       |── doc
+    |   |       |── metadata
+    |   |       |── nrt
+    |   |       |── raw
+    |   |       |── rep
+    |   |       |── stats
+    │   ├── drifter
+    │   ├── float
+    │   ├── mixed
+    │   └── station
+    └── remote
+        └── satellite
+</pre></div>
 </div>
 <p>Dropbox’s CLI tools are installed on the workstation. Using the selective sync feature of dropbox, the <strong>/vault</strong> stored on disk can be synced with the cloud.
 By reading/writing to disk, IO speeds for data processing should be improved.</p>
@@ -149,10 +172,18 @@ By reading/writing to disk, IO speeds for data processing should be improved.</p
 </pre></div>
 </div>
 </section>
+<section id="workstation-repositories">
+<h2>Workstation Repositories<a class="headerlink" href="#workstation-repositories" title="Link to this heading"></a></h2>
+<p>Scripts for new SQL tables and indicies are written to the DB repository found here: <strong>~/Documents/CMAP/DB/</strong></p>
+<p>Python scripts for collection, ingestion, and processing are written to the cmapdata repository found here: <strong>~/Documents/CMAP/cmapdata/</strong>. The dataingest branch contains the most recent updates.</p>
+<p>The vault directory that syncs with Dropbox is found here: <strong>/data/CMAPDataSubmissionDropbox/SimonsCMAP/vault/</strong>
+Note there are spaces in the directories “CMAP Data Submission” and “Simons CMAP”</p>
+<p>Thumbnails for the catalog page are saved here: <strong>/data/CMAPDataSubmissionDropbox/SimonsCMAP/static/mission_icons</strong></p>
+</section>
 <section id="synology-nas-and-drobo-storage">
 <h2>Synology NAS and Drobo Storage<a class="headerlink" href="#synology-nas-and-drobo-storage" title="Link to this heading"></a></h2>
 <p>Before storing data on Dropbox, two non-cloud storage methods were tried. Both the Drobo and Synology NAS are desktop size hard disk storage. Each contains ~40-50TB of disk space.
-There are limitations to each of these. The Drobo requires a connection through usb-c/thunderbolt. The Synology NAS can be accessed over the internet, ie ((Network Attached Storage).
+There are limitations to each of these. The Drobo requires a connection through usb-c/thunderbolt. The Synology NAS can be accessed over the internet, ie (Network Attached Storage).
 They read/write speed for both is quite slow compared to the disks on the workstation. Perhaps one or both could be used as another backup?</p>
 </section>
 </section>

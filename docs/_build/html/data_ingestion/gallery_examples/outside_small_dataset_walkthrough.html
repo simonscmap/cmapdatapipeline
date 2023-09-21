@@ -55,6 +55,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_validation.html">Data Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../continuous_ingestion.html">Continuous Ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Outside Small Dataset Walkthrough</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#collecting-a-small-dataset-from-an-ftp-site-using-wget">Collecting a small dataset from an FTP site using wget</a></li>
@@ -62,6 +64,8 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
@@ -147,7 +151,7 @@ For this example, we have created a directory with the tree structure:</p>
 </div>
 <p>For each dataset in this cruise (CTD, underway, underway sample, bottle  &amp; wind), we can collect any files using wget.</p>
 <p>For CTD we can write a download function using wget and pass the FTP link for the CTD files. Using wget, we can specify the output directory.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">odir</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">collected_data</span> <span class="o">+</span> <span class="s2">&quot;insitu/cruise/misc_cruise/KM0704_CMORE_BULA/&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">odir</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">cruise</span> <span class="o">+</span> <span class="s2">&quot;tblKM0704_CMORE_BULA/raw/&quot;</span>
 
 <span class="k">def</span> <span class="nf">download_KM0704_data</span><span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="n">download_link</span><span class="p">):</span>
     <span class="n">wget_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;wget -P &#39;</span><span class="si">{</span><span class="n">outputdir</span><span class="si">}</span><span class="s2">&#39; -np -R &quot;&#39;index.html*&quot; robots=off -nH --cut-dirs 8 -r  </span><span class="si">{</span><span class="n">download_link</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span>
@@ -165,7 +169,7 @@ For this example, we have created a directory with the tree structure:</p>
 <h2>Processing a small dataset<a class="headerlink" href="#processing-a-small-dataset" title="Link to this heading"></a></h2>
 <p>Now that the CTD files have been collected, we can begin processing them.
 Once again, we are going to create a dataset/collection specific file for a record. In this example, we will call it process_KM0704_CMORE_BULA.py
-This should be placed in the <strong>collect/</strong> submodule of cmapdata.</p>
+This should be placed in the <strong>process/</strong> submodule of cmapdata.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── insitu
     ├── cruise
         ├── misc_cruise
@@ -192,7 +196,7 @@ This should be placed in the <strong>collect/</strong> submodule of cmapdata.</p
 </div></blockquote>
 <p>Other datasets in the CMORE-BULA cruise required additional processing. Some required time and depth formatting.
 Others were missing spatio-temporal coordinates, which had to be collected using spatial or station/cast # joins to the other datasets.</p>
-<p>Once all the data are processed, the can be exported to dropbox/../vault/staging/combined/ where dataset and variable metadata sheets can be added. Once these are complete, the dataset should run through the validator.
+<p>Once all the data are processed, the can be exported to dropbox/../vault/observation/in-situ/cruise/tblKM0704_CMORE_BULA/raw where dataset and variable metadata sheets can be added. Once these are complete, the dataset should run through the validator.
 From here, follow the steps outlined in the <strong>user submitted datasets walkthrough</strong> section to ingest the data into the database.</p>
 </section>
 </section>

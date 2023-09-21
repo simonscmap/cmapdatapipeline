@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Geotraces Seawater Walkthrough &mdash; cmapdata 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Mesoscale Eddy Data Walkthrough" href="eddy_walkthrough.html" />
+    <link rel="prev" title="Outside Large Dataset Walkthrough" href="outside_large_dataset_walkthrough.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            cmapdata
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/installation.html">Installation and Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/database_design.html">Database Design and Table Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/compute_and_storage.html">Compute Resources and Data Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started/pitfalls.html">Pitfalls</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dataset Ingestion Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../web_validator.html">Web Validator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_validation.html">Data Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../continuous_ingestion.html">Continuous Ingestion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Geotraces Seawater Walkthrough</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#geotraces-overview">Geotraces Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#geotraces-data-collection">Geotraces Data Collection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#geotraces-seawater-processing">Geotraces Seawater Processing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ingestion-to-the-database">Ingestion to the Database</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#add-new-cruises">Add New Cruises</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-and-ingesting-metadata">Creating and Ingesting Metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-and-ingesting-unstructured-metadata">Creating and Ingesting Unstructured Metadata</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../subpackages/DB.html">DB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../subpackages/collect.html">collect</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../subpackages/process.html">process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../subpackages/ingest.html">ingest</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Future Improvements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../future/code_changes.html">Code Changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Ref</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_common.html">API Ref common.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_cruise.html">API Ref cruise.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_data.html">API Ref data.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_DB.html">API Ref DB.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_general.html">API Ref general.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_mapping.html">API Ref mapping.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_metadata.html">API Ref metadata.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_region_classifcation.html">API/API_region_classification.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_SQL.html">API Ref SQL.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_stats.html">API Ref stats.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_transfer.html">API Ref transfer.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../API/API_vault_structure.html">API Ref vault_structure.py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cmapdata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Geotraces Seawater Walkthrough</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/data_ingestion/gallery_examples/geotraces_walkthrough.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="geotraces-seawater-walkthrough">
+<h1>Geotraces Seawater Walkthrough<a class="headerlink" href="#geotraces-seawater-walkthrough" title="Link to this heading"></a></h1>
+<p>The Geotraces Seawater dataset is unique for two reasons:
+1. The data table contains &gt;1,024 columns which is the max allowed by SQL Server
+2. The data producers requested the inclusion of unstructured metatdata</p>
+<section id="geotraces-overview">
+<h2>Geotraces Overview<a class="headerlink" href="#geotraces-overview" title="Link to this heading"></a></h2>
+<p>Geotraces IDP2021v2 contains 5 datasets: Seawater, Sensor, Precipitation, Aerosols, and Cryosphere. Only Seawater and Aerosols have updated data in v2, but the download link includes the v1 data for the remaining 3 datasets. Based on discussions with the Geotraces data team, there are no plans to update the remaining 3 datasets to v2. The second version includes additional cruises and fixes to multiple errors found in v1. The full list of fixes can be found here: <a class="reference external" href="https://www.bodc.ac.uk/geotraces/data/idp2021/documents/geotraces_idp2021v2_changes.pdf">https://www.bodc.ac.uk/geotraces/data/idp2021/documents/geotraces_idp2021v2_changes.pdf</a></p>
+<section id="geotraces-data-collection">
+<h3>Geotraces Data Collection<a class="headerlink" href="#geotraces-data-collection" title="Link to this heading"></a></h3>
+<p>A zipped file of all five GEOTRACES datasets can be found on BODC: <a class="reference external" href="https://www.bodc.ac.uk/data/published_data_library/catalogue/10.5285/ff46f034-f47c-05f9-e053-6c86abc0dc7e/">https://www.bodc.ac.uk/data/published_data_library/catalogue/10.5285/ff46f034-f47c-05f9-e053-6c86abc0dc7e/</a></p>
+<p>The raw data will be saved in <strong>dropbox/../vault/observation/in-situ/cruise/tblGeotraces_{dataset_name}/raw</strong>
+These files will need to be unzipped, saving to each dataset’s raw folder. Copies of the included PDFs are moved to the /metadata folder. The script to download the data and unzip the raw data into each of the 5 dataset folders in the vault is here: ../cmapdata/collect/insitu/cruise/GEOTRACES/collectGeotraces_v2.py</p>
+<p>In addition to a NetCDF for each dataset, Geotraces also includes an infos folder. Within that folder is a static html file for each cruise and variable combination that metadata was submitted for. These are scraped to populate the variable-level unstructured metadata (UM) which is described in detail below.</p>
+</section>
+<section id="geotraces-seawater-processing">
+<h3>Geotraces Seawater Processing<a class="headerlink" href="#geotraces-seawater-processing" title="Link to this heading"></a></h3>
+<p>Detailed processing steps for the Seawater dataset can be found in process/insitu/cruise/GEOTRACES/process_Geotraces_Seawater_IDP2021v2.py. The rough processing logic is outlined below:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>import netcdf with xarray</p></li>
+<li><p>loop through netcdf metadata and export to Geotraces_Seawater_Vars.xlsx to build out the vars_metadata sheet for validator</p></li>
+<li><p>decode binary xarray column data</p></li>
+<li><p>change flag values from ASCII to int / string values based on Geotraces request</p></li>
+<li><p>rename depth field as it contains nulls</p></li>
+<li><p>build suggested SQL table based on netcdf data types</p></li>
+<li><p>convert xarray to dataframe and reset index</p></li>
+<li><p>add a depth specific column calculated from pressure and latitude using python seawater library</p></li>
+<li><p>rename Space-Time columns</p></li>
+<li><p>format datetime</p></li>
+<li><p>map longitude values from 0, 360 to -180, 180</p></li>
+<li><p>drop any invalid ST rows (rows missing time/lat/lon/depth)</p></li>
+<li><p>reorder columns and sort by time/lat/lon</p></li>
+<li><p>create two temp tables in SQL</p></li>
+<li><p>split dataframe in two, retaining the initial 17 metadata columns in both</p></li>
+<li><p>ingest split dataframes into two temp tables</p></li>
+<li><p>insert into final table with column set</p></li>
+<li><p>drop two temporary tables</p></li>
+</ul>
+</div></blockquote>
+<section id="ingestion-to-the-database">
+<h4>Ingestion to the Database<a class="headerlink" href="#ingestion-to-the-database" title="Link to this heading"></a></h4>
+<p>Geotraces_Seawater_IDP2021v2 includes 1186 variables which exceeds the limit SQL server allows to be held within a single table. Due to the nature of how the data is organized, much of the data is sparse, as not every cruise collected data for each variable.</p>
+<p>An example of the syntax to create a column set for sparse columns is shown below. Not all columns in the full create table script are show here.</p>
+<div class="highlight-SQL notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="p">[</span><span class="n">dbo</span><span class="p">].[</span><span class="n">tblGeotraces_Seawater_IDP2021v2</span><span class="p">](</span>
+<span class="w">    </span><span class="p">[</span><span class="k">time</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">lat</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="nb">float</span><span class="p">]</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">lon</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="nb">float</span><span class="p">]</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">N_SAMPLES</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">N_STATIONS</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">cruise_id</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">nvarchar</span><span class="p">](</span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">station_id</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">nvarchar</span><span class="p">](</span><span class="mi">26</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">station_type</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">nvarchar</span><span class="p">](</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">Bot__Depth</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="nb">float</span><span class="p">]</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">Operator_s_Cruise_Name</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">nvarchar</span><span class="p">](</span><span class="mi">13</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">Ship_Name</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">nvarchar</span><span class="p">](</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="k">Period</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">nvarchar</span><span class="p">](</span><span class="mi">23</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">Chief_Scientist</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">nvarchar</span><span class="p">](</span><span class="mi">31</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">GEOTRACES_Scientist</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">nvarchar</span><span class="p">](</span><span class="mi">77</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">Cruise_Aliases</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">nvarchar</span><span class="p">](</span><span class="mi">14</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">Cruise_Information_Link</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">nvarchar</span><span class="p">](</span><span class="mi">75</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">BODC_Cruise_Number</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="nb">float</span><span class="p">]</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">CSet</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">xml</span><span class="p">]</span><span class="w"> </span><span class="n">COLUMN_SET</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="n">ALL_SPARSE_COLUMNS</span><span class="w">  </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">CTDPRS_T_VALUE_SENSOR</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="nb">float</span><span class="p">]</span><span class="w"> </span><span class="n">SPARSE</span><span class="w">  </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">CTDPRS_T_VALUE_SENSOR_qc</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">nvarchar</span><span class="p">](</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="n">SPARSE</span><span class="w">  </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">DEPTH_SENSOR</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="nb">float</span><span class="p">]</span><span class="w"> </span><span class="n">SPARSE</span><span class="w">  </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span><span class="n">DEPTH_SENSOR_qc</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">nvarchar</span><span class="p">](</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="n">SPARSE</span><span class="w">  </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="p">[</span><span class="n">FG3</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>In order to successfully ingest into the column set, the data needs to be unioned from the two temp tables described above into the full table. BCP directly into the table with the column set fails.</p>
+</section>
+<section id="add-new-cruises">
+<h4>Add New Cruises<a class="headerlink" href="#add-new-cruises" title="Link to this heading"></a></h4>
+<p>The first version of Geotraces included data for multiple cruises that were not in CMAP. See the cruise ingestion for details on the template specific for adding cruise metadata and trajectories. Most US-based cruises can be found on the following websites:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>R2R: <a class="reference external" href="https://www.rvdata.us/browse_vessels">https://www.rvdata.us/browse_vessels</a></p></li>
+<li><p>SAMOS: <a class="reference external" href="https://samos.coaps.fsu.edu/html/cruise_data_availability.php">https://samos.coaps.fsu.edu/html/cruise_data_availability.php</a></p></li>
+<li><p>BODC: <a class="reference external" href="https://www.bodc.ac.uk/data/bodc_database/nodb/search/">https://www.bodc.ac.uk/data/bodc_database/nodb/search/</a></p></li>
+<li><p>UNOLS: <a class="reference external" href="https://strs.unols.org/Public/Search/diu_ships.aspx">https://strs.unols.org/Public/Search/diu_ships.aspx</a></p></li>
+</ul>
+</div></blockquote>
+<p>It is always preferred to use navigation or underway data for a cruise trajectory. In rare cases this data is not publicly available and sample locations can be used instead. Geotraces provides an API endpoint for sample locations that is “live (or close to) dynamically created data from Geotraces databases”.</p>
+<p>The collection script for the new cruises in v2 can be found here: cmapdata/collect/insitu/cruise/GEOTRACES/collectGeotraces_sample_locations_v2.py</p>
+<p>The processing script for the the new cruises can be found here: cmapdata/process/insitu/cruise/GEOTRACES/process_Geotraces_trajectories_v2.py</p>
+<p>The processing script creates the excel template needed for cruise trajectory ingestion. The metadata details for each cruise was pulled from IDP2021v2_Cruises.pdf, which is included in download provided by Geotraces. The final template is saved to the vault here: ../vault/r2r_cruise/{cruise_name}/raw/{cruise_name}_cruise_meta_nav_data.xlsx</p>
+<p>An example ingestion string for a new cruise is:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python general.py &quot;SAG25_cruise_meta_nav_data.xlsx&quot; -C SAG25 -S &quot;Rossby&quot; -v True</span>
+</pre></div>
+</div>
+<p>The {-v} flag tells the ingestion script to look in the raw folder of the vault, instead of pulling from Apps validator folder.</p>
+</section>
+<section id="creating-and-ingesting-metadata">
+<h4>Creating and Ingesting Metadata<a class="headerlink" href="#creating-and-ingesting-metadata" title="Link to this heading"></a></h4>
+<p>The Geotraces NetCDFs contain metadata that can be used to build out the vars_meta_data sheet for validator submission. This includes variable short name (Geotraces requested we maintain their variable short names), long names, and flag values. Below is syntax used to loop through the variables and create an initial spreadsheet of provided metadata:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tbl</span> <span class="o">=</span> <span class="s1">&#39;tblGeotraces_Seawater_IDP2021v2&#39;</span>
+<span class="n">meta_folder</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">vs</span><span class="o">.</span><span class="n">cruise</span><span class="si">}{</span><span class="n">tbl</span><span class="si">}</span><span class="s1">/metadata/&#39;</span>
+<span class="n">n</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">vs</span><span class="o">.</span><span class="n">cruise</span><span class="si">}{</span><span class="n">tbl</span><span class="si">}</span><span class="s1">/raw/GEOTRACES_IDP2021_Seawater_Discrete_Sample_Data_v2.nc&#39;</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="n">d1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;var_name&#39;</span><span class="p">:[],</span> <span class="s1">&#39;std_name&#39;</span><span class="p">:[],</span> <span class="s1">&#39;long_name&#39;</span><span class="p">:[],</span> <span class="s1">&#39;dtype&#39;</span><span class="p">:[],</span> <span class="s1">&#39;units&#39;</span><span class="p">:[],</span> <span class="s1">&#39;comment&#39;</span><span class="p">:[],</span> <span class="s1">&#39;flag_val&#39;</span><span class="p">:[],</span> <span class="s1">&#39;flag_def&#39;</span><span class="p">:[]}</span>
+<span class="n">df_varnames</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">d1</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">da</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">if</span> <span class="s1">&#39;flag_values&#39;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">fl_val</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;flag_values&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">fl_def</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;flag_meanings&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fl_val</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">fl_def</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s1">&#39;long_name&#39;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">long_name</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">long_name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s1">&#39;standard_name&#39;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">std_name</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;standard_name&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">std_name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s1">&#39;comment&#39;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">comment</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;comment&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s1">&#39;units&#39;</span> <span class="ow">in</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">units</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">units</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">d1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;var_name&#39;</span><span class="p">:[</span><span class="n">varname</span><span class="p">],</span> <span class="s1">&#39;std_name&#39;</span><span class="p">:[</span><span class="n">std_name</span><span class="p">],</span> <span class="s1">&#39;long_name&#39;</span><span class="p">:[</span><span class="n">long_name</span><span class="p">],</span> <span class="s1">&#39;dtype&#39;</span><span class="p">:[</span><span class="n">dtype</span><span class="p">],</span> <span class="s1">&#39;units&#39;</span><span class="p">:[</span><span class="n">units</span><span class="p">],</span> <span class="s1">&#39;comment&#39;</span><span class="p">:[</span><span class="n">comment</span><span class="p">],</span> <span class="s1">&#39;flag_val&#39;</span><span class="p">:[</span><span class="n">fl_val</span><span class="p">],</span> <span class="s1">&#39;flag_def&#39;</span><span class="p">:[</span><span class="n">fl_def</span><span class="p">]}</span>
+    <span class="n">temp_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">d1</span><span class="p">)</span>
+    <span class="n">df_varnames</span> <span class="o">=</span> <span class="n">df_varnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp_df</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">df_varnames</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">meta_folder</span> <span class="o">+</span><span class="s1">&#39;Geotraces_Seawater_Vars.xlsx&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With so many variable names, a significant amount of additional work is needed to clean up this initial spreadsheet. All variable long names should be title case. Specifically for Geotraces, there were many instances when the metadata in the NetCDF was truncated. Holes were filled in by referring to the relevant static HTML files included in the infos folder, later used to scrape for UM.</p>
+<p>All dataset ingestion using general.py (see cruise ingestion for differences) pulls metadata from a folder named “final” within the validator folders in DropBox. For large datasets, you will still need to submit a template to the validator. In order to pass the validator tests you will need to include a minimum of one row of data in the data sheet. The values can all be placeholders, but must contain some value. After the data curation team run the QC API to add the necessary keywords, they will include the finalized template to Apps/Geotraces_Seawater_IDP2021v2/final.</p>
+<p>To ingest the metadata only, you can use ingest/general.py</p>
+<p>Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal. Because the DOI for the Argo datasets is already in the references column in the <strong>dataset_meta_data</strong> tab of the metadata template, you do not need to use the {-d} flag with ingestion.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="p">{</span><span class="n">table_name</span><span class="p">}</span> <span class="p">{</span><span class="n">branch</span><span class="p">}</span> <span class="p">{</span><span class="n">filename</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">S</span><span class="p">}</span> <span class="p">{</span><span class="n">server</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">a</span><span class="p">}</span> <span class="p">{</span><span class="n">data_server</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">i</span><span class="p">}</span> <span class="p">{</span><span class="n">icon_filename</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">F</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">N</span><span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>{<strong>table_name</strong>}: Table name for the dataset. Must start with prefix “tbl”. Ex. tblArgoBGC_REP_Sep2023</p></li>
+<li><p>{<strong>branch</strong>}: Branch where dataset should be placed in Vault. Ex’s: cruise, float, station, satellite, model, assimilation</p></li>
+<li><p>{<strong>filename</strong>}: Base file name in vault/staging/combined/. Ex.: ‘global_diazotroph_nifH.xlsx’</p></li>
+<li><p>{<strong>-S</strong>}: Required flag for specifying server choice for metadata. Server name string follows flag.</p></li>
+<li><p>{<strong>server</strong>}: Valid server name string.  Ex. “Rainier”, “Mariana” or “Rossby”</p></li>
+<li><p>{<strong>-i</strong>}: Optional flag for specifying icon name instead of creating a map thumbnail of the data</p></li>
+<li><p>{<strong>icon_filename</strong>}: Filename for icon in Github instead of creating a map thumbnail of data. Ex: argo_small.jpg</p></li>
+<li><p>{<strong>-F</strong>}: Optional flag for specifying a dataset has a valid depth column. Default value is 0</p></li>
+<li><p>{<strong>-N</strong>}: Optional flag for specifying a ‘dataless’ ingestion or a metadata only ingestion.</p></li>
+</ul>
+<p>An example string for the September 2023 BGC dataset is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="n">tblGeotraces_Seawater_IDP2021v2</span> <span class="n">cruise</span> <span class="s1">&#39;Geotraces_Seawater_IDP2021v2.xlsx&#39;</span> <span class="o">-</span><span class="n">i</span> <span class="s1">&#39;tblGeotraces_Sensor.jpg&#39;</span> <span class="o">-</span><span class="n">S</span> <span class="s1">&#39;Rossby&#39;</span> <span class="o">-</span><span class="n">N</span>
+</pre></div>
+</div>
+</section>
+<section id="creating-and-ingesting-unstructured-metadata">
+<h4>Creating and Ingesting Unstructured Metadata<a class="headerlink" href="#creating-and-ingesting-unstructured-metadata" title="Link to this heading"></a></h4>
+<p>The unstructured metadata (UM) for v1 of Geotraces Seawater was provided by Jesse McNichol. As there were additional cruises and variables in v2, a new set of UM needed to be scraped from the static HTML files included in the Geotraces data download.</p>
+<p>The file naming convention for the HTML files is {cruise_name}_{variable_short_name}.html</p>
+<p>The files were scraped using BeautifulSoup. The cruise name and variable name were parsed from the file name. The Geotraces data team requested we include the BODC documentation links on methods for each variable and cruise. Additional links to cruise information are also included in the html files, but were not requested. These can be added to the future iteration of the cruise page if the new designs include UM for cruises.</p>
+<p>For details on the unstructured metadata project see Jira the following tickets: (<a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-563">https://simonscmap.atlassian.net/browse/CMAP-563</a>, <a class="reference external" href="https://simonscmap.atlassian.net/browse/CMAP-572">https://simonscmap.atlassian.net/browse/CMAP-572</a>). Each unstructured metadata object includes a value array and a description array. Values and descriptions are always arrays, even if empty or single values. Also, these arrays must always have identical lengths, even if descriptions are empty strings. Descriptions are meant to be human readable, short descriptions akin to alt-text for an image online. A single variable may have multiple entries in tblVariables_JSON_Metadata. An example of a variable-level unstructured metadata is:</p>
+<div class="highlight-SQL notranslate"><div class="highlight"><pre><span></span><span class="err">{</span><span class="ss">&quot;cruise_names&quot;</span><span class="p">:</span><span class="err">{</span><span class="ss">&quot;values&quot;</span><span class="p">:[</span><span class="ss">&quot;PS71&quot;</span><span class="p">],</span><span class="ss">&quot;descriptions&quot;</span><span class="p">:[</span><span class="ss">&quot;Operators Cruise Name&quot;</span><span class="p">]</span><span class="err">}</span><span class="p">,</span><span class="ss">&quot;meta_links&quot;</span><span class="p">:</span><span class="err">{</span><span class="ss">&quot;values&quot;</span><span class="p">:[</span><span class="ss">&quot;https://www.bodc.ac.uk/data/documents/nodb/285421/&quot;</span><span class="p">],</span><span class="ss">&quot;descriptions&quot;</span><span class="p">:[</span><span class="ss">&quot;BODC documentation link&quot;</span><span class="p">]</span><span class="err">}}</span>
+</pre></div>
+</div>
+<p>The script for creating UM for Geotraces Seawater is here: ..cmapdata/process/insitu/cruise/GEOTRACES/scrape_Geotraces_Seawater_UM.py</p>
+<p>Only one entry was requested by the Geotraces data team for dataset level metadata:</p>
+<div class="highlight-SQL notranslate"><div class="highlight"><pre><span></span><span class="err">{</span><span class="ss">&quot;publication_link&quot;</span><span class="p">:</span><span class="err">{</span><span class="ss">&quot;values&quot;</span><span class="p">:[</span><span class="ss">&quot;https://www.geotraces.org/geotraces-publications-database/&quot;</span><span class="p">],</span><span class="ss">&quot;descriptions&quot;</span><span class="p">:[</span><span class="ss">&quot;Link to database of GEOTRACES publications&quot;</span><span class="p">]</span><span class="err">}}</span>
+</pre></div>
+</div>
+<p>The dataset-level UM is ingested in the scrape script using DB.toSQLpandas(). The variable-level UM is ingested using DB.toSQLbcp_wrapper(), though requires a final update to fix BCP including additional quotes, causing the JSON to no longer be valid:</p>
+<div class="highlight-SQL notranslate"><div class="highlight"><pre><span></span><span class="n">qry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;&quot;&quot;UPDATE tblVariables_JSON_Metadata SET json_metadata = replace(replace(replace(json_metadata,&#39;&quot;&quot;&#39;,&#39;&quot;</span><span class="s1">&#39;), &#39;</span><span class="ss">&quot;{&#39;,&#39;{&#39;), &#39;}&quot;</span><span class="s1">&#39;,&#39;</span><span class="err">}&#39;</span><span class="p">)</span><span class="ss">&quot;&quot;</span><span class="err">&quot;</span>
+<span class="n">DB</span><span class="p">.</span><span class="n">DB_modify</span><span class="p">(</span><span class="n">qry</span><span class="p">,</span><span class="w"> </span><span class="n">server</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can check for invalid JSON in tblVariables_JSON_Metadata and tblDatasets_JSON_Metadata with the following:</p>
+<div class="highlight-SQL notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">tblVariables_JSON_Metadata</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">ISJSON</span><span class="p">(</span><span class="n">JSON_Metadata</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Norland Raphael Hagen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

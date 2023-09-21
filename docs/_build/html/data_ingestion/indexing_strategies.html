@@ -20,7 +20,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="User Submitted Dataset Walkthrough" href="gallery_examples/user_submitted_dataset_walkthrough.html" />
+    <link rel="next" title="Data Validation" href="data_validation.html" />
     <link rel="prev" title="Workflow" href="workflow.html" /> 
 </head>
 
@@ -60,9 +60,13 @@
 <li class="toctree-l2"><a class="reference internal" href="#file-groups">File Groups</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="data_validation.html">Data Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="continuous_ingestion.html">Continuous Ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gallery_examples/user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gallery_examples/outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gallery_examples/outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gallery_examples/cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
@@ -120,13 +124,13 @@
 <h1>Table Creation and Indexing<a class="headerlink" href="#table-creation-and-indexing" title="Link to this heading"></a></h1>
 <section id="space-time-index">
 <h2>Space-Time Index<a class="headerlink" href="#space-time-index" title="Link to this heading"></a></h2>
-<p>All datasets in CMAP share a common data format that includes columns with space a time information (time, lat, lon depth &lt;opt.&gt;).
-With these, space-time indexes can be created on data tables. Creating clustered indicies on this ST index can speed up query performance on large datasets.
+<p>All datasets in CMAP share a common data format that includes columns with space a time information (time, lat, lon, depth &lt;opt.&gt;).
+With these, space-time indexes can be created on data tables. Creating clustered indicies on this ST index will speed up query performance on large datasets.
 Only include depth in the index if the dataset has a depth component.</p>
 </section>
 <section id="climatology">
 <h2>Climatology<a class="headerlink" href="#climatology" title="Link to this heading"></a></h2>
-<p>To quickly calculate climatology for large datasets, specific climatology indicies can be created. Examples of these can be found in the tblWind_NRT.sql or others.</p>
+<p>To quickly calculate climatology for large datasets, specific climatology indicies can be created. Examples of these can be found in the tblSSS_NRT_cl1 or others.</p>
 </section>
 <section id="file-groups">
 <h2>File Groups<a class="headerlink" href="#file-groups" title="Link to this heading"></a></h2>

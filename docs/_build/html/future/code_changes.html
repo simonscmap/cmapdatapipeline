@@ -55,9 +55,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/data_validation.html">Data Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/continuous_ingestion.html">Continuous Ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_ingestion/gallery_examples/cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
@@ -114,16 +118,12 @@
   <section id="code-changes">
 <h1>Code Changes<a class="headerlink" href="#code-changes" title="Link to this heading"></a></h1>
 <ul class="simple">
-<li><p>Move collection data into a new leaf of vault/ perhaps raw or collected.</p></li>
 <li><p>Improve test coverage</p></li>
 <li><p>Update all .format() to fstring formatting</p></li>
-<li><p>Rename dropbox pathing to remove any spacing</p></li>
-<li><p>Add the ability to ingest to add DB’s</p></li>
 <li><p>Metadata insert should all be captured in a SQL transaction, so that if a table insert fails, other tables and relations are rolled back.</p></li>
-<li><p>Move any r2r cruise collection remnant into collect/</p></li>
 <li><p>Build up cruise ingestion infrastructure</p></li>
 <li><p>Build gridded spatio-temporal dataset classifier</p></li>
-<li><p>Finish up cmapsync and put on cronjob with report emailed</p></li>
+<li><p>Finish cmapsync and put on cronjob with report emailed</p></li>
 </ul>
 </section>
 

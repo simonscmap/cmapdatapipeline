@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Validation &mdash; cmapdata 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Continuous Ingestion" href="continuous_ingestion.html" />
+    <link rel="prev" title="Table Creation and Indexing" href="indexing_strategies.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmapdata
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installation and Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/database_design.html">Database Design and Table Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/compute_and_storage.html">Compute Resources and Data Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/pitfalls.html">Pitfalls</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dataset Ingestion Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="web_validator.html">Web Validator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Validation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pre-ingestion-tests">Pre-Ingestion Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#post-ingestion-tests">Post-Ingestion Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#db-api-endpoints">DB API Endpoints</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="continuous_ingestion.html">Continuous Ingestion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/DB.html">DB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/collect.html">collect</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/process.html">process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/ingest.html">ingest</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Future Improvements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../future/code_changes.html">Code Changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Ref</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_common.html">API Ref common.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_cruise.html">API Ref cruise.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_data.html">API Ref data.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_DB.html">API Ref DB.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_general.html">API Ref general.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_mapping.html">API Ref mapping.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_metadata.html">API Ref metadata.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_region_classifcation.html">API/API_region_classification.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_SQL.html">API Ref SQL.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_stats.html">API Ref stats.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_transfer.html">API Ref transfer.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_vault_structure.html">API Ref vault_structure.py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmapdata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Data Validation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/data_ingestion/data_validation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-validation">
+<h1>Data Validation<a class="headerlink" href="#data-validation" title="Link to this heading"></a></h1>
+<p>There are multiple data validation tests built into the ingestion code. Additional functions can be added to the scripts below, depending on when you would like the checks to run.</p>
+<section id="pre-ingestion-tests">
+<h2>Pre-Ingestion Tests<a class="headerlink" href="#pre-ingestion-tests" title="Link to this heading"></a></h2>
+<p>There are multiple touch points for a use submitted dataset to pass through data and formatting checks. The first is a successful submission through the validator. Following that, the CMAP data curation team uses the QC API (<a class="reference external" href="https://cmapdatavalidation.com/docs#tag/Pre-Ingestion-Checks">https://cmapdatavalidation.com/docs#tag/Pre-Ingestion-Checks</a>) to run additional checks and fill in keywords. Prior to the existence of the QC API, pre-ingestion checks were written into the ingestion code that are now duplicative. Specifically, checks for outliers in data values are done during submission to the validator, in the viz output of the QC API, and when the data is read into memory for ingestion.</p>
+<p><strong>ingest/data_checks.py</strong> contains various functions for checking data, either before or during ingestion.</p>
+<p><strong>check_df_on_trajectory</strong> was a test written before the QC API checked if the data submitted fell within the space and time bounds of the associate cruise trajectory in CMAP. It uses the CMAP_Sandbox database on Beast, which will likely be retired.</p>
+<p><strong>check_df_values</strong> checks that lat and lon are within range, depth is not below zero, and checks all numeric variables for min / max &lt; or &gt; 5 times standard deviation of dataset. Returns 0 if all checks pass, returns 1 or more for each variable with values out of expected range. This is called in <strong>general.py</strong> with each ingestion.</p>
+<p><strong>check_df_nulls</strong> checks a dataframe against an existing SQL table for nulls where a SQL column is defined as not null. Returns 0 if all checks pass, returns 1 or more for each dataframe variable with nulls where SQL column is not null.</p>
+<p><strong>check_df_constraint</strong> checks a dataframe again an existing SQL table’s unique indicies. Returns 0 if all checks pass, returns 1 if duplicates are in the dataframe in columns that should contain unique values.</p>
+<p><strong>check_df_dtypes</strong> checks a dataframe against an existing SQL table. Returns 0 if all checks pass, returns 1 or more for each column with different data types.</p>
+<p><strong>check_df_ingest</strong> runs the last three tests and returns 0 if all checks passed.</p>
+<p><strong>check_metadata_for_organism</strong> checks variable_metadata_df for variable names or units that could be associated with organisms. Checks variable short and long names for any name found in tblOrganism. Returns True if no potential organism variables are present. This is called in <strong>general.py</strong> with each ingestion.</p>
+<p><strong>validate_organism_ingest</strong> checks for the presence of org_id and conversion_coefficient in the vars_meta_data sheet. If those columns are present but blank, if checks that they should be blank. Checks that both columns are filled if one is filled for a variable. Checks that the conversion_coefficient is correct based on unit (this last check could use additional logic). Returns True if columns are not present or no issues are found. This is called in <strong>general.py</strong> with each ingestion.</p>
+</section>
+<section id="post-ingestion-tests">
+<h2>Post-Ingestion Tests<a class="headerlink" href="#post-ingestion-tests" title="Link to this heading"></a></h2>
+<p>All post-ingestion tests are run when the ingestion server is Rainier. As Rainier is the production database for the CMAP website, testing for a successful ingestion on Rossby first is suggested. With Rainier as the final server for ingestion, the following tests are run in <strong>post_ingest.py</strong>:</p>
+<p><strong>checkServerAlias</strong> checks the table is present on each server listed for a dataset in tblDataset_Servers. If less than three servers are listed in tblDataset_Server, it checks each on prem server if the table is present.</p>
+<p><strong>checkRegion</strong> checks that at least one region is associated with a dataset in tblDataset_Regions. If the dataset only lives on the cluster it will either assign all regions associated with Argo datasets, or allow you to enter your own. If no regions are associated with a dataset and it is in an on-prem server, regions will be assigned automatically based on a distinct list of lat and lon.</p>
+<p><strong>checkHasDepth</strong> checks that the Has_Depth flag in tblVariables is accurate based on the presence of a depth column in the data table.</p>
+<p><strong>compareDOI</strong> downloads a CMAP template from a DOI link and checks the data against what is in SQL. Checks numeric columns with math.isclose() as the number of significant digits can change on import. Deletes downloaded template after checks.</p>
+<p><strong>pycmapChecks</strong> calls various pycmap functions. Skips tests on stats if the dataset is larger than 2 million rows (included to stop SELECT * FROM running on the cluster, specifically for Argo). Note: due to a cache of the dataset IDs on the api layer, it’s possible the pycmap tests will fail if the cache has not reset after ingestion.</p>
+<p><strong>fullIngestPostChecks</strong> runs all checks listed above, with the optional argument to check the DOI data. Also runs <strong>api_checks.postIngestAPIChecks()</strong> on every 10th dataset (see DB API Endpoints below for details on this). This is called in <strong>general.py</strong> with each ingestion to Rainier.</p>
+</section>
+<section id="db-api-endpoints">
+<h2>DB API Endpoints<a class="headerlink" href="#db-api-endpoints" title="Link to this heading"></a></h2>
+<p>Information on the DB API endpoints can be found here: <a class="reference external" href="https://cmapdatavalidation.com/docs#tag/Post-Ingestion-Checks">https://cmapdatavalidation.com/docs#tag/Post-Ingestion-Checks</a></p>
+<p>You can test out each endpoint here: <a class="reference external" href="https://cmapdatavalidation.com/try#/">https://cmapdatavalidation.com/try#/</a></p>
+<p>Running the DB API checks on each ingestion should not be necessary. There is both a monetary cost for each API check and an unneccesary load on the servers to justify running these checks on each ingestion. Currently the logic to run these checks is on every 10 datasets. Each new dataset, or metadata update, will result in a new Dataset ID. These IDs are not backfilled, so when metadata is deleted, the old Dataset ID will not be reused.</p>
+<p>The <strong>fullIngestPostChecks</strong> function will run <a href="#id1"><span class="problematic" id="id2">**</span></a>api_checks.postIngestAPIChecks()  ** when a Dataset ID is divisible by ten.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">postIngestAPIChecks</span><span class="p">(</span><span class="n">server</span> <span class="o">=</span> <span class="s1">&#39;Rossby&#39;</span><span class="p">):</span>
+<span class="c1">## Runs DB endpoint checks. Default server is Rossby</span>
+    <span class="n">db_name</span> <span class="o">=</span> <span class="s1">&#39;Opedia&#39;</span>
+    <span class="n">strandedTables</span><span class="p">()</span>
+    <span class="n">strandedVariables</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">db_name</span><span class="p">)</span> <span class="c1">## Checks all on prem servers</span>
+    <span class="n">numericLeadingVariables</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">db_name</span><span class="p">)</span>
+    <span class="n">duplicateVarLongName</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">db_name</span><span class="p">)</span>
+    <span class="n">duplicateDatasetLongName</span><span class="p">()</span>
+    <span class="n">datasetsWithBlankSpaces</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">db_name</span><span class="p">)</span>
+    <span class="n">varsWithBlankSpace</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">db_name</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The default server is Rossby as it’s the fastest. Only strandedVariables() checks all on prem servers.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Norland Raphael Hagen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

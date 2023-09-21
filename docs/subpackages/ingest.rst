@@ -6,10 +6,17 @@ Ingesting a dataset using this submodule will be covered in data_ingestion/workf
 
 ingest/ is broken into the multiple python scripts to separate ingestion logic. Descriptions and uses of each are described below.
 
+
+api_checks.py
+---------
+
+This script holds functions that leverage the DB API endpoint. See the data validation section for details.
+
+
 common.py
 ---------
 
-This scrip holds many commonly used simple functions for data processing/cleaning. It is a good location for generalized use functions.
+This script holds many commonly used simple functions for data processing/cleaning. It is a good location for generalized use functions.
 
 
 credentials.py
@@ -25,55 +32,71 @@ cruise.py
 This file contains some cruise metadata helper functions and database calls along with a smattering of old cruise trajectory/metadata webscrapping stuff for r2r (rolling deck to repository).
 
 
+data_checks.py
+-------
+
+This script holds functions used to prepare datasets for ingestion, as well as within the ingestion process. See the data validation section for details.
+
+
 data.py
 -------
 
 This file contains general cleaning and data processing functions specifically for the data sheet of the template.
+
 
 DB.py
 -----
 
 DB contains the SQL connection logic, table insert logic, bcp (MSSQL bulk copy program) wrapper functions etc.
 
+
 general.py
 ----------
 
 general.py contains wrapper functions that take arguments through argparse to ingest datasets. It is the main script used in the collection script.
 
+
 ingest_test.py
 --------------
 
-This is a fragment of a started post-ingestion test suite, with the aim of testing the success of the ingestion. Could be removed, rewritted or expanded upon.
+This is a legacy script fragment for a started post-ingestion test suite, with the aim of testing the success of the ingestion. Could be removed, rewritted or expanded upon.
+
 
 mapping.py
 ----------
 
 Contains the functionallity for creating .png and .html interactive maps from input datasets. These are stored in /static and used in the web catalog to give a spatial representation of a dataset. html interactive maps were never included in the catalog, but could be.
 
+
 metadata.py
 -----------
 
 This contains multiple functions to format the dataset_meta_data and vars_meta_data into custom SQL queries.
+
 
 region_classification.py
 ------------------------
 
 This uses input dataset coordinates along with a geopackage of ocean regions to classify a dataset by spatial region.
 
+
 SQL.py
 ------
 
 Has functionality to suggest SQL tables and basic indices.
+
 
 stats.py
 --------
 
 Functions to build summary statistics from datasets. These results are used for data size estimations in the web app.
 
+
 transfer.py
 -----------
 
 A few functions to move and split excel files from /staging to /vault
+
 
 vault_structure.py
 ------------------
@@ -87,6 +110,12 @@ vault_structure contains the relative paths of vault as well as some directory c
     ├── observation
         ├── in-situ
         │   ├── cruise
+        │      ├── nrt  
+        │      ├── rep     
+        │      ├── metadata                           
+        │      ├── doc    
+        │      ├── code                           
+        │      ├── raw                   
         │   ├── drifter        
         │   ├── float
         │   ├── mixed        

@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="DB" href="../../subpackages/DB.html" />
-    <link rel="prev" title="Outside Large Dataset Walkthrough" href="outside_large_dataset_walkthrough.html" /> 
+    <link rel="prev" title="Mesoscale Eddy Data Walkthrough" href="eddy_walkthrough.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -55,9 +55,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../web_validator.html">Web Validator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../workflow.html">Workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_validation.html">Data Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../continuous_ingestion.html">Continuous Ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
 <li class="toctree-l1"><a class="reference internal" href="outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Ingesting Cruise Metdata and Trajectory</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#metadata-sheet">Metadata Sheet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#trajectory-sheet">Trajectory Sheet</a></li>
@@ -160,7 +164,7 @@ These allow us to visualize cruise tracks on map, colocalize datasets with cruis
 <section id="ingesting-cruise-templates">
 <h2>Ingesting Cruise Templates<a class="headerlink" href="#ingesting-cruise-templates" title="Link to this heading"></a></h2>
 <p>Similar to how datasets are ingested into CMAP, we can use the functionallity in the <strong>ingest</strong> subpackage.</p>
-<p>Completed crusie templates should start the ingestion process in ‘/CMAP Data Submission Dropbox/Simons CMAP/staging/combined/{cruise_name_template.xlsx}’</p>
+<p>Completed crusie templates should start the ingestion process in ‘/CMAP Data Submission Dropbox/Simons CMAP/vault/r2r_cruise/{cruise_name}/{cruise_name_template.xlsx}’</p>
 <p>Using ingest/general.py, you can pass command line arguments to specify a cruise ingestion as well as a server.</p>
 <p>Navigate to the ingest/ submodule of cmapdata. From there, run the following in the terminal.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="p">{</span><span class="n">filename</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">C</span><span class="p">}</span> <span class="p">{</span><span class="n">cruise_name</span><span class="p">}</span> <span class="p">{</span><span class="o">-</span><span class="n">S</span><span class="p">}</span> <span class="p">{</span><span class="n">server</span><span class="p">}</span>
@@ -172,9 +176,11 @@ These allow us to visualize cruise tracks on map, colocalize datasets with cruis
 <li><p>{<strong>cruise_name</strong>}: String for official (UNOLS) cruise name Ex. TN278</p></li>
 <li><p>{<strong>-S</strong>}: Required flag for specifying server choice. Server name string follows flag.</p></li>
 <li><p>{<strong>server</strong>}: Valid server name string.  Ex. “Rainier”, “Mariana” or “Rossby”</p></li>
+<li><p>{<strong>-v</strong>}: Optional flag denoting metadata template is present in the raw folder of the vault</p></li>
+<li><p>{<strong>in_vault</strong>}: If True, pulls template from vault. Default is False, which pulls from /final folder in Apps folder created after submitting to the validator</p></li>
 </ul>
 <p>An example string would be:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="s1">&#39;TN278_cruise_meta_nav_data.xlsx&#39;</span> <span class="o">-</span><span class="n">C</span> <span class="n">TN278</span> <span class="o">-</span><span class="n">S</span> <span class="s2">&quot;Rainier&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">general</span><span class="o">.</span><span class="n">py</span> <span class="s1">&#39;TN278_cruise_meta_nav_data.xlsx&#39;</span> <span class="o">-</span><span class="n">C</span> <span class="n">TN278</span> <span class="o">-</span><span class="n">S</span> <span class="s2">&quot;Rainier&quot;</span> <span class="o">-</span><span class="n">v</span> <span class="kc">True</span>
 </pre></div>
 </div>
 <p>Behind the scenes, the script is doing:</p>
@@ -182,7 +188,6 @@ These allow us to visualize cruise tracks on map, colocalize datasets with cruis
 <div><ol class="arabic simple">
 <li><p>parsing the user supplied arguments.</p></li>
 <li><p>Splitting the data template into cruise_metadata and cruise_trajectory files.</p></li>
-<li><p>Transfering the files to <strong>vault/</strong>.</p></li>
 <li><p>Importing into memory the cruise_metadata and cruise_trajectory sheets as pandas dataframes.</p></li>
 <li><p>Filling in the ST bounds for the cruise_metdata dataframe with min/max’s from the trajectory dataframe.</p></li>
 <li><p>Inserting the metadata dataframe into tblCruise.</p></li>

@@ -50,6 +50,7 @@ Navigate to the ingest/ submodule of cmapdata. From there, run the following in 
 
    python general.py {table_name} {branch} {filename} {-d} {DOI link} {-l} {DOI download link} {-f} {DOI file name} {-S} {server}
 
+* {**table_name**}: Table name for the dataset. Must start with prefix "tbl". Ex. tblFalkor_2018
 * {**branch**}: Branch where dataset should be placed in Vault. Ex's: cruise, float, station, satellite, model, assimilation
 * {**filename**}: Base file name in vault/staging/combined/. Ex.: 'Falkor_2018.xlsx'
 * {**-d**}: Optional flag for including DOI with dataset in tblReferences. DOI link string follows flag arg. 
