@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMAP Website &mdash; cmapdata 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="User Submitted Dataset Walkthrough" href="gallery_examples/user_submitted_dataset_walkthrough.html" />
+    <link rel="prev" title="Continuous Ingestion" href="continuous_ingestion.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            cmapdata
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installation and Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/database_design.html">Database Design and Table Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/compute_and_storage.html">Compute Resources and Data Storage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/pitfalls.html">Pitfalls</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Dataset Ingestion Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="web_validator.html">Web Validator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="indexing_strategies.html">Table Creation and Indexing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_validation.html">Data Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="continuous_ingestion.html">Continuous Ingestion</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CMAP Website</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/user_submitted_dataset_walkthrough.html">User Submitted Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/outside_small_dataset_walkthrough.html">Outside Small Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/outside_large_dataset_walkthrough.html">Outside Large Dataset Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/geotraces_walkthrough.html">Geotraces Seawater Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/eddy_walkthrough.html">Mesoscale Eddy Data Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gallery_examples/cruise_ingestion.html">Ingesting Cruise Metdata and Trajectory</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Package Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/DB.html">DB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/collect.html">collect</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/process.html">process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../subpackages/ingest.html">ingest</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Future Improvements</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../future/code_changes.html">Code Changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Ref</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_common.html">API Ref common.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_cruise.html">API Ref cruise.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_data.html">API Ref data.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_DB.html">API Ref DB.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_general.html">API Ref general.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_mapping.html">API Ref mapping.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_metadata.html">API Ref metadata.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_region_classifcation.html">API/API_region_classification.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_SQL.html">API Ref SQL.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_stats.html">API Ref stats.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_transfer.html">API Ref transfer.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/API_vault_structure.html">API Ref vault_structure.py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cmapdata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">CMAP Website</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/data_ingestion/cmap_website.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cmap-website">
+<h1>CMAP Website<a class="headerlink" href="#cmap-website" title="Link to this heading"></a></h1>
+<p>Below are a handful of screenshots of the CMAP website with names of the core tables in the database that populate each section. Included are lessons learned when debugging various issues.</p>
+<p>The functionality on the catalog page relies on multiple core tables.</p>
+<ul class="simple">
+<li><p>The search box relies on keywords associated with a dataset.</p></li>
+<li><p>The dataset cards are populated by the udfCatalog() SQL function</p></li>
+<li><p>The regions filter pulls from tblDataset_Regions. While all datasets that have gone through the QCI API checks include regions as keywords, the region filter does not reference keywords.</p></li>
+<li><p>The download data dialog populates the subset values from tblDataset_Stats.</p></li>
+</ul>
+<figure class="align-default">
+<a class="reference internal image-reference" href="../_images/catalog_page.png"><img alt="../_images/catalog_page.png" src="../_images/catalog_page.png" style="width: 1121.3999999999999px; height: 602.0px;" /></a>
+</figure>
+<p>The top of the dataset page uses a stored procedure to join data from three core SQL tables:</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="../_images/dataset_page_1.png"><img alt="../_images/dataset_page_1.png" src="../_images/dataset_page_1.png" style="width: 527.8px; height: 498.4px;" /></a>
+</figure>
+<p>The bottom of the dataset page uses udfVariableCatalog() which is optimized to extract the JSON data from tblDataset_Stats more efficiently.
+The entries diplayed in the references section show all references submitted in the validator template, along with an additional DOI where applicable.
+The linked cruises at the bottom will display if there is a match on Name or Nickname in tblCruise. If the cruise is not yet in CMAP, the cruise name included in the dataset_meta_data tab of the validator excel template will not be displayed here. All datasets run through the QC API will include all cruise names and nicknames listed in the template as keywords.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="../_images/dataset_page_2.png"><img alt="../_images/dataset_page_2.png" src="../_images/dataset_page_2.png" style="width: 1115.8px; height: 505.4px;" /></a>
+</figure>
+<p>The cruise page groups cruises by year. If a cruise is added to tblCruise but does not include a min/max time value, the cruise name will be grouped in a NULL category at the bottom of listed years.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="../_images/cruise_search.png"><img alt="../_images/cruise_search.png" src="../_images/cruise_search.png" style="width: 1068.2px; height: 606.1999999999999px;" /></a>
+</figure>
+<p>Only cruises that are associated with a dataset are displayed in the cruise search list. The cruise page will link you back to each dataset page it is associated with.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="../_images/cruise_page.png"><img alt="../_images/cruise_page.png" src="../_images/cruise_page.png" style="width: 870.0999999999999px; height: 623.6999999999999px;" /></a>
+</figure>
+<p>If a cruise is added but does not have an associated trajectory, selecting the cruise will zoom you in on your current view of the globe. The location the globe zooms you to is based on the data in tblCruise_Trajectory, not based on the min/max of lat/lon in tblCruise.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="../_images/cruise_viz.png"><img alt="../_images/cruise_viz.png" src="../_images/cruise_viz.png" style="width: 960.8000000000001px; height: 716.0px;" /></a>
+</figure>
+<p>The viz page will show different charting options depending on the variable selected. Only gridded datasets (typically model or satellite) should be given a defined spatial resolution. If a variable is assigned a spatial resolution other than “Irregular” (ID = 1), it cannot have any missing lat/lon values that would leave holes in the global coverage.
+The depth profile chart option will only be visible if the Has_Depth = 1 in tblVariables.</p>
+<figure class="align-default">
+<a class="reference internal image-reference" href="../_images/viz_page.png"><img alt="../_images/viz_page.png" src="../_images/viz_page.png" style="width: 832.0px; height: 716.8000000000001px;" /></a>
+</figure>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Norland Raphael Hagen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
