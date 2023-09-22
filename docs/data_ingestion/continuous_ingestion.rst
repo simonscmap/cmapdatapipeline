@@ -121,6 +121,7 @@ Once all new files have been processed from tblProcess_Queue and added to tblIng
 
 After all files have successfully ingested to the cluster (Ingested will be filled with the date and time it was completed), each dataset will need updates to tblDataset_Stats. In run_cont_ingestion.py, updateCIStats(tbl) formats the min and max times to ensure the download subsetting and viz page works properly. In short, time must be included, along with the '.000Z' suffix.
 
+
 Troubleshooting
 ----------------------------------
 Occasionally datasets will have days missing, resulting in a date being retried on each new run of run_cont_ingestion.py. In some cases, data will never be provided for these dates. This information can be found in the documentation provided by each data provider. For example, the SMAP instrument used for SSS data experienced downtime between Aug 6 - Sept 23 2022 (see Missing Data section: https://remss.com/missions/smap/salinity/). That date range was deleted from tblProcess_Queue to prevent those dates from being rechecked each run. 
@@ -176,6 +177,7 @@ Sea Surface Salinity Walkthrough
 There are two version of Sea Surface Salinity (SSS) data. For details on the differences see Jira ticket 754 (https://simonscmap.atlassian.net/browse/CMAP-754). Continuous ingestion downloads the REMSS SMAP data. The previous version of SSS data in CMAP was collected from V4.0 provided by REMSS. The updates in the V5.0 release recalculated historic data (details can be found here: https://remss.com/missions/smap/salinity/), which meant we could no longer append new data to the existing table. 
 
 Due to the release of V5.0, a new table was made with a "change log" suffix of 1. New SSS data is currently ingested into **tblSSS_NRT_cl1**. The tblSSS_NRT table can be retired and removed from the databases after users have been notified via a news update on the homepage. A typical wait time has been one month after publishing a news story before a dataset can be removed. 
+
 
 Download SSS Data
 ~~~~~~~~~~~~~~~~~

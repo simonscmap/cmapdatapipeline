@@ -213,11 +213,13 @@ For details on the unstructured metadata project see Jira the following tickets:
 
 The script for creating UM for Geotraces Seawater is here: ..cmapdata/process/insitu/cruise/GEOTRACES/scrape_Geotraces_Seawater_UM.py
 
+
 Only one entry was requested by the Geotraces data team for dataset level metadata: 
 
 .. code-block:: SQL
 
    {"publication_link":{"values":["https://www.geotraces.org/geotraces-publications-database/"],"descriptions":["Link to database of GEOTRACES publications"]}}
+
 
 The dataset-level UM is ingested in the scrape script using DB.toSQLpandas(). The variable-level UM is ingested using DB.toSQLbcp_wrapper(), though requires a final update to fix BCP including additional quotes, causing the JSON to no longer be valid:
 
