@@ -20,6 +20,7 @@ suggested improvements.
     getting_started/installation.rst
     getting_started/database_design.rst
     getting_started/compute_and_storage.rst
+    getting_started/cmap_website.rst    
     getting_started/pitfalls.rst
 
 .. toctree::

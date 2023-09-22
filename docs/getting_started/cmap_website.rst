@@ -1,7 +1,7 @@
 CMAP Website
 =============
 
-Below are a handful of screenshots of the CMAP website with names of the core tables in the database that populate each section. Included are lessons learned when debugging various issues. 
+Below are a handful of screenshots of the CMAP website with names of the core tables in the database that populate each section. The examples given are based on lessons learned when debugging various issues after updates to the database.
 
 
 The functionality on the catalog page relies on multiple core tables. 
@@ -31,6 +31,7 @@ The linked cruises at the bottom will display if there is a match on Name or Nic
    :scale: 70 %
 
 
+
 The cruise page groups cruises by year. If a cruise is added to tblCruise but does not include a min/max time value, the cruise name will be grouped in a NULL category at the bottom of listed years. 
 
 .. figure:: ../_static/cruise_search.png
@@ -40,6 +41,7 @@ Only cruises that are associated with a dataset are displayed in the cruise sear
 
 .. figure:: ../_static/cruise_page.png
    :scale: 70 %
+
 
 
 If a cruise is added but does not have an associated trajectory, selecting the cruise will zoom you in on your current view of the globe. The location the globe zooms you to is based on the data in tblCruise_Trajectory, not based on the min/max of lat/lon in tblCruise.
