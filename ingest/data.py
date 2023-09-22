@@ -8,6 +8,7 @@ cmapdata - data - data cleaning and reformatting functions.
 
 import sys
 import os
+# from this import s
 import pandas as pd
 import numpy as np
 import glob
@@ -40,6 +41,33 @@ def removeMissings(df, cols):
     for col in cols:
         df[col].replace(r"^\s*$", np.nan, regex=True, inplace=True)
         df.dropna(subset=[col], inplace=True)
+    return df
+
+def remove_blank_columns(df):
+    """Removes all blank columns
+
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        The dataframe to be modified
+
+    Returns
+    -------
+    df
+        Pandas DataFrame with blank columns removed
+    """
+    empty_cols = [col for col in df.columns if df[col].isnull().all()]
+    for c in empty_cols:
+        contYN = input(
+        "Are you sure you want to delete column "
+        + str(c)
+        + " ?  [yes/no]: "
+        )
+        if contYN == 'yes':
+            df.drop(c, axis=1, inplace=True)
+        else:
+            continue
+
     return df
 
 def removeUnnamed(df):
@@ -89,6 +117,7 @@ def mapTo180180(df):
     return df
 
 
+
 def sort_values(df, cols):
     """Sorts dataframe cols
 
@@ -125,6 +154,29 @@ def check_ST_ordering(ST_vars):
             ST_vars = ["time", "lat", "lon"]
     return ST_vars
 
+def check_ST_ordering_clim(ST_vars):
+    """Ensures that ST column list is in correct order. ie ['time','lat','lon'] not ['time','lon','lat]
+
+    Args:
+        ST_vars ([type]): [description]
+    Returns: ST_vars (sorted)
+    """
+    if len(ST_vars) == 4:
+        st_bool = ST_vars == ["month", "lat", "lon", "depth"]
+        if st_bool == False:
+            ST_vars = ["month", "lat", "lon", "depth"]
+    elif len(ST_vars) == 3:
+        st_bool = ST_vars == ["month", "lat", "lon"]
+        if st_bool == False:
+            ST_vars = ["month", "lat", "lon"]
+    return ST_vars
+
+def ST_columns_clim(df):
+    """Returns SpaceTime related columns in a dataset as a list"""
+    df_cols = cmn.lowercase_List(list(df))
+    ST_vars = [i for i in df_cols if i in ["month", "lat", "lon", "depth"]]
+    ST_vars_ordered = check_ST_ordering_clim(ST_vars)
+    return ST_vars_ordered
 
 def ST_columns(df):
     """Returns SpaceTime related columns in a dataset as a list"""

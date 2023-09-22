@@ -81,7 +81,7 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
     Description = (
         dataset_metadata_df["dataset_description"]
         .iloc[0]
-        # .replace("'", "CHAR(39)")
+        .replace("'", "CHAR(39)")
         .replace("’", "")
         .replace("‘", "")
         # .replace("\n", "")
@@ -131,6 +131,8 @@ def tblDatasets_Insert(dataset_metadata_df, tableName, icon_filename, server, db
     for row in dataset_metadata_df.itertuples():
         if getattr(row, 'Index') ==0:
             desc = row.dataset_description
+            if "CHAR(39)" in desc:
+                desc = desc.replace("CHAR(39)", "''")
             qry = f"update tbldatasets set description = '{desc}' where id = {last_dataset_ID}"   
             DB.DB_modify(qry, server)   
     print("Metadata inserted into tblDatasets.")
@@ -146,12 +148,9 @@ def tblProcess_Queue_Download_Insert(Original_Name, Table_Name, db_name, server,
     DB.lineInsert(
                 server, db_name +".[dbo].[tblProcess_Queue]", columnList, query
             )
-def tblProcess_Queue_Download_Error_Update(Error_Date, Original_Name, Table_Name, db_name, server, error_flag=''):
-    pr_str = datetime.datetime.now().astimezone(timezone('US/Pacific')).strftime("%Y-%m-%d %H:%M:%S")
-    if len(error_flag) ==0:    
-        qry = f"UPDATE {db_name}.[dbo].[tblProcess_Queue] SET Downloaded = '{pr_str}', Original_Name = '{Original_Name}', Error_Str = NULL WHERE Table_Name = '{Table_Name}' and Original_Name = '{Error_Date}' "
-    else:
-        qry = f"UPDATE {db_name}.[dbo].[tblProcess_Queue] SET Downloaded = '{pr_str}', Error_Str='{error_flag}' WHERE Table_Name = '{Table_Name}' and Original_Name = '{Error_Date}' "        
+def tblProcess_Queue_Download_Error_Update(Error_Date, Original_Name, Table_Name, db_name, server):
+    pr_str = datetime.datetime.now().astimezone(timezone('US/Pacific')).strftime("%Y-%m-%d %H:%M:%S")   
+    qry = f"UPDATE {db_name}.[dbo].[tblProcess_Queue] SET Downloaded = '{pr_str}', Original_Name = '{Original_Name}', Error_Str = NULL WHERE Table_Name = '{Table_Name}' and Original_Name = '{Error_Date}' "     
     DB.DB_modify(qry,server)
 
 def tblProcess_Queue_Process_Update(Original_Name, Path, Table_Name, db_name, server, error_flag=''):
@@ -306,7 +305,7 @@ def tblVariables_Insert(
     elif data_server.lower() == 'cluster':
         try:
             # min_date, max_date, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth = api.statsCluster(Table_Name, has_depth)
-            min_date, max_date, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth =stats.pull_from_stats_folder(Table_Name,vs.float_dir)
+            min_date, max_date, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth, row_count =stats.pull_from_stats_folder(Table_Name,vs.float_dir)
             min_date = min_date.strftime("%Y-%m-%dT%H:%M:%S")
             max_date = max_date.strftime("%Y-%m-%dT%H:%M:%S")
         except:
@@ -744,6 +743,31 @@ def deleteFromtblDataset_Vault(Dataset_ID, db_name, server):
     DB.DB_modify(cur_str, server)
     print("tblDataset_Vault entries deleted for Dataset_ID: ", Dataset_ID)
 
+def deleteFromtblDatasets_JSON_Metadata(Dataset_ID, db_name, server):
+    cur_str = (
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblDatasets_JSON_Metadata] WHERE [Dataset_ID] = """
+        + str(Dataset_ID)
+    )
+    DB.DB_modify(cur_str, server)
+    print("tblDatasets_JSON_Metadata entries deleted for Dataset_ID: ", Dataset_ID)    
+
+def deleteFromtblVariables_JSON_Metadata(Dataset_ID, db_name, server):
+    qry = f"SELECT ID FROM tblVariables WHERE [Dataset_ID] = {Dataset_ID}"
+    df_var = DB.dbRead(qry, server)
+    var_list = df_var['ID'].to_list()
+    var_ids = "','".join(str(key) for key in var_list)
+    cur_str = (
+        """DELETE FROM """
+        + db_name
+        + """.[dbo].[tblVariables_JSON_Metadata] WHERE [Var_ID] IN ('"""
+        + str(var_ids)
+        + """')"""
+    )
+    DB.DB_modify(cur_str, server)
+    print("tblVariables_JSON_Metadata entries deleted for Dataset_ID: ", Dataset_ID)        
+
 def deleteFromtblVariables(Dataset_ID, db_name, server):
     cur_str = (
         """DELETE FROM """
@@ -794,7 +818,7 @@ def dropTable(tableName, server):
 
 def deleteCatalogTables(tableName, db_name, server):
     contYN = input(
-        "Are you sure you want to delete all of the catalog tables for "
+        "Are you sure you want to delete all of the catalog tables and data for "
         + tableName
         + " ?  [yes/no]: "
     )
@@ -806,13 +830,15 @@ def deleteCatalogTables(tableName, db_name, server):
         deleteFromtblDataset_Regions(Dataset_ID, db_name, server)
         deleteFromtblDataset_DOI_Download(Dataset_ID, db_name, server)
         deleteFromtblDataset_References(Dataset_ID, db_name, server)
+        deleteFromtblVariables_JSON_Metadata(Dataset_ID, db_name, server)         
         deleteFromtblVariables(Dataset_ID, db_name, server)
         deleteFromtblDataset_Servers(Dataset_ID, db_name, server)
         deleteFromtblDataset_Vault(Dataset_ID, db_name, server)
+        deleteFromtblDatasets_JSON_Metadata(Dataset_ID, db_name, server)
         deleteFromtblDatasets(Dataset_ID, db_name, server)
         dropTable(tableName, server)
     else:
-        print("Catalog tables for ID" + Dataset_ID + " not deleted")
+        print(f"Catalog tables for {tableName}, ID" + str(Dataset_ID) + " not deleted")
 
 def deleteTableMetadata(tableName, db_name, server):
     contYN = input(
@@ -820,20 +846,28 @@ def deleteTableMetadata(tableName, db_name, server):
         + tableName
         + " ?  [yes/no]: "
     )
-    Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
-    if contYN == "yes":
-        deleteFromtblKeywords(Dataset_ID, db_name, server)
+    if contYN == "yes":    
+        ## If variables for dataset are in tblVariables
+        try:
+            Dataset_ID = cmn.getDatasetID_Tbl_Name(tableName, db_name, server)
+            deleteFromtblKeywords(Dataset_ID, db_name, server)
+            deleteFromtblVariables_JSON_Metadata(Dataset_ID, db_name, server) 
+            deleteFromtblVariables(Dataset_ID, db_name, server)   
+        ## If removing partial ingestion
+        except:
+            datasetName = input("Enter the dataset short name you want deleted: ")
+            Dataset_ID = cmn.getDatasetID_DS_Name(datasetName, db_name, server)        
         deleteFromtblDataset_Stats(Dataset_ID, db_name, server)
         deleteFromtblDataset_Cruises(Dataset_ID, db_name, server)
         deleteFromtblDataset_Regions(Dataset_ID, db_name, server)
         deleteFromtblDataset_DOI_Download(Dataset_ID, db_name, server)
-        deleteFromtblDataset_References(Dataset_ID, db_name, server)
-        deleteFromtblVariables(Dataset_ID, db_name, server)
+        deleteFromtblDataset_References(Dataset_ID, db_name, server)    
         deleteFromtblDataset_Servers(Dataset_ID, db_name, server)
         deleteFromtblDataset_Vault(Dataset_ID, db_name, server)
+        deleteFromtblDatasets_JSON_Metadata(Dataset_ID, db_name, server)        
         deleteFromtblDatasets(Dataset_ID, db_name, server)
     else:
-        print("Metadata for dataset ID" + Dataset_ID + " not deleted")        
+        print(f"Catalog tables for {tableName}, ID" + str(Dataset_ID) + " not deleted")      
 
 
 def removeKeywords(keywords_list, var_short_name_list, tableName, db_name, server):

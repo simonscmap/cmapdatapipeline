@@ -12,7 +12,6 @@ import vault_structure as vs
 import DB
 import metadata
 import api_checks as api
-import data_checks as dc
 import data
 
 
@@ -58,7 +57,7 @@ for fil in tqdm(flist):
     df["week"] = pd.to_datetime(df["time"]).dt.isocalendar().week
     df["dayofyear"] = pd.to_datetime(df["time"]).dt.dayofyear
     df = df[["time", "lat", "lon", "poc", "year", "month", "week", "dayofyear"]]
-    df = dc.sort_values(df, dc.ST_columns(df))
+    df = data.sort_values(df, data.ST_columns(df))
     if df.dtypes.to_dict() != test_dtype:
         print(f"Check data types in {fil}. New: {df.columns.to_list()}")
         sys.exit()      

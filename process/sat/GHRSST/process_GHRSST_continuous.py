@@ -19,7 +19,7 @@ sys.path.append("../../../ingest")
 
 import vault_structure as vs
 import DB
-import data_checks as dc
+import data
 import metadata
 
 tbl = 'tblSST_AVHRR_OI_NRT'
@@ -60,7 +60,7 @@ for fil in tqdm(flist):
     df_import['sst'] = df_import['sst']- 273.15 
     df_import['time'] =  df_import['time'].dt.date
     # pd.to_datetime(df_import['time']).dt.date
-    df_import = dc.add_day_week_month_year_clim(df_import)
+    df_import = data.add_day_week_month_year_clim(df_import)
     df_import.sort_values(['time', 'lat', 'lon'], ascending=[True, True, True], inplace=True)
     df_import['week'] = df_import['week'].astype(int)
     ## Data type changed in 5/2023 from float(64) to float(32)

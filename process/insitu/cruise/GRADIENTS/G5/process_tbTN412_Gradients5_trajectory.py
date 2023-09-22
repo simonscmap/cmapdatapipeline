@@ -11,7 +11,7 @@ sys.path.append("ingest")
 import vault_structure as vs
 import credentials as cr
 import cruise
-import data_checks as dc
+import data
 
 
 tbl = 'tblTN412_Gradients5_uw_tsg'
@@ -99,7 +99,7 @@ for fil in nav_flist:
             df[col] = df[col].str.decode("utf-8").fillna(df[col])    
     df = df.loc[df['h_num']==49]
     df = df[['time', 'lat', 'lon','TS', 'SSPS', 'CNDC']]
-    df = dc.mapTo180180(df)
+    df = data.mapTo180180(df)
     combined_df_list.append(df)
 
 combined_df = pd.concat(combined_df_list, axis=0, ignore_index=True)

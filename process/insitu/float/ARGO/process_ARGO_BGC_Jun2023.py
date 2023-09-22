@@ -149,9 +149,9 @@ def set_bgc_dtypes(df):
     for c in df.columns.to_list():
         if c in ['time','JULD_LOCATION']:
             df[c] = pd.to_datetime(df[c].astype(str), format="%Y-%m-%d %H:%M:%S").astype("datetime64[s]")         
-        elif c in ["DIRECTION", "DATA_CENTRE"] or "_QC" in c:
+        elif c in ["DIRECTION", "DATA_CENTRE"]:
             df[c] = df[c].astype(str)
-        elif c in ["float_id", "cycle"]:
+        elif c in ["float_id", "cycle"] or "_QC" in c:
             df[c] = df[c].astype(int) 
         else: 
             df[c] = df[c].astype(np.float64)   
@@ -564,6 +564,7 @@ for fil in tqdm(flist):
     temp_df = pd.DataFrame(data=d)
     df_stats = df_stats.append(temp_df, ignore_index = True)
     del df, df_sp,df_sp_d
+### CHECK TIME FORMAT
 min_time = df_stats['time'].min()
 max_time = df_stats['time'].max()
 min_lat = df_stats['lat'].min()

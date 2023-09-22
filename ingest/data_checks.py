@@ -1,14 +1,12 @@
 """
-Author: Norland Raphael Hagen <norlandrhagen@gmail.com>
-Date: 07-23-2021
+Author:  Diana Haring <dharing@uw.edu>
+Date: 12-30-2021
 
-cmapdata - data - data cleaning and reformatting functions.
+cmapdata - data_checks - functions to check data for ingest.
 """
-
 
 import sys
 import os
-# from this import s
 import pandas as pd
 import numpy as np
 
@@ -16,158 +14,8 @@ import common as cmn
 import DB
 
 
-def removeMissings(df, cols):
-    """Removes missing rows for all columns provided
-
-    Parameters
-    ----------
-    df : Pandas DataFrame
-        The dataframe to be modified
-    cols :  list
-        List of column names
-
-    Returns
-    -------
-    df
-        Pandas DataFrame with missing rows removed
-    """
-    for col in cols:
-        df[col].replace(r"^\s*$", np.nan, regex=True, inplace=True)
-        df.dropna(subset=[col], inplace=True)
-    return df
-
-def remove_blank_columns(df):
-    """Removes all blank columns
-
-    Parameters
-    ----------
-    df : Pandas DataFrame
-        The dataframe to be modified
-
-    Returns
-    -------
-    df
-        Pandas DataFrame with blank columns removed
-    """
-    empty_cols = [col for col in df.columns if df[col].isnull().all()]
-    for c in empty_cols:
-        contYN = input(
-        "Are you sure you want to delete column "
-        + str(c)
-        + " ?  [yes/no]: "
-        )
-        if contYN == 'yes':
-            df.drop(c, axis=1, inplace=True)
-        else:
-            continue
-
-    return df
-
-
-def format_time_col(df, time_col, format="%Y-%m-%d %H:%M:%S"):
-    """Formats dataframe timecolumn
-
-    Parameters
-    ----------
-    df : Pandas DataFrame
-        The dataframe to be modified
-    time_col : str
-        Name of the time column. ex: 'time'
-    format : str, optional, default = %Y-%m-%d %H:%M:%S
-
-    Returns
-    -------
-    df
-        Pandas DataFrame with time col formatted
-    """
-    df[time_col] = pd.to_datetime(df[time_col].astype(str))
-    # df["time"].dt.strftime(format)
-
-    df[time_col] = df[time_col].dt.strftime(format)
-    return df
-
-
-def mapTo180180(df):
-    df["lon"] = pd.to_numeric(df["lon"])
-    df.loc[df["lon"] > 180, "lon"] = df.loc[df["lon"] > 180, "lon"] - 360
-    return df
-
-
-def sort_values(df, cols):
-    """Sorts dataframe cols
-
-    Parameters
-    ----------
-    df : Pandas DataFrame
-        The dataframe to be modified
-    cols : list
-        List of column name strings
-
-    Returns
-    -------
-    df
-        Pandas DataFrame with input cols sorts in ASC order.
-    """
-    df = df.sort_values(cols, ascending=[True] * len(cols))
-    return df
-
-
-def check_ST_ordering(ST_vars):
-    """Ensures that ST column list is in correct order. ie ['time','lat','lon'] not ['time','lon','lat]
-
-    Args:
-        ST_vars ([type]): [description]
-    Returns: ST_vars (sorted)
-    """
-    if len(ST_vars) == 4:
-        st_bool = ST_vars == ["time", "lat", "lon", "depth"]
-        if st_bool == False:
-            ST_vars = ["time", "lat", "lon", "depth"]
-    elif len(ST_vars) == 3:
-        st_bool = ST_vars == ["time", "lat", "lon"]
-        if st_bool == False:
-            ST_vars = ["time", "lat", "lon"]
-    return ST_vars
-
-def check_ST_ordering_clim(ST_vars):
-    """Ensures that ST column list is in correct order. ie ['time','lat','lon'] not ['time','lon','lat]
-
-    Args:
-        ST_vars ([type]): [description]
-    Returns: ST_vars (sorted)
-    """
-    if len(ST_vars) == 4:
-        st_bool = ST_vars == ["month", "lat", "lon", "depth"]
-        if st_bool == False:
-            ST_vars = ["month", "lat", "lon", "depth"]
-    elif len(ST_vars) == 3:
-        st_bool = ST_vars == ["month", "lat", "lon"]
-        if st_bool == False:
-            ST_vars = ["month", "lat", "lon"]
-    return ST_vars
-
-def ST_columns(df):
-    """Returns SpaceTime related columns in a dataset as a list"""
-    df_cols = cmn.lowercase_List(list(df))
-    ST_vars = [i for i in df_cols if i in ["time", "lat", "lon", "depth"]]
-    ST_vars_ordered = check_ST_ordering(ST_vars)
-    return ST_vars_ordered
-
-def ST_columns_clim(df):
-    """Returns SpaceTime related columns in a dataset as a list"""
-    df_cols = cmn.lowercase_List(list(df))
-    ST_vars = [i for i in df_cols if i in ["month", "lat", "lon", "depth"]]
-    ST_vars_ordered = check_ST_ordering_clim(ST_vars)
-    return ST_vars_ordered
-
-def NaNtoNone(df):
-    df = df.replace(np.nan, '', regex=True)
-    return df
-
 def check_df_on_trajectory(df, cruise_name, loc_round, server, db_name='Opedia'):
-    """Data checks on a dataframe before import
-    Checks lat, lon, and date against known trajectory    
-    """
+    """Data checks on a dataframe before import, relies on Beast database. Checks lat, lon, and date against known trajectory."""
     ## Temp table import to sandbox server
     conn_str = DB.pyodbc_connection_string('Beast')
     quoted_conn_str = DB.urllib_pyodbc_format(conn_str)
@@ -198,14 +46,12 @@ def check_df_on_trajectory(df, cruise_name, loc_round, server, db_name='Opedia')
     return df_time_check, df_loc_check
 
 
-
 def check_df_values(df):
     """Data checks on a dataframe before import
     Checks lat, lon, and depth
     Checks all numeric variables for min or max < or > 5 times standard deviation of dataset
     Returns 0 if all checks pass
     Returns 1 or more for each test with values out of expected range
-    
     """
     i = 0
     ## Check data values
@@ -237,7 +83,6 @@ def check_df_nulls(df, table_name, server):
     """Check dataframe against SQL table for SQL not null columns
     Returns 0 if all checks pass
     Returns 1 or more for each df variable with nulls where SQL column is not null
-    
     """
     i = 0
     query_not_null = f'''
@@ -258,7 +103,6 @@ def check_df_constraint(df, table_name, server):
     """Check dataframe against SQL table for SQL unique indicies
     Returns 0 if all checks pass
     Returns 1 if duplicates in df where should be unique
-    
     """
     i = 0
     query_unique_indices = f'''
@@ -289,7 +133,6 @@ def check_df_dtypes(df, table_name, server):
     """Check dataframe data types against SQL table
     Returns 0 if all checks pass
     Returns 1 or more for each column with different data types
-    
     """
     i=0
     query = f'''
@@ -314,85 +157,16 @@ def check_df_dtypes(df, table_name, server):
     return i
   
 def check_df_ingest(df, table_name, server):
-    """Runs checks on a pandas df before ingest"""
-    v = check_df_values(df)
+    """Runs checks on a pandas df for ingest"""
     n = check_df_nulls(df, table_name, server)
     d = check_df_dtypes(df, table_name, server)
     c = check_df_constraint(df, table_name, server)
 
-    if v + n + d + c == 0:
+    if n + d + c == 0:
         print('All checks passed')
-    return v + n + d + c
+    return n + d + c
 
 
-def clean_data_df(df, clim=False):
-    """Combines multiple data functions to apply a clean to a pandas df"""
-    df = cmn.strip_whitespace_headers(df)
-    # df = NaNtoNone(df)
-    # df = removeMissings(df, ST_columns(df))
-    df = ensureST_numeric(df, clim)
-    df = remove_blank_columns(df)
-    if clim:
-        df = sort_values(df, ST_columns_clim(df))
-    else:    
-        df = sort_values(df, ST_columns(df))
-        df = format_time_col(df, "time")
-    return df
-
-
-def ensureST_numeric(df, clim=False):
-    """Ensures non time, ST cols are numeric
-
-    Args:
-        df (Pandas DataFrame): Input dataframe with ST cols
-        clim (bool): Default is false, set to True if climatology data
-
-    Returns:
-        Pandas DataFrame: Pandas DataFrame with numeric ST cols.
-    """
-    if clim:
-        ST_cols = ST_columns_clim(df)
-    else:     
-        ST_cols = ST_columns(df)
-        ST_cols.remove("time")
-    for col in ST_cols:
-        df[col] = df[col].map(lambda x: x.strip() if isinstance(x, str) else x)
-        e = int(pd.to_numeric(df[col],errors='coerce').isna().mask(df[col].isna()).sum())
-        if e != 0:
-            print(col + ' lost data to coerce')
-        df[col] = pd.to_numeric(df[col], errors="coerce")
-        
-    return df
-
-
-def decode_df_columns(df):
-    """Decodes any bytestring columns in pandas
-
-    Args:
-        df (Pandas DataFrame): Input DataFrame
-
-    Returns:
-        df: Pandas DataFrame
-    """
-    df = df.applymap(lambda x: x.decode() if isinstance(x, bytes) else x)
-    return df
-
-
-def add_day_week_month_year_clim(df):
-    """Takes input pandas DataFrame and adds year, month, week, dayofyear columns to end.
-    IMPORTANT, time column must be in dataframe and be named [time]
-
-    Args:
-        df (Pandas DataFrame): Input Pandas DataFrame containing 'time' column.
-
-    Returns:
-        df Pandas DataFrame: Output Pandas DataFrame with appended climatology columns
-    """
-    df["year"] = pd.to_datetime(df["time"]).dt.year
-    df["month"] = pd.to_datetime(df["time"]).dt.month
-    df["week"] = pd.to_datetime(df["time"]).dt.isocalendar().week
-    df["dayofyear"] = pd.to_datetime(df["time"]).dt.dayofyear
-    return df
 
 def check_metadata_for_organism(df, server):
     """Checks variable_metadata_df for variable names or units that could be associated with organisms
@@ -490,6 +264,7 @@ def validate_organism_ingest(df, server):
             if pd.isnull(row.org_id) and row.conversion_coefficient not in blank_check_list:
                 print(f'Index: {str(row.Index)}, Coefficient {row.conversion_coefficient} Missing organism ID')
                 i +=1
+            ## More logic can be added here
             if row.conversion_coefficient not in blank_check_list and isinstance(row.conversion_coefficient, (int, float)):
                 if (row.conversion_coefficient > 1 and ('^' not in row.var_unit or 'micro' not in row.var_unit)) \
                 or (row.conversion_coefficient <= 1 and '^' in row.var_unit):

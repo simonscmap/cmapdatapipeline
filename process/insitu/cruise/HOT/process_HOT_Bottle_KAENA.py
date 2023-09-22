@@ -14,6 +14,7 @@ import DB
 import data_checks as dc
 import common as cmn
 import stats
+import data
 
 tbl = 'tblHOT_Bottle_KAENA'
 
@@ -40,7 +41,7 @@ df.rename(columns={'date':'time'}, inplace=True)
 df['lat']=21.847
 df['lon']=-158.363
 df['depth']=df['pressure_ctd_bottle_kaena_hot']
-df_clean = dc.clean_data_df(df)
+df_clean = data.clean_data_df(df)
 
 
 dc.check_df_ingest(df_clean,tbl,'Rainier')

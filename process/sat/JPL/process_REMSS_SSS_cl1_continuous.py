@@ -12,7 +12,7 @@ sys.path.append("../../../ingest")
 
 import vault_structure as vs
 import DB
-import data_checks as dc
+import data
 import metadata
 
 
@@ -50,10 +50,10 @@ for fil in tqdm(flist):
     df_raw = x.to_dataframe().reset_index()
     df_raw['time'] = x_time
     x.close()
-    df = dc.add_day_week_month_year_clim(df_raw)
+    df = data.add_day_week_month_year_clim(df_raw)
     df = df[['time','lat','lon','sss_smap','year','month','week','dayofyear']]
     df = df.sort_values(["time", "lat","lon"], ascending = (True, True,True))
-    df = dc.mapTo180180(df)
+    df = data.mapTo180180(df)
     if df.dtypes.to_dict() != test_dtype:
         print(f"Check data types in {fil}. New: {df.columns.to_list()}")
         sys.exit()       

@@ -8,7 +8,7 @@ import xarray as xr
 sys.path.append("../../../ingest")
 sys.path.append("cmapdata/ingest")
 from ingest import vault_structure as vs
-from ingest import credentials as cr
+from ingest import data
 from ingest import DB 
 from ingest import data_checks as dc
 from ingest import metadata
@@ -40,6 +40,8 @@ x.metavar5.attrs
 
 
 df_x = x.to_dataframe().reset_index()
+## Empty in raw data before any processing: cruise_name == 'M135' , cruise_name == 'M81', cruise_name == 'SS01'
+# df_x.loc[df_x['metavar5']=='SS01']
 
 df_x['date_time'] = df_x['date_time'].astype('datetime64[s]')
 
@@ -77,15 +79,15 @@ dc.check_df_nulls(df_x1, 'tblGeotraces_Seawater_1', "Beast")
 dc.check_df_dtypes(df_x2, 'tblGeotraces_Seawater_2', "Beast")
 dc.check_df_nulls(df_x2, 'tblGeotraces_Seawater_2', "Beast")
 
-df_import_1 = dc.mapTo180180(df_x1)
-df_import_2 = dc.mapTo180180(df_x2)
+df_import_1 = data.mapTo180180(df_x1)
+df_import_2 = data.mapTo180180(df_x2)
 df_import_2.shape
 
 
-df_clean_1 = dc.clean_data_df(df_import_1)
+df_clean_1 = data.clean_data_df(df_import_1)
 df_clean_1['time'].head
 df_import_1['time'].head
-df_clean_2 = dc.clean_data_df(df_import_2)
+df_clean_2 = data.clean_data_df(df_import_2)
 
 for v in df_clean_1.columns.to_list():
       if df_clean_1[v].dtype=='O':

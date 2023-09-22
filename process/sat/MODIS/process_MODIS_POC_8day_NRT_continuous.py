@@ -11,7 +11,6 @@ sys.path.append("../../../ingest")
 import vault_structure as vs
 import DB
 import metadata
-import data_checks as dc
 import data
 
 tbl = 'tblModis_POC_NRT'
@@ -61,7 +60,7 @@ for fil in tqdm(flist):
     if df.dtypes.to_dict() != test_dtype:
         print(f"Check data types in {fil}. New: {df.columns.to_list()}")
         sys.exit()       
-    df = dc.sort_values(df, dc.ST_columns(df))
+    df = data.sort_values(df, data.ST_columns(df))
     df.to_parquet(f"{nrt_folder}{tbl}_{fil_date}.parquet", index=False)      
     metadata.tblProcess_Queue_Process_Update(fil_name, path, tbl, 'Opedia', 'Rainier')
     xdf.close()

@@ -45,7 +45,8 @@ def build_SQL_suggestion_df(df):
             except:
                 col_convert = col_clean
                 ## Get longest string length
-                max_len = df[cn].map(len).max()
+                # max_len = df[cn].map(len).max()
+                max_len = df[df[cn].notna()][cn].str.len().max()
             col_dtype = col_convert.dtype
         sug_list = [cn, col_dtype, max_len]
         sug_df.loc[len(sug_df)] = sug_list

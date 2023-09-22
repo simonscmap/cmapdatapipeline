@@ -11,6 +11,7 @@ import vault_structure as vs
 import credentials as cr
 import DB 
 import data_checks as dc
+import data
 
 
 tbl = 'tblGeotraces_Aerosols'
@@ -107,12 +108,12 @@ df_x = df_x[['time', 'lat', 'lon', 'N_SAMPLES', 'N_STATIONS', 'metavar1', 'metav
 dc.check_df_ingest(df_x, 'tblGeotraces_Aerosol', "Beast")
 df_x[df_x['time'].isna()] #32,082,204
 
-df_import_1 = dc.mapTo180180(df_x)
+df_import_1 = data.mapTo180180(df_x)
 
 dc.check_df_ingest(df_import_1, 'tblGeotraces_Aerosol', "Beast")
 
 
-df_clean_1 = dc.clean_data_df(df_import_1)
+df_clean_1 = data.clean_data_df(df_import_1)
 dc.check_df_ingest(df_clean_1, 'tblGeotraces_Aerosol', "Beast")
 
 df_clean_1.columns

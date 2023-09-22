@@ -11,7 +11,7 @@ sys.path.append("ingest")
 
 import vault_structure as vs
 import DB
-import data_checks as dc
+import data
 import stats
 
 tbl = 'tblSST_AVHRR_OI_NRT'
@@ -40,7 +40,7 @@ for fil in tqdm(flist):
     df_import.rename(columns={'analysed_sst':'sst'}, inplace = True)
     ## Original data in Kelvin
     df_import['sst'] = df_import['sst']- 273.15 
-    df_import = dc.add_day_week_month_year_clim(df_import)
+    df_import = data.add_day_week_month_year_clim(df_import)
     df_import.sort_values(['time', 'lat', 'lon'], ascending=[True, True, True], inplace=True)
     ## First round checks
     #dc.check_df_ingest(df_import,tbl,'Rossby')

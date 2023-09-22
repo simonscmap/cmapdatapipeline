@@ -58,6 +58,8 @@ df_station_cast.loc[df_station_cast['time'].isna()]
 df_station_cast.columns.to_list()
 df_station_cast = df_station_cast[['time', 'lat', 'lon', 'start_time', 'end_time','station', 'taxogroup', 'lineage',  'otu_count', 'OTU_purity', 'pid', 'cid', 'md5sum']]
 df_station_cast.dtypes
+df_station_cast['start_time'] =df_station_cast.start_time.dt.strftime('%Y-%m-%dT%H:%M:%S')
+df_station_cast['end_time'] = df_station_cast.end_time.dt.strftime('%Y-%m-%dT%H:%M:%S')
 df_station_cast.to_excel(base_folder+"/tblTara_eukaryote_otu_data.xlsx",index=False)
 
 # SQL.full_SQL_suggestion_build(df_station_cast, tbl, 'cruise', 'Rainier', 'Opedia')

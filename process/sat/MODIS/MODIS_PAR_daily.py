@@ -12,7 +12,7 @@ from ingest import vault_structure as vs
 from ingest import common as cmn
 from ingest import data_checks as dc
 from ingest import DB
-from ingest import stats
+from ingest import data
 
 
 # startdate = "2010001" #YYYYDDD
@@ -83,7 +83,7 @@ for fil in tqdm(files_in_range):
     # stats.buildLarge_Stats(
     #     df, timecol, "tblModis_PAR", "satellite", transfer_flag="dropbox"
     # )
-    df = dc.clean_data_df(df)
+    df = data.clean_data_df(df)
     # pq_file = rep_folder+fil.strip(".nc").replace(".","_")+".parquet"
     # df.to_parquet(pq_file, engine = 'auto', compression = None, index=False)
     # dc.check_df_nulls(df, tbl, 'Rainier')

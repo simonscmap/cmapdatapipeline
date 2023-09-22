@@ -10,7 +10,6 @@ import sys
 sys.path.append("ingest")
 from ingest import vault_structure as vs
 from ingest import common as cmn
-from ingest import data_checks as dc
 from ingest import data
 from ingest import metadata
 from ingest import stats
@@ -39,7 +38,7 @@ for fil in tqdm(flist):
     df["week"] = pd.to_datetime(df["time"]).dt.isocalendar().week
     df["dayofyear"] = pd.to_datetime(df["time"]).dt.dayofyear
     df = df[["time", "lat", "lon", "poc", "year", "month", "week", "dayofyear"]]
-    df = dc.sort_values(df, dc.ST_columns(df))
+    df = data.sort_values(df, data.ST_columns(df))
     df.to_parquet(f"{nrt_folder}{tbl}_{fil_date.replace('-','_')}.parquet", index=False)      
     metadata.tblProcess_Queue_Process_Update(fil_name, path, tbl, 'Opedia', 'Rainier')
     xdf.close()

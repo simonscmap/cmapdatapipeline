@@ -9,7 +9,7 @@ import glob
 sys.path.append("/ingest")
 import vault_structure as vs
 import DB
-import data_checks as dc
+import data
 
 month_list = ['01','02','03','04','05','06','07','08','09','10','11','12']
 
@@ -88,7 +88,7 @@ for m in tqdm(month_list):
     # df_3 = pd.merge(df_1, df_2, how='left', on=['lat','lon','depth']) ## left & outer: 3693600 rows x 67 columns
     df_1['month'] = int(f'{m}')
     df_1 = df_1[cols_df] 
-    df_1 = dc.clean_data_df(df_1, True)
+    df_1 = data.clean_data_df(df_1, True)
     print('data cleaned')
     DB.toSQLbcp_wrapper(df_1, 'tblWOA_2018_qrtdeg_Climatology', "Rossby")
     # DB.toSQLbcp_wrapper(df_1, 'tblWOA_2018_1deg_Climatology', "Mariana") 

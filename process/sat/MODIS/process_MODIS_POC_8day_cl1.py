@@ -43,7 +43,7 @@ for fil in tqdm(flist):
     df["week"] = pd.to_datetime(df["time"]).dt.isocalendar().week
     df["dayofyear"] = pd.to_datetime(df["time"]).dt.dayofyear
     df = df[["time", "lat", "lon", "poc", "year", "month", "week", "dayofyear"]]
-    df = dc.sort_values(df, dc.ST_columns(df))
+    df = data.sort_values(df, data.ST_columns(df))
     null_check = dc.check_df_nulls(df, tbl, 'Rossby')
     unique_check = dc.check_df_constraint(df, tbl, 'Rossby')
     if null_check == 0 and unique_check == 0:

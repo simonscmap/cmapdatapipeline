@@ -18,7 +18,7 @@ sys.path.append("../../../ingest")
 import vault_structure as vs
 import metadata 
 import DB
-import data_checks as dc
+import data
 
 tbl = 'tblWind_NRT_hourly'
 sat_dir = f'{vs.satellite}{tbl}/raw/'
@@ -69,7 +69,7 @@ def proc_wind(fil):
     df = df.sort_values(["time", "lat","lon","hour"], ascending = (True, True,True,True))
     df['number_of_observations'] = df['number_of_observations'].astype('Int64')
     df['number_of_observations_divcurl'] = df['number_of_observations_divcurl'].astype('Int64')
-    df = dc.add_day_week_month_year_clim(df)
+    df = data.add_day_week_month_year_clim(df)
     if df.dtypes.to_dict() != test_dtype:
         print(f"Check data types in {fil}. New: {df.columns.to_list()}, Old: {test_cols}")
         metadata.tblProcess_Queue_Process_Update(fil, path, tbl, 'Opedia', 'Rainier','Dtype change')

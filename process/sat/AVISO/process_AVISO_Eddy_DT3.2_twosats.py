@@ -12,7 +12,7 @@ sys.path.append("ingest")
 from ingest import vault_structure as vs
 from ingest import SQL
 from ingest import common as cm
-from ingest import data_checks as dc
+from ingest import data
 from ingest import DB
 from ingest import metadata
 
@@ -96,10 +96,10 @@ for fil in tqdm(flist_all):
         df['eddy_polarity'] = -1
     df_cols = df.columns.tolist()
     data_cols = [e for e in df_cols if e not in core_cols]
-    df = dc.add_day_week_month_year_clim(df)
+    df = data.add_day_week_month_year_clim(df)
     df = df[core_cols + data_cols]
-    df = dc.mapTo180180(df)
-    df = dc.sort_values(df, ['time','lat','lon'])
+    df = data.mapTo180180(df)
+    df = data.sort_values(df, ['time','lat','lon'])
     if '_long' in fil:
         DB.toSQLbcp_wrapper(df, 'tblMesoscale_Eddy_twosats_long', 'Rossby')
     elif '_short' in fil: 

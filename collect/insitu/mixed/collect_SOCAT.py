@@ -4,8 +4,7 @@ import sys
 sys.path.append("ingest")
 
 import vault_structure as vs
-
-
+import credentials as cr
 
 tbl = 'tblSOCATv2022'
 vs.leafStruc(vs.mixed+tbl)
@@ -19,3 +18,4 @@ wget_str = f'wget --no-check-certificate "{dl_url}" -P "{base_folder}"'
 os.system(wget_str)
 
 #head -n 7000 SOCATv2022.tsv >> header.tsv
+

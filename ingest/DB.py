@@ -21,7 +21,7 @@ import bcpandas
 import pycmap
 import common as cmn
 
-pycmap.API(cr.api_key)
+# pycmap.API(cr.api_key)
 ######## DB Specific ############
 
 

@@ -13,7 +13,7 @@ sys.path.append("cmapdata/ingest")
 import vault_structure as vs
 import credentials as cr
 import DB 
-import data_checks as dc
+import data
 
 
 tbl = 'tblWind_NRT_hourly'
@@ -129,7 +129,7 @@ for fil in tqdm(flist_m):
     # 40203 before changing data type from float to int with nulls. 39836 after
     df['number_of_observations'] = df['number_of_observations'].astype('Int64')
     df['number_of_observations_divcurl'] = df['number_of_observations_divcurl'].astype('Int64')
-    df = dc.add_day_week_month_year_clim(df)
+    df = data.add_day_week_month_year_clim(df)
     DB.toSQLbcp_wrapper(df, tbl, "Rossby") 
     print(fil)
 
@@ -146,7 +146,7 @@ for fil in tqdm(flist_all):
     # 40203 before changing data type from float to int with nulls. 39836 after
     df['number_of_observations'] = df['number_of_observations'].astype('Int64')
     df['number_of_observations_divcurl'] = df['number_of_observations_divcurl'].astype('Int64')
-    df = dc.add_day_week_month_year_clim(df)
+    df = data.add_day_week_month_year_clim(df)
     file_name = fil.rsplit('/',1)[1].rsplit('.',1)[0]
     df.to_parquet(nrt_folder+file_name+'.parquet')
 

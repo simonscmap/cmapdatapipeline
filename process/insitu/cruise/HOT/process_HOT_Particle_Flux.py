@@ -14,6 +14,7 @@ import DB
 import data_checks as dc
 import common as cmn
 import stats
+import data
 
 tbl = 'tblHOT_ParticleFlux'
 
@@ -41,7 +42,7 @@ df.drop(['date','date2'], axis=1, inplace=True)
 
 df['lat']=22.75
 df['lon']=-158
-df_clean = dc.clean_data_df(df)
+df_clean = data.clean_data_df(df)
 
 
 dc.check_df_ingest(df_clean,tbl,'Rainier')

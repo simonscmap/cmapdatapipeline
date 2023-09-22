@@ -4,6 +4,7 @@ import os
 import pandas as pd
 from tqdm import tqdm
 sys.path.append("cmapdata/ingest")
+sys.path.append("ingest")
 from ingest import vault_structure as vs
 from ingest import DB
 
@@ -31,25 +32,25 @@ cruise_ids = DB.dbRead(qry, server)
 cols = var_id['short_name'].to_list()
 cruise_list = cruise_ids['Name'].to_list()
 
-d = {'cruise':[],'column':[]}
-df_cruise_vars = pd.DataFrame(data=d)
+# d = {'cruise':[],'column':[]}
+# df_cruise_vars = pd.DataFrame(data=d)
 
-for cruise in tqdm(cruise_list):
-    if cruise == 'KN192-05':
-        cruise = 'KN192-5'
-    for col in cols:
-        qry = f"SELECT count(*) as cnt from dbo.{tbl} where {cruise_column_name} = '{cruise}' and [{col}] is not null"
-        check_count = DB.dbRead(qry, 'Rainier')
-        if check_count['cnt'][0] > 0:
-            d2 = {'cruise':[cruise],'column':[col]}
-            temp_df = pd.DataFrame(data=d2)
-            df_cruise_vars = df_cruise_vars.append(temp_df, ignore_index=True)  
+# for cruise in tqdm(cruise_list):
+#     if cruise == 'KN192-05':
+#         cruise = 'KN192-5'
+#     for col in cols:
+#         qry = f"SELECT count(*) as cnt from dbo.{tbl} where {cruise_column_name} = '{cruise}' and [{col}] is not null"
+#         check_count = DB.dbRead(qry, 'Rainier')
+#         if check_count['cnt'][0] > 0:
+#             d2 = {'cruise':[cruise],'column':[col]}
+#             temp_df = pd.DataFrame(data=d2)
+#             df_cruise_vars = df_cruise_vars.append(temp_df, ignore_index=True)  
 
-df_cruise_vars_id = pd.merge(df_cruise_vars, cruise_ids[['Cruise_ID','Name','Nickname']], how = 'left', left_on = 'cruise', right_on='Name' )
-df_cruise_vars_ids = pd.merge(df_cruise_vars_id, var_id[['ID','short_name']], how = 'left', left_on = 'column', right_on='short_name' )
-df_cruise_vars_ids.replace({'KN192-5':'KN192-05'}, inplace=True)
+# df_cruise_vars_id = pd.merge(df_cruise_vars, cruise_ids[['Cruise_ID','Name','Nickname']], how = 'left', left_on = 'cruise', right_on='Name' )
+# df_cruise_vars_ids = pd.merge(df_cruise_vars_id, var_id[['ID','short_name']], how = 'left', left_on = 'column', right_on='short_name' )
+# df_cruise_vars_ids.replace({'KN192-5':'KN192-05'}, inplace=True)
 
-df_cruise_vars_ids.to_excel(f'{vs.cruise}{tbl}/raw/cruise_vars_ids.xlsx', index=False)
+# df_cruise_vars_ids.to_excel(f'{vs.cruise}{tbl}/raw/cruise_vars_ids.xlsx', index=False)
 
 # cruise_list_db = [x if x != 'KN192-5' else 'KN192-05' for x in cruise_list]
 ### tbDatasets_JSON_Metadata
@@ -94,6 +95,9 @@ len(df_var_links_ids[df_var_links_ids.duplicated(keep=False)])
 ### Drop duplicates
 df_var_links_ids.drop_duplicates(inplace=True)
     
+
+####### ?? JOIN VAR IDS based on if short name like to get _qc and _err
+
 # d = {'Var_ID':[],'JSON_Values':[],'JSON_Desc':[]}
 d = {'Var_ID':[],'JSON_Metadata':[]}
 df_Vars_JSON = pd.DataFrame(data=d)
@@ -101,7 +105,8 @@ for c in cols:
     cl = df_var_links_ids.loc[df_var_links_ids['short_name']==c]
     if len(cl) > 0:
         for row in cl.itertuples():
-            if row.cruise_name == 'M135':
+            ## no data in seawater table for these cruises
+            if row.cruise_name == 'M135' or row.cruise_name == 'M81' or row.cruise_name == 'SS01':
                 continue
             c_id = int(row.Cruise_ID)
             c_name = row.cruise_name
@@ -113,19 +118,34 @@ for c in cols:
             # v_meta_d = "', '".join(v_meta_desc)
             # v_ds_json = f"""{{"values":['{c_name}','{v_meta_list}']}}"""
             # d_ds_json = f"""{{"descriptions":['cruise_name','{v_meta_d}']}}"""
-
-            json_str = f"""{{"cruise_names":{{"values":['{c_name}'],"descriptions":['{c_nickname}']}},"meta_links":{{"values":['{v_meta_list}'],"descriptions":{v_meta_desc}}}}}"""
+            json_str = f"""{{"cruise_names":{{"values":['{c_name}'],"descriptions":["Operators Cruise Name"]}},"meta_links":{{"values":['{v_meta_list}'],"descriptions":{v_meta_desc}}}}}"""
+            # json_str = f"""{{"cruise_names":{{"values":['{c_name}'],"descriptions":['{c_nickname}']}},"meta_links":{{"values":['{v_meta_list}'],"descriptions":{v_meta_desc}}}}}"""
             d2 = {'Var_ID':[v_id],'JSON_Metadata':[json_str]}
             # d2 = {'Var_ID':[v_id],'JSON_Values':[v_ds_json],'JSON_Desc':[d_ds_json]}
             temp_df = pd.DataFrame(data=d2)
             temp_df.replace({'\'':'"'}, inplace=True, regex=True)
             df_Vars_JSON = df_Vars_JSON.append(temp_df, ignore_index=True)
 
+df_Vars_JSON.to_excel(vs.download_transfer+'geo_var_um.xlsx', index = False)
+df_Vars_JSON['Var_ID'] = df_Vars_JSON['Var_ID'].astype(int)
 # server_list = ['Rainier','Rossby','Mariana']
 # for server in server_list:
-qry = f"delete from dbo.tblDatasets_JSON_Metadata"
-DB.DB_modify(qry,server)
+server = 'mariana'
+# qry = f"delete from dbo.tblDatasets_JSON_Metadata"
+# DB.DB_modify(qry,server)
 qry = f"delete from dbo.tblVariables_JSON_Metadata"
 DB.DB_modify(qry,server)
-DB.toSQLpandas(df_Datasets_JSON,'tblDatasets_JSON_Metadata',server)
+# DB.toSQLpandas(df_Datasets_JSON,'tblDatasets_JSON_Metadata',server)
 DB.toSQLpandas(df_Vars_JSON,'tblVariables_JSON_Metadata',server)
+
+DB.toSQLbcp_wrapper(df_Vars_JSON,'tblVariables_JSON_Metadata',server)
+
+## Fix bcp additional quotes in sql
+
+#   update tblVariables_JSON_Metadata set JSON_Metadata = replace(JSON_Metadata,'""','"') 
+
+#     update tblVariables_JSON_Metadata
+#   set JSON_Metadata = replace(JSON_Metadata,'"{','{')
+
+#       update tblVariables_JSON_Metadata
+#   set JSON_Metadata = replace(JSON_Metadata,'}"','}')

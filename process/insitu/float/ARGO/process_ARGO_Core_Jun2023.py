@@ -73,9 +73,9 @@ def set_core_dtypes(df):
     for c in df.columns.to_list():
         if c in ['time','JULD_LOCATION']:
             df[c] = pd.to_datetime(df[c].astype(str), format="%Y-%m-%d %H:%M:%S").astype("datetime64[s]")           
-        elif c in ["DIRECTION","DATA_MODE", "DATA_CENTRE"] or "_QC" in c:
+        elif c in ["DIRECTION","DATA_MODE", "DATA_CENTRE"]:
             df[c] = df[c].astype(str)
-        elif c in ["float_id", "cycle"]:
+        elif c in ["float_id", "cycle"] or "_QC" in c:
             df[c] = df[c].astype(int) 
         else: 
             df[c] = df[c].astype(np.float64)   

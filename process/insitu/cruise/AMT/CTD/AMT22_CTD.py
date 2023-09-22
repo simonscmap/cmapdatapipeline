@@ -14,7 +14,7 @@ sys.path.append("ingest")
 
 import vault_structure as vs
 import DB
-import data_checks as dc
+import data as dc
 import common as cmn
 import stats
 

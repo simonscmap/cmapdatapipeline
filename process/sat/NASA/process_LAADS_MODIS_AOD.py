@@ -15,7 +15,7 @@ sys.path.append("ingest")
 import vault_structure as vs
 import credentials as cr
 import DB 
-import data_checks as dc
+import data as dc2
 import stats
 
 server = 'Rossby'
@@ -70,8 +70,8 @@ for f in tqdm(flist):
     data_scaled = (data - add_offset) * scale_factor
     df = pd.DataFrame({'lat': lat.ravel(), 'lon': lon.ravel(), 'aod': data_scaled.ravel()})
     df['time'] =check_date
-    df = dc.add_day_week_month_year_clim(df)
-    df = dc.sort_values(df,['time','lat','lon'])
+    df = dc2.add_day_week_month_year_clim(df)
+    df = dc2.sort_values(df,['time','lat','lon'])
     df = df[['lat','lon','time','aod','year','month','week','dayofyear']]
     DB.toSQLbcp_wrapper(df, tbl, 'mariana')
     DB.toSQLbcp_wrapper(df, tbl, 'rossby')

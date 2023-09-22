@@ -12,7 +12,7 @@ sys.path.append("ingest")
 import vault_structure as vs
 import credentials as cr
 import metadata 
-import data_checks as dc
+import data
 
 
 tbl = 'tblSSS_NRT_cl1'
@@ -30,10 +30,10 @@ for fil in tqdm(flist_all):
     df_raw = x.to_dataframe().reset_index()
     df_raw['time'] = x_time
     x.close()
-    df = dc.add_day_week_month_year_clim(df_raw)
+    df = data.add_day_week_month_year_clim(df_raw)
     df = df[['time','lat','lon','sss_smap','year','month','week','dayofyear']]
     df = df.sort_values(["time", "lat","lon"], ascending = (True, True,True))
-    df = dc.mapTo180180(df)
+    df = data.mapTo180180(df)
     fil_name = os.path.basename(fil)
     fil_date = df['time'][0].strftime("%Y_%m_%d") 
     path = f"{nrt_folder.split('vault/')[1]}{tbl}_{fil_date}.parquet"

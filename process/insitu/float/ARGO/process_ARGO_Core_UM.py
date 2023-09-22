@@ -140,7 +140,7 @@ um_cols = [
             "PROJECT_NAME",
             "PI_NAME",
             "STATION_PARAMETERS",
-            "DC_REFERENCE",
+            #"DC_REFERENCE", ##Unique identifier of the profile in the data centre. not unique across data centres
             "DATA_STATE_INDICATOR", 
             "PLATFORM_TYPE",
             "FLOAT_SERIAL_NO",
@@ -150,10 +150,6 @@ um_cols = [
             "VERTICAL_SAMPLING_SCHEME",
             "CONFIG_MISSION_NUMBER",
             "PARAMETER",
-            "SCIENTIFIC_CALIB_EQUATION",
-            "SCIENTIFIC_CALIB_COEFFICIENT",
-            "SCIENTIFIC_CALIB_COMMENT",
-            "SCIENTIFIC_CALIB_DATE",
             "HISTORY_INSTITUTION",
             "HISTORY_STEP",
             "HISTORY_SOFTWARE",
@@ -167,6 +163,15 @@ um_cols = [
             "HISTORY_PREVIOUS_VALUE",
             "HISTORY_QCTEST",
         ]
+
+
+sci_cols = [
+            "PARAMETER",
+            "SCIENTIFIC_CALIB_EQUATION",
+            "SCIENTIFIC_CALIB_COEFFICIENT",
+            "SCIENTIFIC_CALIB_COMMENT",
+            "SCIENTIFIC_CALIB_DATE",
+]
 
 
 fil = Core_flist[12274]
@@ -184,14 +189,31 @@ for fil in tqdm(Core_flist_sub):
         print(v.long_name)
     xdf.data_vars['SCIENTIFIC_CALIB_EQUATION']
     xdf.FIRMWARE_VERSION
+    xum1 =  xdf.drop_dims(["N_LEVELS","N_PARAM"])
+    xum1.to_dataframe()
+    xum2 =  xdf.drop_dims(["N_LEVELS","N_PARAM","N_PROF"])
+
     xum = xdf.drop([x for x in list(xdf.keys()) if x not in um_cols])
+    scium = xdf.drop([x for x in list(xdf.keys()) if x not in sci_cols])
+    df_sci = scium.to_dataframe().reset_index()
+    df_sci.describe()
+    df_sci.drop(columns=['N_CALIB'], inplace=True)
+    df_sci.to_excel("/data/CMAP Data Submission Dropbox/Simons CMAP/vault/observation/in-situ/float/tblArgoCore_REP/raw/sci_test.xlsx", index=False)
     xum.data_vars.values()
+
+    df_um = pd.DataFrame(columns=['name','attr','value'])
     for x in xum.data_vars:
         if xum.data_vars[x].size > 0:
+            d = {'name':[x],'attr':[xum.data_vars[x].attrs],'value':[np.unique(xum.data_vars[x])]}
+            temp= pd.DataFrame(data=d)
+            df_um = df_um.append(temp)
             print(x)
             print(xum.data_vars[x].attrs)
-            print(xum.data_vars[x].max().item())
-        
+            if xum.data_vars[x].max().item() != xum.data_vars[x].min().item():
+                np.unique(xum.data_vars[x])
+            else:    
+                print(xum.data_vars[x].max().item())
+    df_um.to_excel("/data/CMAP Data Submission Dropbox/Simons CMAP/vault/observation/in-situ/float/tblArgoCore_REP/raw/um_test.xlsx", index=False)    
     xum.data_vars['PI_NAME'].max().item()
     df_um = xum.to_dataframe().reset_index()
     # drop ex cols from xarray

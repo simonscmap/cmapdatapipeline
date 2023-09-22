@@ -7,8 +7,6 @@
 *.vscode/
 *.pickle
 ingest/error
-ingest/api_checks.py
-ingest/post_ingest.py
 ingest/geckodriver.log
 *geckodriver.log*
 *__pycache__
@@ -16,4 +14,5 @@ ingest/geckodriver.log
 *keyword_check.py
 process/data_only
 .listing
-*_continuous.py
+.netrc
+*wget-log

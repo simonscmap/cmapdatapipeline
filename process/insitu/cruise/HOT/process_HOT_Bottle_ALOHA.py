@@ -12,8 +12,10 @@ sys.path.append("ingest")
 import vault_structure as vs
 import DB
 import data_checks as dc
+import data
 import common as cmn
 import stats
+
 
 tbl = 'tblHOT_Bottle_ALOHA'
 
@@ -40,7 +42,7 @@ df.rename(columns={'date':'time'}, inplace=True)
 df['lat']=22.75
 df['lon']=-158
 df['depth']=df['pressure_ctd_bottle_aloha_hot']
-df_clean = dc.clean_data_df(df)
+df_clean = data.clean_data_df(df)
 
 
 dc.check_df_ingest(df_clean,tbl,'Rainier')

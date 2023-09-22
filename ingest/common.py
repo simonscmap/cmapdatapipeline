@@ -36,7 +36,7 @@ def getMax_SQL_date(table, server):
     return sql_date
 
 def getLast_file_download(table, vault_type, raw=True):
-    """Returns .....
+    """Returns full filepath of the latest file downloaded
     Args:
         table (str): CMAP table name
         vault_type (str): Vault folder type (ie cruise, station, satellite)
@@ -73,12 +73,14 @@ def getLast_file_download(table, vault_type, raw=True):
     return last_download
 
 def check_file_download(file_name, table, vault_type, raw=True):
-    """Returns .....
+    """Checks if file exists in the vault
     Args:
+        file_name (str): Name of file in vault
         table (str): CMAP table name
         vault_raw (str): Vault folder type (ie cruise, station, satellite)
+        raw (boolean): Optional argument to check in raw folder of vault. Default is true
     Returns:
-        last_download (str): Full filepath of the latest file downloaded
+        file_exists (boolean): True if file exists in the vault
     """
     ## Pass string as attribute to get full vault path
     if raw:
@@ -189,6 +191,19 @@ def lowercase_List(list):
 
 
 def getColBounds_from_DB(tableName, col, server, data_server, list_multiplier=0):
+    """Gets the min and max bounds of a column from the database
+
+    Args:
+        tableName {string} : Valid CMAP table name
+        col {string}: Name of column
+        server {string}: Valid server name (ie Rainier, Rossby, Mariana)
+        data_server {string}: Valid server name where data is present (ie Rainier, Rossby, Mariana)
+        list_multiplier {int}: Optional, default = 0. Output is a a list of returned values with length of length list_multiplier integer
+
+    Returns:
+        min_col, max_col {list}: Returns two lists of column mins and maxes
+
+    """    
     qry = f"""SELECT MIN({col}),MAX({col}) FROM {tableName}"""
     if len(data_server) > 0:
         df = DB.dbRead(qry, data_server)
@@ -290,7 +305,6 @@ def get_name_pkey(tableName, server):
 
 def get_last_ID(tableName, server):
     """last ID in table"""
-
     pkey_col_name = get_name_pkey(tableName, server)
     last_ID_qry = f"""SELECT TOP 1 * FROM {tableName} ORDER BY {pkey_col_name} DESC"""
     last_ID = DB.dbRead(last_ID_qry, server).iloc[0][0]
@@ -333,7 +347,6 @@ def getDatasetID_Tbl_Name(tableName, db_name, server):
         + """'"""
     )
     query_return = DB.dbRead(cur_str, server=server)
-
     dsID = query_return.iloc[0][0]
     return dsID
 
@@ -346,7 +359,6 @@ def getTbl_Name_DatasetID(Dataset_ID, db_name, server):
         + str(Dataset_ID)
     )
     query_return = DB.dbRead(cur_str, server=server)
-
     tableName = query_return.iloc[0][0]
     return tableName    
 
@@ -363,7 +375,6 @@ def getRefID_Tbl_Name_Ref(ref, tableName, db_name, server):
         + """'"""        
     )
     query_return = DB.dbRead(cur_str, server=server)
-
     refID = query_return.iloc[0][0]
     return refID, dsID
 
@@ -374,7 +385,6 @@ def getKeywordIDsTableNameVarName(tableName, var_short_name_list, server):
     cur_str = f"""select [ID] from tblVariables where Table_Name = '{tableName}' AND [Short_Name] in {vsnp}"""
     if len(var_short_name_list) == 1:
         cur_str = cur_str.replace(",)", ")")
-
     query_return = DB.dbRead(cur_str, server=server)["ID"].tolist()
     return query_return
 
@@ -644,6 +654,9 @@ def get_numeric_cols_in_table_excluding_climatology(tableName, server):
     Args:
         tableName (string): CMAP table name
         Server (string): Valid CMAP server name
+
+    Returns:
+        col_list (list): List of column names
     """
     qry = f"""select COLUMN_NAME from Information_schema.columns where Table_name = '{tableName}' and( DATA_TYPE = 'float' or DATA_TYPE like '%int') and COLUMN_NAME NOT IN ('year','month','week','dayofyear')"""
     df = DB.dbRead(qry, server)
@@ -651,27 +664,36 @@ def get_numeric_cols_in_table_excluding_climatology(tableName, server):
     return col_list
 
 def getStats_TblName(tableName, server):
-        ds_id = getDatasetID_Tbl_Name(tableName, 'Opedia', server)
-        qry = f"""  SELECT 
-        JSON_VALUE(JSON_stats,'$.time.min') AS [Time_Min],
-        JSON_VALUE(JSON_stats,'$.time.max') AS [Time_Max],
-        CAST(JSON_VALUE(JSON_stats,'$.lat.min') AS float) AS [Lat_Min],
-        CAST(JSON_VALUE(JSON_stats,'$.lat.max') AS float) AS [Lat_Max],
-        CAST(JSON_VALUE(JSON_stats,'$.lon.min') AS float) AS [Lon_Min],
-        CAST(JSON_VALUE(JSON_stats,'$.lon.max') AS float) AS [Lon_Max],
-        CAST(JSON_VALUE(JSON_stats,'$.depth.min') AS float) AS [Depth_Min],
-        CAST(JSON_VALUE(JSON_stats,'$.depth.max') AS float) AS [Depth_Max]
-        from tblDataset_Stats where Dataset_ID = {ds_id} """
-        df_stat = DB.dbRead(qry, server)
-        min_time = df_stat['Time_Min'][0]
-        max_time = df_stat['Time_Max'][0]
-        min_lat = df_stat['Lat_Min'][0]
-        max_lat = df_stat['Lat_Max'][0]
-        min_lon =  df_stat['Lon_Min'][0]
-        max_lon = df_stat['Lon_Max'][0]    
-        min_depth = df_stat['Depth_Min'][0]   
-        max_depth = df_stat['Depth_Max'][0]   
-        return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth
+    """Return existing stats from tblDataset_Stats for a table
+
+    Args:
+        tableName (string): CMAP table name
+        Server (string): Valid CMAP server name
+
+    Returns:
+        min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth
+    """        
+    ds_id = getDatasetID_Tbl_Name(tableName, 'Opedia', server)
+    qry = f"""  SELECT 
+    JSON_VALUE(JSON_stats,'$.time.min') AS [Time_Min],
+    JSON_VALUE(JSON_stats,'$.time.max') AS [Time_Max],
+    CAST(JSON_VALUE(JSON_stats,'$.lat.min') AS float) AS [Lat_Min],
+    CAST(JSON_VALUE(JSON_stats,'$.lat.max') AS float) AS [Lat_Max],
+    CAST(JSON_VALUE(JSON_stats,'$.lon.min') AS float) AS [Lon_Min],
+    CAST(JSON_VALUE(JSON_stats,'$.lon.max') AS float) AS [Lon_Max],
+    CAST(JSON_VALUE(JSON_stats,'$.depth.min') AS float) AS [Depth_Min],
+    CAST(JSON_VALUE(JSON_stats,'$.depth.max') AS float) AS [Depth_Max]
+    from tblDataset_Stats where Dataset_ID = {ds_id} """
+    df_stat = DB.dbRead(qry, server)
+    min_time = df_stat['Time_Min'][0]
+    max_time = df_stat['Time_Max'][0]
+    min_lat = df_stat['Lat_Min'][0]
+    max_lat = df_stat['Lat_Max'][0]
+    min_lon =  df_stat['Lon_Min'][0]
+    max_lon = df_stat['Lon_Max'][0]    
+    min_depth = df_stat['Depth_Min'][0]   
+    max_depth = df_stat['Depth_Max'][0]   
+    return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth
 
 
 def built_meta_DataFrame():
@@ -723,14 +745,7 @@ def combine_df_to_excel(filename, df, dataset_metadata, vars_metadata, cruise=Fa
     writer.save()
 
 def dropbox_public_link(folder_path):
-    # auth_flow = dropbox.DropboxOAuth2FlowNoRedirect(
-    #     cr.dropbox_vault_key,
-    #     cr.dropbox_vault_secret,
-    #     token_access_type="offline",
-    # )
-    # oauth_result = auth_flow.finish('')
-    # print(oauth_result.refresh_token)
-    # dbx = dropbox.Dropbox(cr.dropbox_api_key_vault, app_key=cr.dropbox_vault_key, app_secret=cr.dropbox_vault_secret, timeout=900)
+    """Creates a public link to Dropbox vault """
     dbx = dropbox.Dropbox(
             app_key = cr.dropbox_vault_key,
             app_secret = cr.dropbox_vault_secret,
@@ -740,7 +755,7 @@ def dropbox_public_link(folder_path):
     try:
         shared_url = existing_link.links[0].url
     except:        
-        print('create new')
+        print('Create new dropbox link')
         dbx_link = dbx.sharing_create_shared_link_with_settings(folder_path)
         shared_url = dbx_link.url
     return shared_url

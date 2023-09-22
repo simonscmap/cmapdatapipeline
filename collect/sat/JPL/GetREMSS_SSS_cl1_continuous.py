@@ -20,14 +20,12 @@ def getMaxDate(tbl):
     ## Check tblIngestion_Queue for downloaded but not ingested
     qry = f"SELECT Path from dbo.tblIngestion_Queue WHERE Table_Name = '{tbl}' AND Ingested IS NULL"
     df_ing = DB.dbRead(qry, 'Rainier')
-
     if len(df_ing) == 0:
         qry = f"SELECT max(path) mx from dbo.tblIngestion_Queue WHERE Table_Name = '{tbl}' AND Ingested IS NOT NULL"
         mx_path = DB.dbRead(qry,'Rainier')
         path_date = mx_path['mx'][0].split('.parquet')[0].rsplit(tbl+'_',1)[1]
         yr, mo, day = path_date.split('_')
         max_path_date = dt.date(int(yr),int(mo),int(day)) 
-        
         qry = f"SELECT max(original_name) mx from dbo.tblProcess_Queue WHERE Table_Name = '{tbl}' AND Error_str IS NOT NULL"
         mx_name = DB.dbRead(qry,'Rainier')
         if mx_name['mx'][0] == None:
@@ -35,9 +33,7 @@ def getMaxDate(tbl):
         else: 
             yr, mo, day = mx_name['mx'][0].strip().split('_')
             max_name_date = dt.date(int(yr),int(mo),int(day))  
-
         max_data_date = api.maxDateCluster(tbl)   
-
         max_date = max([max_path_date,max_name_date,max_data_date])
     else:
         last_path = df_ing['Path'].max()

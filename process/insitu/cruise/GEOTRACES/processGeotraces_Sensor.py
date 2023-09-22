@@ -13,7 +13,7 @@ sys.path.append("ingest")
 from ingest import vault_structure as vs
 from ingest import DB 
 from ingest import stats
-from ingest import data_checks as dc
+from ingest import data
 
 server = 'Beast'
 tbl = 'tblGeotraces_Sensor'
@@ -228,7 +228,7 @@ for var in s_list:
 df_import = pd.merge(df_time, df_samples, how='left', on='N_STATIONS')
 
 # null_check = dc.check_df_nulls(df_import, 'tbl15673890', "Rainier")
-df_import_1 = dc.mapTo180180(df_import)
+df_import_1 = data.mapTo180180(df_import)
 df_import_1 = df_import_1[['time_fill', 'lat', 'lon', 'N_STATIONS', 'N_SAMPLES', 'metavar1', 'metavar2',
        'metavar3', 'metavar4', 'metavar5', 'var9_qc', 'var10',
        'var10_qc']]

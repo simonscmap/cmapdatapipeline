@@ -20,7 +20,7 @@ sys.path.append("../../../ingest")
 import vault_structure as vs
 import DB 
 import metadata
-import data_checks as dc
+import data
 
 
 tbl = 'tblAltimetry_NRT_Signal'
@@ -56,7 +56,7 @@ for fil in tqdm(flist):
     df = df[['time','latitude', 'longitude', 'sla', 'err_sla', 'ugosa', 'err_ugosa', 'vgosa', 'err_vgosa', 'adt', 'ugos', 'vgos', 'flag_ice']]
     df = df.sort_values(["time", "latitude","longitude"], ascending = (True, True,True))
     df.rename(columns={'latitude':'lat', 'longitude':'lon'}, inplace = True)
-    df = dc.add_day_week_month_year_clim(df)
+    df = data.add_day_week_month_year_clim(df)
     if df.dtypes.to_dict() != test_dtype:
         print(f"Check data types in {fil}. New: {df.columns.to_list()}, Old: {test_cols}")
         metadata.tblProcess_Queue_Process_Update(fil, path, tbl, 'Opedia', 'Rainier','Dtype change')

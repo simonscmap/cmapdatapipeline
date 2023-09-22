@@ -11,9 +11,8 @@ import shutil
 
 sys.path.append("ingest")
 import vault_structure as vs
-import credentials as cr
+import data
 import DB 
-import data_checks as dc
 import stats
 
 
@@ -60,7 +59,7 @@ for fil in tqdm(flist):
             ).strftime("%Y-%m-%d")
         )
         # dc.check_df_nulls(df, tbl, "Beast")
-        df_clean = dc.clean_data_df(df)
+        df_clean = data.clean_data_df(df)
         # pq_file = rep_folder+os.path.basename(fil).strip(".nc").replace(".","_")+".parquet"
         # df_clean.to_parquet(pq_file, engine = 'auto', compression = None, index=False)
         DB.toSQLbcp_wrapper(df_clean, tbl, server) 
@@ -77,7 +76,7 @@ for fil in tqdm(flist):
         ).strftime("%Y-%m-%d")
     )
     # dc.check_df_nulls(df, tbl, "Beast")
-    df_clean = dc.clean_data_df(df)
+    df_clean = data.clean_data_df(df)
     pq_file = rep_folder+os.path.basename(fil).strip(".nc").replace(".","_")+".parquet"
     df_clean.to_parquet(pq_file, engine = 'auto', compression = None, index=False)
     x.close()

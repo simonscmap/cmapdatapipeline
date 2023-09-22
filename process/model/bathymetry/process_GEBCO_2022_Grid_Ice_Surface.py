@@ -44,5 +44,6 @@ DB.toSQLbcp_wrapper(df, tbl, 'Rossby')
 
 metadata.tblDataset_Server_Insert(tbl, 'Opedia', 'Rossby')
 ## After metadata ingest
-stats.updateStats_Manual("2022-06-22T00:00:00.000Z", "2022-06-22T00:00:00.000Z", -89.99792, 89.99792, -179.9979, 179.9979, None, None, tbl, 'Opedia', 'Rossby')
+row_count = len(df)
+stats.updateStats_Manual("2022-06-22T00:00:00.000Z", "2022-06-22T00:00:00.000Z", -89.99792, 89.99792, -179.9979, 179.9979, None, None, row_count, tbl, 'Opedia', 'Rainier')
 

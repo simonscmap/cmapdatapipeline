@@ -1,3 +1,10 @@
+"""
+Author: Diana Haring <dharing@uw.edu>
+Date: 04-19-2023
+
+Script to run processing for continuous ingestion
+"""
+
 import sys
 import os
 
@@ -13,7 +20,7 @@ sys.path.append("ingest")
 import vault_structure as vs
 import DB 
 import metadata
-import data_checks as dc
+import data
 import api_checks as api
 
 
@@ -40,7 +47,7 @@ test_fil = rep_folder+'dt_global_allsat_phy_l4_19930101_20210726.parquet'
 test_df = pd.read_parquet(test_fil)
 test_dtype = test_df.dtypes.to_dict()
 
-
+## Process and ingest Altimetry NetCDF
 for fil in tqdm(flist):
     x = xr.open_dataset(base_folder+fil)
     df = x.to_dataframe().reset_index()
@@ -53,7 +60,7 @@ for fil in tqdm(flist):
     df = df[['time','latitude', 'longitude', 'sla', 'err_sla', 'ugosa', 'err_ugosa', 'vgosa', 'err_vgosa', 'adt', 'ugos', 'vgos', 'flag_ice', 'tpa_correction']]
     df = df.sort_values(["time", "latitude","longitude"], ascending = (True, True,True))
     df.rename(columns={'latitude':'lat', 'longitude':'lon'}, inplace = True)
-    df = dc.add_day_week_month_year_clim(df)
+    df = data.add_day_week_month_year_clim(df)
     if df.dtypes.to_dict() != test_dtype:
         print(f"Check data types in {fil}. New: {df.columns.to_list()}, Old: {test_cols}")
         sys.exit()   

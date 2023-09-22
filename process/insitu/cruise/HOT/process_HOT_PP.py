@@ -13,6 +13,7 @@ import vault_structure as vs
 import DB
 import data_checks as dc
 import stats
+import data
 
 tbl = 'tblHOT_PP'
 
@@ -28,7 +29,7 @@ df = df.replace(missingValue, '')
 df.insert(0,'time',pd.to_datetime(df['date'], format='%y%m%d'))
 df.drop('date', axis=1, inplace=True)
 
-df_clean = dc.clean_data_df(df)
+df_clean = data.clean_data_df(df)
 
 dc.check_df_ingest(df_clean,'tblHOT_PP','Rainier')
 df_clean['light_12_hot']=df_clean['light_12_hot'].apply(pd.to_numeric, downcast='float')

@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 sys.path.append("cmapdata/ingest")
 import vault_structure as vs
-import credentials as cr
+import data
 import DB 
 import data_checks as dc
 
@@ -58,7 +58,7 @@ for yr in tqdm(day_list):
         df = df[['time','latitude', 'longitude', 'sla', 'err_sla', 'ugosa', 'err_ugosa', 'vgosa', 'err_vgosa', 'adt', 'ugos', 'vgos', 'flag_ice', 'tpa_correction']]
         df = df.sort_values(["time", "latitude","longitude"], ascending = (True, True,True))
         df.rename(columns={'latitude':'lat', 'longitude':'lon'}, inplace = True)
-        df = dc.add_day_week_month_year_clim(df)
+        df = data.add_day_week_month_year_clim(df)
         null_check = dc.check_df_nulls(df, tbl, "Beast")
         unique_check = dc.check_df_constraint(df, 'tblKOK1606_Gradients1_Surface_O2Ar_NCP', 'Rossby')
         if null_check == 0 and unique_check == 0:
@@ -82,7 +82,7 @@ for yr in tqdm(yr_list):
         df = df[['time','latitude', 'longitude', 'sla', 'err_sla', 'ugosa', 'err_ugosa', 'vgosa', 'err_vgosa', 'adt', 'ugos', 'vgos', 'flag_ice', 'tpa_correction']]
         df = df.sort_values(["time", "latitude","longitude"], ascending = (True, True,True))
         df.rename(columns={'latitude':'lat', 'longitude':'lon'}, inplace = True)
-        df = dc.add_day_week_month_year_clim(df)
+        df = data.add_day_week_month_year_clim(df)
         null_check = 0 #dc.check_df_nulls(df, tbl, "Rossby")
         unique_check = 0 #dc.check_df_constraint(df, 'tblKOK1606_Gradients1_Surface_O2Ar_NCP', 'Rossby')
         if null_check == 0 and unique_check == 0:

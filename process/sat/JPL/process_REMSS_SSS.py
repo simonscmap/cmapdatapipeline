@@ -10,7 +10,7 @@ import datetime
 
 sys.path.append("ingest")
 import vault_structure as vs
-import credentials as cr
+import data
 import DB 
 import data_checks as dc
 import stats
@@ -38,10 +38,10 @@ for fil in tqdm(flist_all):
     x = x['sss_smap']
     df_raw = x.to_dataframe().reset_index()
     x.close()
-    df = dc.add_day_week_month_year_clim(df_raw)
+    df = data.add_day_week_month_year_clim(df_raw)
     df = df[['lat','lon','time','sss_smap','year','month','week','dayofyear']]
     df = df.sort_values(["time", "lat","lon"], ascending = (True, True,True))
-    df = dc.mapTo180180(df)
+    df = data.mapTo180180(df)
     null_check = dc.check_df_nulls(df, tbl, server)
     unique_check = dc.check_df_constraint(df, 'tbl', server)
     if null_check == 0 and unique_check == 0:

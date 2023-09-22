@@ -12,7 +12,7 @@ sys.path.append("ingest")
 from ingest import vault_structure as vs
 from ingest import SQL
 from ingest import common as cm
-from ingest import data_checks as dc
+from ingest import data
 from ingest import DB
 from ingest import metadata
 
@@ -26,7 +26,7 @@ base_folder = f'{vs.satellite}{tbl}/raw/'
 
 flist_all = np.sort(glob.glob(os.path.join(base_folder, f'*.nc')))
 
-
+x = xr.open_dataset(flist_all[0]).sel(NbSample=0)
 
 d1 = {'var_name':[], 'std_name':[], 'long_name':[], 'dtype':[], 'units':[], 'comment':[], 'flag_val':[], 'flag_def':[]}
 df_varnames = pd.DataFrame(data=d1)
@@ -63,7 +63,6 @@ for varname, da in x.data_vars.items():
     df_varnames = df_varnames.append(temp_df, ignore_index=True)
 
 df_varnames.to_excel(vs.download_transfer +'AVISO_Eddy32_allsats_Vars.xlsx', index=False)
-df_varnames.to_csv('AVISO_Eddy32_allsats_Vars.csv', index=False)
 
 core_cols = ["time",
     "lat",
@@ -73,9 +72,8 @@ core_cols = ["time",
     "week",
     "dayofyear"]
 
-fil = flist_all[3]
 
-x = xr.open_dataset(fil)
+df = x.to_dataframe().reset_index()
 
 SQL.full_SQL_suggestion_build(df, 'tblMesoscale_Eddy_allsats_long', 'satellite', 'Rainier', 'Opedia')
 SQL.full_SQL_suggestion_build(df, 'tblMesoscale_Eddy_allsats_short', 'satellite', 'Rainier', 'Opedia')
@@ -96,10 +94,10 @@ for fil in tqdm(flist_all):
         df['eddy_polarity'] = -1
     df_cols = df.columns.tolist()
     data_cols = [e for e in df_cols if e not in core_cols]
-    df = dc.add_day_week_month_year_clim(df)
+    df = data.add_day_week_month_year_clim(df)
     df = df[core_cols + data_cols]
-    df = dc.mapTo180180(df)
-    df = dc.sort_values(df, ['time','lat','lon'])
+    df = data.mapTo180180(df)
+    df = data.sort_values(df, ['time','lat','lon'])
     if '_long' in fil:
         DB.toSQLbcp_wrapper(df, 'tblMesoscale_Eddy_allsats_long', 'Rainier')
     elif '_short' in fil: 

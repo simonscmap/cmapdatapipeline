@@ -9,9 +9,7 @@ import re
 sys.path.append("ingest")
 
 from ingest import vault_structure as vs
-from ingest import data_checks as dc
-from ingest import transfer
-from ingest import common as cmn
+from ingest import data
 
 tbl = 'tblKOK1606_Gradients1'
 raw_folder = f'{vs.cruise}{tbl}/raw/'
@@ -73,7 +71,7 @@ df_join = pd.merge(df_raw, qc, how='left', on='index')
 df = pd.merge(df_join, qc2, how='left', on='index')
 df = df.drop(["index"], axis=1)
 
-df = dc.remove_blank_columns(df)
+df = data.remove_blank_columns(df)
 df.columns = df.columns.str.lower()
 
 

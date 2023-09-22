@@ -10,7 +10,7 @@ import sys
 sys.path.append("cmapdata/ingest")
 from ingest import vault_structure as vs
 from ingest import common as cmn
-from ingest import data_checks as dc
+from ingest import data
 from ingest import metadata
 
 
@@ -44,7 +44,7 @@ for fil in tqdm(flist):
     df["week"] = pd.to_datetime(df["time"]).dt.isocalendar().week
     df["dayofyear"] = pd.to_datetime(df["time"]).dt.dayofyear
     df = df[["time", "lat", "lon", "par", "year", "month", "week", "dayofyear"]]
-    df = dc.clean_data_df(df)
+    df = data.clean_data_df(df)
     df.to_parquet(f"{rep_folder}{tbl}_{timecol.replace('-','_')}.parquet", index=False)      
     path = f"{rep_folder.split('vault/')[1]}{tbl}_{timecol.replace('-','_')}.parquet"
     metadata.tblProcess_Queue_Process_Update(fil_name, path, tbl, 'Opedia', 'Rainier')

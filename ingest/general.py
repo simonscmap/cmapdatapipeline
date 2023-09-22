@@ -35,6 +35,7 @@ import common as cmn
 import cruise
 import data_checks as dc
 import api_checks as api
+import post_ingest
 
 
 def getBranch_Path(args):
@@ -42,6 +43,9 @@ def getBranch_Path(args):
     branch_path = cmn.vault_struct_retrieval(args.branch)
     return branch_path
 
+def fullIngestChecks(tableName, doi_check=True):
+    """Wrapper function for post_ingest.fullIngestPostChecks."""
+    post_ingest.fullIngestPostChecks(tableName, doi_check)
 
 def splitExcel(staging_filename, branch, tableName, data_missing_flag):
     """Wrapper function for transfer.single_file_split."""
@@ -407,7 +411,7 @@ def full_ingestion(args):
 
     print("Full Ingestion")
     if not args.in_vault:
-        transfer.dropbox_validator_sync(args.staging_filename)        
+        transfer.dropbox_validator_sync(args.staging_filename)  
         print("Transfer from validator to vault")
         validator_to_vault(
             args.staging_filename,
@@ -426,7 +430,7 @@ def full_ingestion(args):
         if contYN != 'no':
             print("Ingest stopped")
             sys.exit()    
-    check_value = dc.check_df_ingest(data_dict['data_df'], args.tableName, args.Server)
+    check_value = dc.check_df_values(data_dict['data_df'])
     if check_value > 0: 
         contYN = input ("Stop to check data values? [yes/no]: ")
         if contYN != 'no':
@@ -442,6 +446,7 @@ def full_ingestion(args):
         addAllServers(args.tableName)
         if args.icon_filename =="":
             createIcon(data_dict, args.tableName)
+        fullIngestChecks(args.tableName)
         # push_icon()
 
 
@@ -491,6 +496,7 @@ def dataless_ingestion(args):
                     max_lat = input("Enter max latitude (ex -57.5)\n")    
                     min_lon = input("Enter min longitude (ex -57.5)\n")      
                     max_lon = input("Enter max longitude (ex -57.5)\n")  
+                row_count = input("Enter row count of dataset\n")  
                 min_time = input("Enter min date (ex 2011-09-13T00:00:00.000Z\n")        
                 max_time = input("Enter max date (ex 2021-09-13T00:00:00.000Z)\n")
                 if args.depth_flag ==0:
@@ -498,9 +504,16 @@ def dataless_ingestion(args):
                 else:
                     min_depth = input("Enter min depth (ex 0)\n")      
                     max_depth = input("Enter max depth (ex 1000)\n")  
-        insert_stats_manual(min_time, max_time,min_lat,max_lat,min_lon,max_lon,min_depth,max_depth,args.tableName,args.Database,args.Server)
+        insert_stats_manual(min_time, max_time,min_lat,max_lat,min_lon,max_lon,min_depth,max_depth,row_count,args.tableName,args.Database,args.Server)
     else:
         insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
+    if args.Server.lower() == "rainier":
+        ## Optional argument to check DOI against Rossby
+        doi_c = input("Check if DOI matches? [y or n] ")
+        if doi_c == 'y':
+            fullIngestChecks(args.tableName)
+        else: 
+            fullIngestChecks(args.tableName, False)
 
 
 def update_metadata(args):
@@ -524,23 +537,17 @@ def update_metadata(args):
         if len(args.data_server) > 0:
             addServer(args.tableName,args.Database,args.data_server)
         else:
-            addAllServers(args.tableName)
+            addAllServers(args.tableName)       
     if args.data_server.lower() =='cluster':
-        ps = input("Pull stats from Rossby? [y or n] \n")
-        if ps == 'y':
-            min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth = getTableStats(args.tableName)
+        Yns =input("Pull stats from stats folder? [y or n] \n") 
+        if Yns == 'y':
+            min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth, row_count =getStatsFolder(args.tableName,getBranch_Path(args))
+            min_time = min_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            max_time = max_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
         else:
-            rC = input("Calc stats from cluster? [y or n] \n")
-            if rC=='y':
-                if args.depth_flag == 0:
-                    min_time, max_time, min_lat, max_lat, min_lon, max_lon = getClusterStats(args.tableName,args.depth_flag)
-                    min_depth, max_depth = None, None
-                else: 
-                    min_time, max_time, min_lat, max_lat, min_lon, max_lon = getClusterStats(args.tableName,args.depth_flag)
-                if len(min_time)==10:
-                    min_time=min_time+'T00:00:00.000Z'
-                if len(max_time)==10:
-                    max_time=max_time+'T00:00:00.000Z'    
+            ps = input("Pull stats from Rossby? [y or n] \n")
+            if ps == 'y':
+                min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth = getTableStats(args.tableName)
             else:
                 Yn = input("Read min/max lat lon from parquet? [y or n] \n")
                 if Yn=='y':
@@ -555,6 +562,7 @@ def update_metadata(args):
                     max_lat = input("Enter max latitude (ex -57.5)\n")    
                     min_lon = input("Enter min longitude (ex -57.5)\n")      
                     max_lon = input("Enter max longitude (ex -57.5)\n")  
+                row_count = input("Enter row count of dataset\n")  
                 min_time = input("Enter min date (ex 2011-09-13T00:00:00.000Z\n")        
                 max_time = input("Enter max date (ex 2021-09-13T00:00:00.000Z)\n")
                 if args.depth_flag ==0:
@@ -562,13 +570,21 @@ def update_metadata(args):
                 else:
                     min_depth = input("Enter min depth (ex 0)\n")      
                     max_depth = input("Enter max depth (ex 1000)\n")  
-        insert_stats_manual(min_time, max_time,min_lat,max_lat,min_lon,max_lon,min_depth,max_depth,args.tableName,args.Database,args.Server)
+        insert_stats_manual(min_time, max_time,min_lat,max_lat,min_lon,max_lon,min_depth,max_depth,row_count,args.tableName,args.Database,args.Server)
     else:
-        statsYn = input("Run small stats? Data must live on server updating. [y/n]")
+        statsYn = input("Run small stats? Data must live on server updating. If no, large stats will be run. [y/n]")
         if statsYn == 'y':
             insert_small_stats(None, args.tableName, args.Database, args.Server)
         else:
             insert_large_stats(args.tableName, args.Database, args.Server, args.data_server)
+    if args.Server.lower() == "rainier":
+        ## Optional argument to check DOI against Rossby
+        doi_c = input("Check if DOI matches? [y or n] ")
+        if doi_c == 'y':
+            fullIngestChecks(args.tableName)
+        else: 
+            fullIngestChecks(args.tableName, False)            
+
 
 
 def main():

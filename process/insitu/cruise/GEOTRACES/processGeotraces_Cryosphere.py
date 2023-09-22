@@ -9,7 +9,7 @@ sys.path.append("../../../ingest")
 sys.path.append("cmapdata/ingest")
 import vault_structure as vs
 import credentials as cr
-import DB 
+import data 
 import data_checks as dc
 
 
@@ -109,18 +109,18 @@ df_x = df_x[cols_to_front + [col for col in df_x.columns if col not in cols_to_f
 dc.check_df_ingest(df_x, tbl, "Beast")
 df_x[df_x['time'].isna()] #0
 
-df_import = dc.mapTo180180(df_x)
+df_import = data.mapTo180180(df_x)
 
 
 dc.check_df_ingest(df_import, tbl, "Beast")
 
 
-df_clean = dc.clean_data_df(df_import)
+df_clean = data.clean_data_df(df_import)
 df_clean['var2_qc'].head
 df_clean.shape
 
 dc.check_df_ingest(df_clean, tbl, "Beast")
-df_clean = dc.sort_values(df_clean, ['time','lat','lon','N_STATIONS','N_SAMPLES'])
+df_clean = data.sort_values(df_clean, ['time','lat','lon','N_STATIONS','N_SAMPLES'])
 # DB.toSQLbcp_wrapper(df_clean, tbl, "Beast") 
 
 
