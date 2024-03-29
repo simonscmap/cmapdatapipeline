@@ -167,6 +167,8 @@ def tblProcess_Queue_Overwrite(Original_Name, Table_Name, db_name, server, error
         qry = f"UPDATE {db_name}.[dbo].[tblProcess_Queue] SET Downloaded = '{pr_str}', Processed=NULL WHERE Table_Name = '{Table_Name}' and Original_Name = '{Original_Name}' "
     else:
         qry = f"UPDATE {db_name}.[dbo].[tblProcess_Queue] SET Downloaded = '{pr_str}', Processed=NULL, Error_Str='{error_flag}' WHERE Table_Name = '{Table_Name}' and Original_Name = '{Original_Name}' "        
+    
+    print(f"tblProcess_Queue_Overwrite: {qry}")
     DB.DB_modify(qry,server)
 
 

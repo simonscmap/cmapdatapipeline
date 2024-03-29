@@ -2,9 +2,12 @@ import sys
 import os
 import time
 import datetime as dt
+import datetime
 
 sys.path.append("ingest")
 sys.path.append("../../../")
+
+sys.path.append("../../../ingest")
 
 import vault_structure as vs
 import credentials as cr
@@ -94,7 +97,7 @@ def retryError(tbl):
     df_err = DB.dbRead(qry, 'Rainier')
     dt_list = df_err['Original_Name'].to_list()
     if len(dt_list)>0:
-        dt_list = [dt.datetime.strptime(x.strip(), '%Y_%m_%d').date() for x in dt_list]
+        dt_list = [datetime.datetime.strptime(x.strip(), '%Y_%m_%d').date() for x in dt_list]
         for dt in dt_list:
             get_POC(dt, True)
 
@@ -112,5 +115,9 @@ while start_date <= end_date:
     start_date = start_date + delta
     if start_date.month == 1 and start_date.day <=6:
         start_date = dt.date(start_date.year, 1, 1)
+
+
+
+
 
 # metadata.export_script_to_vault(tbl,'satellite','collect/sat/MODIS/GetMODIS_POC_8day_NRT.py','collect.txt')       

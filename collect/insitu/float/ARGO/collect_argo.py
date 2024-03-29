@@ -1,8 +1,8 @@
 import os
 import sys
 
-sys.path.append("ingest")
-from ingest import vault_structure as vs
+sys.path.append("../../../../ingest")
+import vault_structure as vs
 
 
 # june_2023 = "https://www.seanoe.org/data/00311/42182/data/103075.tar.gz"
@@ -11,6 +11,9 @@ from ingest import vault_structure as vs
 # april_link = "https://www.seanoe.org/data/00311/42182/data/101760.tar.gz"
 # july_2023 = "https://www.seanoe.org/data/00311/42182/data/103614.tar.gz"
 # aug_2023 = "https://www.seanoe.org/data/00311/42182/data/104145.tar.gz"
+# sep_2023 = 'https://www.seanoe.org/data/00311/42182/data/104707.tar.gz'
+# oct_2030 = 'https://www.seanoe.org/data/00311/42182/data/105302.tar.gz'
+# Nov2023 = 'https://www.seanoe.org/data/00311/42182/data/105924.tar.gz'
 
 def downloadArgo(newmonth, tar_url):
     """Download Argo tar file. Creates new vault tables based on newmonth stub
@@ -25,6 +28,9 @@ def downloadArgo(newmonth, tar_url):
     output_dir = base_folder.replace(" ", "\\ ")      
     os.system(f"""wget --no-check-certificate {tar_url} -P {output_dir}""")
 
-newmonth = 'Sep2023'
-tar_url = 'https://www.seanoe.org/data/00311/42182/data/104707.tar.gz'
+
     
+newmonth = 'Feb2024'
+tar_url = 'https://www.seanoe.org/data/00311/42182/data/108452.tar.gz'
+    
+downloadArgo(newmonth, tar_url)

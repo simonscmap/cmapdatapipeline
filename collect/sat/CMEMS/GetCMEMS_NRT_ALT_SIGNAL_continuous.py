@@ -3,6 +3,7 @@ import os
 import datetime
 import glob
 import time
+import copernicusmarine
 
 # directory = os.path.abspath('../../..')
 # sys.path.append(directory)
@@ -11,6 +12,7 @@ from multiprocessing import Pool
 
 sys.path.append("ingest")
 sys.path.append("../../../")
+sys.path.append("../../../ingest")
 
 import vault_structure as vs
 import credentials as cr
@@ -23,7 +25,8 @@ tbl = 'tblAltimetry_NRT_Signal'
 base_folder = f'{vs.satellite}{tbl}/raw/'
 # vs.leafStruc(vs.satellite+tbl)
 
-output_dir = base_folder.replace(" ", "\\ ")
+# output_dir = base_folder.replace(" ", "\\ ")
+output_dir = os.path.normpath(base_folder)
 
 def getMaxDate(tbl):
     ## Check tblIngestion_Queue for downloaded but not ingested
@@ -61,10 +64,23 @@ def wget_file(date,retry=False):
     mn = f'{date:%m}'
     dy = f'{date:%d}'
     start_index = date.strftime('%Y_%m_%d')
-    fpath = f"ftp://nrt.cmems-du.eu/Core/SEALEVEL_GLO_PHY_L4_NRT_OBSERVATIONS_008_046/dataset-duacs-nrt-global-merged-allsat-phy-l4/{yr}/{mn}/nrt_global_allsat_phy_l4_{yr}{mn}{dy}_*"
-    wget_str = f"""wget --no-parent -nd -r -m --ftp-user={cr.usr_cmem} --ftp-password={cr.psw_cmem} {fpath}  -P  {output_dir}"""
+    # fpath = f"ftp://nrt.cmems-du.eu/Core/SEALEVEL_GLO_PHY_L4_NRT_OBSERVATIONS_008_046/dataset-duacs-nrt-global-merged-allsat-phy-l4/{yr}/{mn}/nrt_global_allsat_phy_l4_{yr}{mn}{dy}_*"
+    # wget_str = f"""wget --no-parent -nd -r -m --ftp-user={cr.usr_cmem} --ftp-password={cr.psw_cmem} {fpath}  -P  {output_dir}"""
     try:
-        os.system(wget_str)
+        # os.system(wget_str)
+
+        copernicusmarine.get( 
+                            dataset_id="cmems_obs-sl_glo_phy-ssh_nrt_allsat-l4-duacs-0.25deg_P1D",
+                            output_directory=output_dir,
+                            username=cr.usr_cmem,
+                            password=cr.psw_cmem,
+                            no_directories=True,
+                            show_outputnames=True,
+                            overwrite_output_data=True,
+                            force_download=True,
+                            filter=f"*{date.strftime("%Y%m%d")}_*.nc"
+                            )
+
         pname = glob.glob(f"{base_folder}nrt_global_allsat_phy_l4_{yr}{mn}{dy}*")
         Original_Name = pname[0].split(f"{base_folder}")[1]
         save_path = base_folder+Original_Name
@@ -110,6 +126,7 @@ end_date = datetime.date.today()
 delta = datetime.timedelta(days=1)
 max_date += delta
 end_date -= delta
+
 
 while max_date <= end_date:
     wget_file(max_date)

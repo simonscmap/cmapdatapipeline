@@ -105,9 +105,12 @@ def SQL_tbl_suggestion_formatter(sdf, tableName, server, db_name, FG="Primary"):
     sdf["column_name"] = "[" + sdf["column_name"].astype(str) + "]"
     ## was 200, fixed to be generated from df
     sdf["max_len"] = "[nvarchar]("+ sdf["max_len"].astype(str) + ")"
+    
+    # sdf["max_len"] = "[nvarchar](max)"
+    
     sdf.loc[sdf["dtype"] == "object", "dtype"] = sdf.loc[sdf["dtype"] == "object", "max_len"]
     sdf["dtype"] = sdf["dtype"].replace("float64", "[float]")
-    sdf["dtype"] = sdf["dtype"].replace("int64", "[int]")
+    sdf["dtype"] = sdf["dtype"].replace("int64", "[bigint]")
     sdf = sdf.drop('max_len', axis=1)
     var_string = sdf.to_string(header=False, index=False)
 

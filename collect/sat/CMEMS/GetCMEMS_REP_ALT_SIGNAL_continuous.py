@@ -3,13 +3,14 @@ import os
 import datetime
 import glob
 import time
+from dateutil import parser
 import ftplib 
-
+import copernicusmarine
 from multiprocessing import Pool
 
 sys.path.append("ingest")
 sys.path.append("../../../")
-
+sys.path.append("../../../ingest")
 import vault_structure as vs
 import credentials as cr
 import DB
@@ -20,27 +21,49 @@ import api_checks as api
 tbl = 'tblAltimetry_REP_Signal'
 base_folder = f'{vs.satellite}{tbl}/raw/'
 # vs.leafStruc(vs.satellite+tbl)
+output_dir = os.path.normpath(base_folder)
 
-output_dir = base_folder.replace(" ", "\\ ")
 
-def checkLatestFTPData():
-    ftp = ftplib.FTP('my.cmems-du.eu', cr.usr_cmem, cr.psw_cmem)
-    ftp.cwd('/Core/SEALEVEL_GLO_PHY_L4_MY_008_047/cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.25deg_P1D')
-    ftp_content = ftp.nlst()
-    latest_yr = ftp_content[-1:][0]
-    ftp.cwd(latest_yr)
-    ftp_content_yr = ftp.nlst()
-    latest_mnt = ftp_content_yr[-1:][0]
-    ftp.cwd(latest_mnt)
-    latest_dt = ftp.nlst()
-    latest_file = latest_dt[-1:][0]
-    last_import = DB.dbRead("SELECT MAX(Original_Name) fl FROM tblProcess_Queue WHERE Table_Name = 'tblAltimetry_REP_Signal'",'Rainier')
-    if latest_file == last_import['fl'][0].replace(' ',''):
-        print("No new data for tblAltimetry_REP_Signal")
-    latest_date = latest_file.rsplit('_',2)[1]
-    max_date = datetime.date(int(latest_yr),int(latest_mnt),int(latest_date[-2:]))
-    return max_date
+# output_dir = base_folder.replace(" ", "\\ ")
+
+# def checkLatestFTPData():
+#     ftp = ftplib.FTP('my.cmems-du.eu', cr.usr_cmem, cr.psw_cmem)
+#     ftp.cwd('/Core/SEALEVEL_GLO_PHY_L4_MY_008_047/cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.25deg_P1D')
+#     ftp_content = ftp.nlst()
+#     latest_yr = ftp_content[-1:][0]
+#     ftp.cwd(latest_yr)
+#     ftp_content_yr = ftp.nlst()
+#     latest_mnt = ftp_content_yr[-1:][0]
+#     ftp.cwd(latest_mnt)
+#     latest_dt = ftp.nlst()
+#     latest_file = latest_dt[-1:][0]
+#     last_import = DB.dbRead("SELECT MAX(Original_Name) fl FROM tblProcess_Queue WHERE Table_Name = 'tblAltimetry_REP_Signal'",'Rainier')
+#     if latest_file == last_import['fl'][0].replace(' ',''):
+#         print("No new data for tblAltimetry_REP_Signal")
+#     latest_date = latest_file.rsplit('_',2)[1]
+#     max_date = datetime.date(int(latest_yr),int(latest_mnt),int(latest_date[-2:]))
+#     return max_date
+
+
+
+# https://data.marine.copernicus.eu/product/SEALEVEL_GLO_PHY_L4_MY_008_047/description
     
+def source_max_coverage_date():
+    dataset_id = "cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.25deg_P1D"
+    print(f"Retrieving the max temporal coverage of '{dataset_id}' from copernicus .... ")
+    max_coverage_date = None
+    cat = copernicusmarine.describe(contains=[dataset_id], 
+                                    include_datasets=True, 
+                                    include_description=False, 
+                                    include_keywords=False
+                                    )
+    coords = cat['products'][0]['datasets'][0]['versions'][-1]['parts'][0]['services'][0]['variables'][0]['coordinates']   
+    for co in coords:
+        if co["coordinates_id"].lower() == "time":            
+            # max_coverage_date = parser.parse(co["maximum_value"]).date()
+            max_coverage_date = datetime.datetime.fromtimestamp(int(co["maximum_value"]) / 1000.0 ).date()
+    return max_coverage_date
+
 
 def getMaxDate(tbl):
     ## Check tblIngestion_Queue for downloaded but not ingested
@@ -75,10 +98,23 @@ def wget_file(date,retry=False):
     mn = f'{date:%m}'
     dy = f'{date:%d}'
     start_index = date.strftime('%Y_%m_%d')
-    fpath = f"ftp://my.cmems-du.eu/Core/SEALEVEL_GLO_PHY_L4_MY_008_047/cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.25deg_P1D/{yr}/{mn}/dt_global_allsat_phy_l4_{yr}{mn}{dy}_*"    
-    wget_str = f"""wget --no-parent -nd -r -m --ftp-user={cr.usr_cmem} --ftp-password={cr.psw_cmem} {fpath}  -P  {output_dir}"""
+    # fpath = f"ftp://my.cmems-du.eu/Core/SEALEVEL_GLO_PHY_L4_MY_008_047/cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.25deg_P1D/{yr}/{mn}/dt_global_allsat_phy_l4_{yr}{mn}{dy}_*"    
+    # wget_str = f"""wget --no-parent -nd -r -m --ftp-user={cr.usr_cmem} --ftp-password={cr.psw_cmem} {fpath}  -P  {output_dir}"""
     try:
-        os.system(wget_str)
+        # os.system(wget_str)
+
+        copernicusmarine.get( 
+                            dataset_id="cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.25deg_P1D",
+                            output_directory=output_dir,
+                            username=cr.usr_cmem,
+                            password=cr.psw_cmem,
+                            no_directories=True,
+                            show_outputnames=True,
+                            overwrite_output_data=True,
+                            force_download=True,
+                            filter=f"*{date.strftime("%Y%m%d")}_*.nc"
+                            )
+
         pname = glob.glob(f"{base_folder}dt_global_allsat_phy_l4_{yr}{mn}{dy}*")
         Original_Name = pname[0].split(f"{base_folder}")[1]
         save_path = base_folder+Original_Name
@@ -115,7 +151,8 @@ def retryError(tbl,output_dir):
 
 max_date = getMaxDate(tbl)
 print(f"Last {tbl} data downloaded: {max_date}")
-end_date = checkLatestFTPData()
+# end_date = checkLatestFTPData()
+end_date = source_max_coverage_date()
 
 if max_date != end_date:
     delta = datetime.timedelta(days=1)

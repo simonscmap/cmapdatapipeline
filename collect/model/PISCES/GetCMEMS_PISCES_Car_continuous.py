@@ -5,6 +5,7 @@ from ftplib import FTP
 import requests
 from urllib.parse import quote
 import pandas as pd
+import copernicusmarine
 
 sys.path.append("../../../ingest")
 sys.path.append("./ingest")
@@ -15,11 +16,6 @@ import metadata
 import credentials as cr
 import api_checks as api
 
-tbl = 'tblPisces_Forecast_cl1'
-base_folder = f'{vs.model}{tbl}/raw/'
-output_dir = base_folder.replace(" ", "\\ ")
-user = cr.usr_cmem
-pw = cr.psw_cmem
 
 
 def query(sql):   
@@ -60,9 +56,11 @@ def getMaxDate(tbl):
         # max_date = df_mx['Time_max'][0]
         qry = f"SELECT max(path) mx from dbo.tblIngestion_Queue WHERE Table_Name = '{tbl}' AND Ingested IS NOT NULL"
         mx_path = DB.dbRead(qry,'Rainier')
-        path_date = mx_path['mx'][0].split('.parquet')[0].rsplit(tbl+'_',1)[1]
-        yr, mo, day = path_date.split('_')
-        max_date = datetime.date(int(yr),int(mo),int(day))  
+        max_date = None        
+        if mx_path['mx'][0] is not None:
+            path_date = mx_path['mx'][0].split('.parquet')[0].rsplit(tbl+'_',1)[1]
+            yr, mo, day = path_date.split('_')
+            max_date = datetime.date(int(yr),int(mo),int(day))  
     elif len(df_ing)>0:
         last_path = df_ing['Path'].max()
         path_date = last_path.split('.parquet')[0].rsplit(tbl+'_',1)[1]
@@ -78,15 +76,22 @@ def getMaxDate(tbl):
     return max_date
 
 
-#ftp://mdehghaniashkez@nrt.cmems-du.eu/Core/GLOBAL_ANALYSIS_FORECAST_BIO_001_028/global-analysis-forecast-bio-001-028-daily/2020/11/mercatorbiomer4v2r1_global_mean_20201101.nc
 def wget_file(output_dir, yr, mnth, day, usr, psw, retry=False):
-    fpath = f"ftp://nrt.cmems-du.eu/Core/GLOBAL_ANALYSIS_FORECAST_BIO_001_028/global-analysis-forecast-bio-001-028-daily/{yr}/{mnth}/mercatorbiomer4v2r1_global_mean_{yr}{mnth}{day}*"  
-    Original_Name = f'mercatorbiomer4v2r1_global_mean_{yr}{mnth}{day}.nc'
+    Original_Name = f'mercatorbiomer4v2r1_global_mean_{dataset_suffix}_{yr}{mnth}{day}.nc'
     try:  
-        os.system(
-            f"""wget --no-parent -nd -r -m --ftp-user={usr} --ftp-password={psw} {fpath} -P {output_dir}"""
-        )
-        save_path = output_dir.replace("\\ ", " ")+Original_Name
+        copernicusmarine.get( 
+                            dataset_id=dataset_id,
+                            output_directory=output_dir,
+                            username=usr,
+                            password=psw,
+                            no_directories=True,
+                            show_outputnames=True,
+                            overwrite_output_data=True,
+                            force_download=True,
+                            filter=f"*_{dataset_suffix}_{datetime.datetime(int(yr), int(mnth), int(day)).strftime('%Y%m%d')}.nc"
+                            )
+
+        save_path = output_dir + Original_Name
         ## Remove empty downloads
         if os.path.getsize(save_path) == 0:
             print(f'empty download for {yr}{mnth}{day}')
@@ -115,17 +120,24 @@ def retryError(tbl):
         wget_file(output_dir, yr, mnth, day, user, pw, True)
 
 def wgetOverwrite(output_dir, yr, mnth, day, usr, psw):
-    fpath = f"ftp://nrt.cmems-du.eu/Core/GLOBAL_ANALYSIS_FORECAST_BIO_001_028/global-analysis-forecast-bio-001-028-daily/{yr}/{mnth}/mercatorbiomer4v2r1_global_mean_{yr}{mnth}{day}*"  
-    Original_Name = f'mercatorbiomer4v2r1_global_mean_{yr}{mnth}{day}.nc'
+    Original_Name = f'mercatorbiomer4v2r1_global_mean_{dataset_suffix}_{yr}{mnth}{day}.nc'
     ###### TEST ON DATE ALREADY UP TO DATE
     ###### MAKE SURE ERROR NOT INCLUDED IF DATA ALREADY UP TO DATE
     try:  
-        save_path = output_dir.replace("\\ ", " ")+Original_Name
+        save_path = output_dir + Original_Name        
         if os.path.exists(save_path): os.remove(save_path)
+        copernicusmarine.get( 
+                            dataset_id=dataset_id,
+                            output_directory=output_dir,
+                            username=usr,
+                            password=psw,
+                            no_directories=True,
+                            show_outputnames=True,
+                            overwrite_output_data=True,
+                            force_download=True,
+                            filter=f"*_{dataset_suffix}_{datetime.datetime(int(yr), int(mnth), int(day)).strftime('%Y%m%d')}.nc"
+                            )
 
-        os.system(
-            f"""wget --no-parent -nd -r -m --ftp-user={usr} --ftp-password={psw} {fpath} -P {output_dir}"""
-        )
         ## Remove empty downloads
         ####### Need original name for errors because file already exists. Differs from other error logic where name is date
         if os.path.getsize(save_path) == 0:
@@ -133,8 +145,8 @@ def wgetOverwrite(output_dir, yr, mnth, day, usr, psw):
             metadata.tblProcess_Queue_Overwrite(Original_Name, tbl, 'Opedia', 'Rainier','Empty File')
             os.remove(save_path)
         else:
-            print(f"Delete from cluster: " + f"delete from tblPisces_Forecast_cl1 where time='{yr}-{mnth}-{day}T12:00:00'")
-            query(f"delete from tblPisces_Forecast_cl1 where time='{yr}-{mnth}-{day}T12:00:00'")
+            print(f"Delete from cluster: " + f"delete from {tbl} where time='{yr}-{mnth}-{day}T12:00:00'")
+            query(f"delete from {tbl} where time='{yr}-{mnth}-{day}T12:00:00'")
             metadata.tblProcess_Queue_Overwrite(Original_Name, tbl, 'Opedia', 'Rainier')
     except Exception as e:
             print("****************************")
@@ -142,23 +154,43 @@ def wgetOverwrite(output_dir, yr, mnth, day, usr, psw):
             metadata.tblProcess_Queue_Overwrite(Original_Name, tbl, 'Opedia', 'Rainier',f'Download Error: {e}')
 
 
-def testDownload(yr, mnth, day, usr, psw):
-    test_dir = vs.download_transfer.replace(" ", "\\ ")
-    fpath = f"ftp://nrt.cmems-du.eu/Core/GLOBAL_ANALYSIS_FORECAST_BIO_001_028/global-analysis-forecast-bio-001-028-daily/{yr}/{mnth}/mercatorbiomer4v2r1_global_mean_{yr}{mnth}{day}*"  
-    os.system(
-        f"""wget --no-parent -nd -r -m --ftp-user={usr} --ftp-password={psw} {fpath} -O {test_dir}PiscesTest{yr}{mnth}{day}.nc"""
-    )
 
-# testDownload('2023', '02', '08', user, pw)
-max_date = getMaxDate(tbl)
-end_date = datetime.date.today()
-delta = datetime.timedelta(days=1)
-max_date += delta
-end_date +=datetime.timedelta(days=9)
+
+
+
+
+
+
+
+
+
+
+
+
+############# inputs #############
+tbl = 'tblPisces_Forecast_Car'
+dataset_id = "cmems_mod_glo_bgc-car_anfc_0.25deg_P1D-m"
+dataset_suffix = "car"
+##################################
+
+
+
+base_folder = f'{vs.model}{tbl}/raw/'
+output_dir = os.path.normpath(base_folder) + "/"
+user = cr.usr_cmem
+pw = cr.psw_cmem
 
 min_time, max_time = api.temporalRange(tbl)
 overwrite_end = datetime.datetime.strptime(max_time.split('T')[0], '%Y-%m-%d').date()
 overwrite_start = overwrite_end - datetime.timedelta(days=16)
+
+max_date = getMaxDate(tbl)
+if max_date is None:
+    max_date = datetime.datetime.strptime(max_time.split('T')[0], '%Y-%m-%d').date()
+end_date = datetime.date.today()
+delta = datetime.timedelta(days=1)
+max_date += delta
+end_date += datetime.timedelta(days=9)
 
 
 
@@ -170,6 +202,7 @@ overwrite_start = overwrite_end - datetime.timedelta(days=16)
 # print(f"max_date: {max_date}")
 # print(f"end_date: {end_date}")
 # ###########################
+
 
 
 while overwrite_start <= overwrite_end:

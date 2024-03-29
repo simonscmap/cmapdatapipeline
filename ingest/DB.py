@@ -20,6 +20,9 @@ import pandas as pd
 import bcpandas
 import pycmap
 import common as cmn
+import warnings
+warnings.filterwarnings('ignore')
+
 
 # pycmap.API(cr.api_key)
 ######## DB Specific ############
@@ -45,7 +48,7 @@ def DB_modify(cmnd, server):
         cursor.execute(cmnd)
         conn.close()
     except Exception as e:
-        print(e)
+        print(f"DB_modify Error: {e}")
         conn.close()
 
 
@@ -254,6 +257,13 @@ def toSQLbcpandas(df, tableName, server):
 def toSQLbcp_wrapper(df, tableName, server):
     """wrapper func for toSQLbcp function. Simplifies arguments"""
     export_path = f"{tableName}_{server}_bcp.csv"
+
+    print("-------&&&&&&&&&&&&---------")
+    print(f"export_path: {export_path}")
+    print(f"server: {server}")
+    print()
+
+
     df.to_csv(export_path, index=False)
     toSQLbcp(export_path, tableName, server)
     os.remove(export_path)

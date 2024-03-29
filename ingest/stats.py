@@ -20,6 +20,7 @@ import DB
 import transfer
 import data
 import vault_structure as vs
+from datetime import datetime
 
 
 def updateStatsTable(ID, json_str, server):
@@ -307,15 +308,26 @@ def build_stats_from_parquet(tableName, make, nrt):
     return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth
 
 def pull_from_stats_folder(tableName, make):
-    df_stats = pd.read_excel(f'{make}{tableName}/stats/{tableName}_stats.xlsx')
-    df_stats = df_stats.query('max_depth < 20000 and min_lat >=-90.0')
-    min_time = df_stats['min_time'].min()
-    max_time = df_stats['max_time'].max()
-    min_lat = df_stats['min_lat'].min()
-    max_lat = df_stats['max_lat'].max()
-    min_lon = df_stats['min_lon'].min()
-    max_lon = df_stats['max_lon'].max()
-    min_depth = df_stats['min_depth'].min()
-    max_depth = df_stats['max_depth'].max()
-    row_count = df_stats['row_count'].sum()
+    try:
+        df_stats = pd.read_excel(f'{make}{tableName}/stats/{tableName}_stats.xlsx')
+        df_stats = df_stats.query('max_depth < 20000 and min_lat >=-90.0')
+        min_time = df_stats['min_time'].min()
+        max_time = df_stats['max_time'].max()
+        min_lat = df_stats['min_lat'].min()
+        max_lat = df_stats['max_lat'].max()
+        min_lon = df_stats['min_lon'].min()
+        max_lon = df_stats['max_lon'].max()
+        min_depth = df_stats['min_depth'].min()
+        max_depth = df_stats['max_depth'].max()
+        row_count = df_stats['row_count'].sum()
+
+        
+        # min_time, max_time = datetime(2022, 1, 1, 12, 0, 0, 0), datetime(2024, 3, 29, 12, 0, 0, 0)
+        # min_lat, max_lat = -80, 90
+        # min_lon, max_lon = -180, 179.75
+        # min_depth, max_depth = 0.4940253794193268, 5727.91650390625
+        # row_count = 40157208000
+
+    except Exception as e:    
+        print(f"Error in pull_from_stats_folder:\n{e}")
     return min_time, max_time, min_lat, max_lat, min_lon, max_lon, min_depth, max_depth, row_count

@@ -4,6 +4,10 @@ import datetime
 import requests
 import pandas as pd 
 
+sys.path.append("../../../ingest")
+sys.path.append("./ingest")
+
+
 sys.path.append("ingest")
 sys.path.append("../../../")
 import vault_structure as vs
@@ -84,6 +88,7 @@ def retryError(tbl):
             getSST(yr, month, day, True)
 
 
+
 retryError(tbl)
 
 # max_date = datetime.date(2022, 2, 6)
@@ -96,10 +101,13 @@ max_date += delta
 end_date -= delta
 
 
+
+
 while max_date <= end_date:
     yr = max_date.year
     month = f"{max_date:%m}"
     day = f"{max_date:%d}"
+    # print(yr, month, day)
     getSST(yr, month, day)
     max_date += delta
 

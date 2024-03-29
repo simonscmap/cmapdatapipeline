@@ -252,9 +252,15 @@ def maxDateCluster(tbl):
                     f.write(chunk)
         df = pd.read_parquet(outPath)
         mx_time = df['time'][0]
+
+        try:
+            return mx_time.to_pydatetime().date()
+        except:
+            return mx_time
+            
     except Exception as e:        
         print(str(e))
-    return mx_time
+    return 
 
 def minDateCluster(tbl):
     qry = f"Select min(time) time from {tbl}"

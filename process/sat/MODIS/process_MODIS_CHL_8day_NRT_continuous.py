@@ -55,8 +55,17 @@ def proc_chl(fil):
     df["month"] = pd.to_datetime(df["time"]).dt.month
     df["week"] = pd.to_datetime(df["time"]).dt.isocalendar().week
     df["dayofyear"] = pd.to_datetime(df["time"]).dt.dayofyear
+
+    df['time'] = df['time'].astype('<M8[us]')
+    for col in ['lat', 'lon']:
+        df[col] = df[col].astype('float64')
+    for col in ['year', 'month', 'dayofyear']:
+        df[col] = df[col].astype('int64')
+        
     if df.dtypes.to_dict() != test_dtype:
         print(f"Check data types in {fil}. New: {df.columns.to_list()}")
+        print(df.dtypes.to_dict())
+        print(test_dtype) 
         sys.exit()      
     fil_name = os.path.basename(fil)
     path = f"{nrt_folder.split('vault/')[1]}{tbl}_{fil_date}.parquet"

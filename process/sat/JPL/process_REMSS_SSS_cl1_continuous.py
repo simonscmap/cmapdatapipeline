@@ -54,8 +54,18 @@ for fil in tqdm(flist):
     df = df[['time','lat','lon','sss_smap','year','month','week','dayofyear']]
     df = df.sort_values(["time", "lat","lon"], ascending = (True, True,True))
     df = data.mapTo180180(df)
+
+
+    df['time'] = df['time'].astype('<M8[us]')
+    for col in ['lat', 'lon']:
+        df[col] = df[col].astype('float64')
+    for col in ['year', 'month', 'dayofyear']:
+        df[col] = df[col].astype('int64')
+
     if df.dtypes.to_dict() != test_dtype:
         print(f"Check data types in {fil}. New: {df.columns.to_list()}")
+        print(df.dtypes.to_dict())
+        print(test_dtype)        
         sys.exit()       
     fil_name = os.path.basename(fil)
     fil_date = df['time'][0].strftime("%Y_%m_%d") 

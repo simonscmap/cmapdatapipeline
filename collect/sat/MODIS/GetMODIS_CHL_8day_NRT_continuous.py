@@ -2,9 +2,12 @@ import sys
 import os
 import time
 import datetime as dt
+import datetime
 
 sys.path.append("ingest")
 sys.path.append("../../../")
+
+sys.path.append("../../../ingest")
 
 import vault_structure as vs
 import credentials as cr
@@ -94,7 +97,7 @@ def retryError(tbl):
     df_err = DB.dbRead(qry, 'Rainier')
     dt_list = df_err['Original_Name'].to_list()
     if len(dt_list)>0:
-        dt_list = [dt.datetime.strptime(x.strip(), '%Y_%m_%d').date() for x in dt_list]
+        dt_list = [datetime.datetime.strptime(x.strip(), '%Y_%m_%d').date() for x in dt_list]
         for dt in dt_list:
             get_CHL(dt, True)
 
@@ -106,6 +109,7 @@ end_date = dt.date.today()
 delta = dt.timedelta(days=8)
 start_date += delta
 end_date -= delta
+
 
 while start_date <= end_date:
     get_CHL(start_date)

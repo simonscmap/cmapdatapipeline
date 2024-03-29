@@ -59,7 +59,10 @@ def proc_wind(fil):
     df = x.to_dataframe().reset_index()
     if df.columns.to_list() != test_cols:
         print(f"Check columns in {fil}. New: {df.columns.to_list()}, Old: {test_cols}")
-        metadata.tblProcess_Queue_Process_Update(fil, path, tbl, 'Opedia', 'Rainier','New columns')
+        print(".............")
+        print(df.columns.to_list())
+        print(test_cols)
+        # metadata.tblProcess_Queue_Process_Update(fil, path, tbl, 'Opedia', 'Rainier','New columns')
         sys.exit()
     x.close()
     df['hour'] = df['time'].dt.hour
@@ -70,9 +73,18 @@ def proc_wind(fil):
     df['number_of_observations'] = df['number_of_observations'].astype('Int64')
     df['number_of_observations_divcurl'] = df['number_of_observations_divcurl'].astype('Int64')
     df = data.add_day_week_month_year_clim(df)
+
+    for col in ['lat', 'lon']:
+        df[col] = df[col].astype('float64')
+    for col in ['hour', 'year', 'month', 'dayofyear']:
+        df[col] = df[col].astype('int64')
+
     if df.dtypes.to_dict() != test_dtype:
         print(f"Check data types in {fil}. New: {df.columns.to_list()}, Old: {test_cols}")
-        metadata.tblProcess_Queue_Process_Update(fil, path, tbl, 'Opedia', 'Rainier','Dtype change')
+        print("??????????????????")
+        print(df.dtypes.to_dict())
+        print(test_dtype)
+        # metadata.tblProcess_Queue_Process_Update(fil, path, tbl, 'Opedia', 'Rainier','Dtype change')
         sys.exit()   
     ### Keeping original file name to match previous ingestion   
     # fil_date = df['time'].max().strftime('%Y_%m_%d_%H')

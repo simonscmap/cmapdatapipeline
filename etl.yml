@@ -1,0 +1,26 @@
+name: etl
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.9,<3.13
+  - pip
+  - pip:
+    - copernicusmarine
+    - geopandas
+    - bcpandas
+    - pyodbc
+    - SQLAlchemy
+    - pycmap
+    - schedule
+    - pyarrow
+    - databricks-sql-connector
+    - xarray
+    - pandera
+    - fastapi
+    - uvicorn
+    - ipython
+    - jupyterlab
+    - notebook
+    - dropbox
+    - selenium
+    - multiprocessing

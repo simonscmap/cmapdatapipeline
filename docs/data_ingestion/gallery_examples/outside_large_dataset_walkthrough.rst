@@ -169,7 +169,7 @@ An example string would be:
 
 .. code-block:: python
 
-    python general.py tblArgoBGC_REP float 'ARGO_BGC.xlsx' -S "Rainier" -N
+    python general.py tblArgoBGC_REP_Nov2023 float 'ARGO_BGC_Nov2023.xlsx' -i 'argo_small.jpg' -S 'Rainier' -N -a 'cluster' -F 1
 
 
 Transferring Large Datasets Between Servers

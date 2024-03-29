@@ -61,8 +61,21 @@ for fil in tqdm(flist):
     df["week"] = pd.to_datetime(df["time"]).dt.isocalendar().week
     df["dayofyear"] = pd.to_datetime(df["time"]).dt.dayofyear
     df = df[["time", "lat", "lon", "par", "year", "month", "week", "dayofyear"]]
+
+
+    ####### This block of code needs to be checked!!
+    df['time'] = df['time'].astype('<M8[us]')
+    for col in ['lat', 'lon']:
+        df[col] = df[col].astype('float64')
+    for col in ['year', 'month', 'dayofyear']:
+        df[col] = df[col].astype('int64')
+    ################################################    
+
+
     if df.dtypes.to_dict() != test_dtype:
         print(f"Check data types in {fil}.")
+        print(df.dtypes.to_dict())
+        print(test_dtype) 
         sys.exit()      
     df.to_parquet(f"{rep_folder}{tbl}_{timecol}.parquet", index=False)      
     path = f"{rep_folder.split('vault/')[1]}{tbl}_{timecol.replace('-','_')}.parquet"

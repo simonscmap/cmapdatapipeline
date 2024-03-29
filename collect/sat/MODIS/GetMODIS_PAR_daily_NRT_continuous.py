@@ -2,6 +2,7 @@ import sys
 import os
 import time
 import datetime as dt
+import pandas as pd
 from multiprocessing import Pool
 
 sys.path.append("ingest")
@@ -44,6 +45,7 @@ def getMaxDate(tbl):
             max_name_date = dt.date(int(yr),int(mo),int(day)) 
 
         max_data_date = api.maxDateCluster(tbl)   
+
 
         max_date = max([max_path_date,max_name_date,max_data_date])
     else:

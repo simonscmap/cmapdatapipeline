@@ -29,10 +29,10 @@ def getMax_SQL_date(table, server):
     Returns:
         sql_date (datetime): Datetime object of max date in table
     """
-    query = 'select max(time) from [Opedia].[dbo].' + table
+    query = 'select max(time) as max_time from [Opedia].[dbo].' + table
     server = 'Rainier'
     sql_read = DB.dbRead(query, server)
-    sql_date = sql_read.iloc[0][0]
+    sql_date = sql_read["max_time"].iloc[0]
     return sql_date
 
 def getLast_file_download(table, vault_type, raw=True):
@@ -299,15 +299,15 @@ def get_name_pkey(tableName, server):
         AND Col.Table_Name = Tab.Table_Name
         AND Constraint_Type = 'PRIMARY KEY'
         AND Col.Table_Name = '{tableName}'"""
-    pkey_name = DB.dbRead(query, server).iloc[0][0]
+    pkey_name = DB.dbRead(query, server)["Column_Name"].iloc[0]
     return pkey_name
 
 
 def get_last_ID(tableName, server):
     """last ID in table"""
     pkey_col_name = get_name_pkey(tableName, server)
-    last_ID_qry = f"""SELECT TOP 1 * FROM {tableName} ORDER BY {pkey_col_name} DESC"""
-    last_ID = DB.dbRead(last_ID_qry, server).iloc[0][0]
+    last_ID_qry = f"""SELECT TOP 1 [{pkey_col_name}] FROM {tableName} ORDER BY [{pkey_col_name}] DESC"""
+    last_ID = DB.dbRead(last_ID_qry, server)[pkey_col_name].iloc[0]
     return last_ID
 
 def getSensorID_SensorName(sensor, db_name, server):
@@ -320,7 +320,7 @@ def getSensorID_SensorName(sensor, db_name, server):
         + """'"""
     )
     query_return = DB.dbRead(cur_str, server)
-    sID = query_return.iloc[0][0]
+    sID = query_return["ID"].iloc[0]
     return sID   
         
 def getDatasetID_DS_Name(datasetName, db_name, server):
@@ -333,7 +333,7 @@ def getDatasetID_DS_Name(datasetName, db_name, server):
         + """'"""
     )
     query_return = DB.dbRead(cur_str, server)
-    dsID = query_return.iloc[0][0]
+    dsID = query_return["ID"].iloc[0]
     return dsID
 
 
@@ -347,7 +347,7 @@ def getDatasetID_Tbl_Name(tableName, db_name, server):
         + """'"""
     )
     query_return = DB.dbRead(cur_str, server=server)
-    dsID = query_return.iloc[0][0]
+    dsID = query_return["Dataset_ID"].iloc[0]
     return dsID
 
 def getTbl_Name_DatasetID(Dataset_ID, db_name, server):
@@ -359,7 +359,7 @@ def getTbl_Name_DatasetID(Dataset_ID, db_name, server):
         + str(Dataset_ID)
     )
     query_return = DB.dbRead(cur_str, server=server)
-    tableName = query_return.iloc[0][0]
+    tableName = query_return["Table_Name"].iloc[0]
     return tableName    
 
 def getRefID_Tbl_Name_Ref(ref, tableName, db_name, server):
@@ -375,7 +375,7 @@ def getRefID_Tbl_Name_Ref(ref, tableName, db_name, server):
         + """'"""        
     )
     query_return = DB.dbRead(cur_str, server=server)
-    refID = query_return.iloc[0][0]
+    refID = query_return["Reference_ID"].iloc[0]
     return refID, dsID
 
 
@@ -453,7 +453,7 @@ def findVarID(datasetID, Short_Name, db_name, server):
     )
     query = DB.dbRead(cur_str, server)        
     print(query)
-    VarID = query.iloc[0][0]
+    VarID = query["ID"].iloc[0]
     return VarID
 
 

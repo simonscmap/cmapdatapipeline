@@ -2,11 +2,12 @@ import sys
 import os
 import time
 import datetime as dt
+import datetime
 from multiprocessing import Pool
 import pandas as pd
 
 sys.path.append("ingest")
-sys.path.append("../../../")
+sys.path.append("../../../ingest")
 
 import vault_structure as vs
 import credentials as cr
@@ -46,7 +47,7 @@ def getMaxDate(tbl):
         # max_data_date = api.maxDateCluster(tbl)   
         max_data_date = pd.to_datetime(mx, format='%Y-%m-%dT%H:%M:%S')
 
-        max_date = max([max_path_date,max_name_date,max_data_date])
+        max_date = max([max_path_date,max_name_date,max_data_date.to_pydatetime().date()])
     else:
         last_path = df_ing['Path'].max()
         path_date = last_path.split('.parquet')[0].rsplit(tbl+'_',1)[1]
@@ -90,7 +91,7 @@ def retryError(tbl):
     df_err = DB.dbRead(qry, 'Rainier')
     dt_list = df_err['Original_Name'].to_list()
     if len(dt_list)>0:
-        dt_list = [dt.datetime.strptime(x.strip(), '%Y_%m_%d').date() for x in dt_list]
+        dt_list = [datetime.datetime.strptime(x.strip(), '%Y_%m_%d').date() for x in dt_list]
         for dat in dt_list:
             get_PAR(dat, True)
 
@@ -99,11 +100,12 @@ retryError(tbl)
 
 start_date = getMaxDate(tbl)
 mn,mx = api.temporalRange('tblModis_PAR_NRT')
-end_date = pd.to_datetime(mn, format='%Y-%m-%dT%H:%M:%S')
+end_date = pd.to_datetime(mn, format='%Y-%m-%dT%H:%M:%S').to_pydatetime().date()
 # end_date = api.minDateCluster('tblModis_PAR_NRT')
 delta = dt.timedelta(days=1)
 start_date += delta
 # end_date += delta
+
 
 while start_date <= end_date:
     get_PAR(start_date)

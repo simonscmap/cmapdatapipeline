@@ -64,13 +64,20 @@ for fil in tqdm(flist):
     df_import.sort_values(['time', 'lat', 'lon'], ascending=[True, True, True], inplace=True)
     df_import['week'] = df_import['week'].astype(int)
     ## Data type changed in 5/2023 from float(64) to float(32)
-    df_import['sst'] = df_import['sst'].astype('float64')
+    for col in ['sst', 'lat', 'lon']:
+        df_import[col] = df_import[col].astype('float64')
+    for col in ['year', 'month', 'week', 'dayofyear']:
+        df_import[col] = df_import[col].astype('int64')
     if df_import.dtypes.to_dict() != test_dtype:
-        print(f"Check data types in {fil}. New: {df.columns.to_list()}, Old: {test_cols}")
+        print(f"Check data types in {fil}. \n\tNew: {df.columns.to_list()}, \n\tOld: {test_cols}")
+        print(df_import.dtypes.to_dict())
+        print(test_dtype)
         sys.exit()        
     fil_date = df_import['time'].max().strftime('%Y_%m_%d')
     path = f"{nrt_dir.split('vault/')[1]}{tbl}_{fil_date}.parquet"
     df_import.to_parquet(f'{nrt_dir}{tbl}_{fil_date}.parquet', index=False)
+
+
     metadata.tblProcess_Queue_Process_Update(fil, path, tbl, 'Opedia', 'Rainier')
     s3_str = f"aws s3 cp {tbl}_{fil_date}.parquet s3://cmap-vault/observation/remote/satellite/tblSST_AVHRR_OI_NRT/nrt/"
     os.system(s3_str)
@@ -83,7 +90,5 @@ for fil in tqdm(flist):
         result = pool.starmap(DB.toSQLbcp_wrapper, zip(a,b,c))
         pool.close() 
         pool.join()
-
-
 
 

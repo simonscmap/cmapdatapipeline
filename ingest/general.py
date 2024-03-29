@@ -453,6 +453,7 @@ def full_ingestion(args):
 
 def dataless_ingestion(args):
     """This wrapper function adds metadata into the database for large datasets that already exist in the database. ex. satellite, model, argo etc."""
+
     if not args.in_vault:
         validator_to_vault(
             args.staging_filename,

@@ -4,7 +4,7 @@ import datetime as dt
 from time import sleep
 
 sys.path.append("ingest")
-sys.path.append("../../../")
+sys.path.append("../../../ingest")
 
 import vault_structure as vs
 import DB
@@ -33,7 +33,7 @@ def getMaxDate(tbl):
         else: 
             yr, mo, day = mx_name['mx'][0].strip().split('_')
             max_name_date = dt.date(int(yr),int(mo),int(day))  
-        max_data_date = api.maxDateCluster(tbl)   
+        max_data_date = api.maxDateCluster(tbl)           
         max_date = max([max_path_date,max_name_date,max_data_date])
     else:
         last_path = df_ing['Path'].max()

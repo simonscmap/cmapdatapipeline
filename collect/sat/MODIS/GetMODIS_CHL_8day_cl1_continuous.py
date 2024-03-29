@@ -103,7 +103,7 @@ def retryError(tbl):
 retryError(tbl)
 
 start_date = getMaxDate(tbl)
-end_date = api.minDateCluster('tblModis_CHL_NRT')
+end_date = api.minDateCluster('tblModis_CHL_NRT').to_pydatetime().date()
 
 delta = dt.timedelta(days=8)
 

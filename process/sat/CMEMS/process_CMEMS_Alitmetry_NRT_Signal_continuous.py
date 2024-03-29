@@ -57,9 +57,20 @@ for fil in tqdm(flist):
     df = df.sort_values(["time", "latitude","longitude"], ascending = (True, True,True))
     df.rename(columns={'latitude':'lat', 'longitude':'lon'}, inplace = True)
     df = data.add_day_week_month_year_clim(df)
+
+
+    df['time'] = df['time'].astype('<M8[us]')
+    for col in ['lat', 'lon']:
+        df[col] = df[col].astype('float64')
+    for col in ['year', 'month', 'dayofyear']:
+        df[col] = df[col].astype('int64')
+
+
     if df.dtypes.to_dict() != test_dtype:
-        print(f"Check data types in {fil}. New: {df.columns.to_list()}, Old: {test_cols}")
-        metadata.tblProcess_Queue_Process_Update(fil, path, tbl, 'Opedia', 'Rainier','Dtype change')
+        print(f"Check data types in {fil}. New: {df.columns.to_list()}, Old: {test_cols}")        
+        print(df.dtypes.to_dict())
+        print(test_dtype)
+        # metadata.tblProcess_Queue_Process_Update(fil, path, tbl, 'Opedia', 'Rainier','Dtype change')
         sys.exit()   
     fil_date = df['time'].max().strftime('%Y_%m_%d')
     path = f"{nrt_folder.split('vault/')[1]}{tbl}_{fil_date}.parquet"

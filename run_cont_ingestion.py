@@ -28,7 +28,13 @@ import DB
 run_script = True
 
 cur_dir = os.getcwd()
-get_pisces = '/collect/model/PISCES/GetCMEMS_NRT_MERCATOR_PISCES_continuous.py'
+# get_pisces = '/collect/model/PISCES/GetCMEMS_NRT_MERCATOR_PISCES_continuous.py'
+get_pisces_nut = '/collect/model/PISCES/GetCMEMS_PISCES_Nutrients_continuous.py'
+get_pisces_bio = '/collect/model/PISCES/GetCMEMS_PISCES_Bio_continuous.py'
+get_pisces_car = '/collect/model/PISCES/GetCMEMS_PISCES_Car_continuous.py'
+get_pisces_optics = '/collect/model/PISCES/GetCMEMS_PISCES_Optics_continuous.py'
+get_pisces_pft = '/collect/model/PISCES/GetCMEMS_PISCES_Pft_continuous.py'
+get_pisces_co2 = '/collect/model/PISCES/GetCMEMS_PISCES_Co2_continuous.py'
 get_wind = '/collect/sat/CMEMS/GetCMEMS_NRT_WIND_HOURLY_continuous.py'
 get_sst = '/collect/sat/MURSST/GetGHRSST_SST_continuous.py'
 get_sss = '/collect/sat/JPL/GetREMSS_SSS_cl1_continuous.py'
@@ -42,7 +48,13 @@ get_alt_nrt = '/collect/sat/CMEMS/GetCMEMS_NRT_ALT_SIGNAL_continuous.py'
 get_alt_rep = '/collect/sat/CMEMS/GetCMEMS_REP_ALT_SIGNAL_continuous.py'
 get_aod = '/collect/sat/NASA/GetLAADS_MODIS_AOD_continuous.py'
 
-proc_pisces = '/process/model/process_Forecast_PISCES_001_028_continuous.py'
+# proc_pisces = '/process/model/process_Forecast_PISCES_001_028_continuous.py'
+proc_pisces_nut = '/process/model/process_PISCES_Nutrients_continuous.py'
+proc_pisces_bio = '/process/model/process_PISCES_Bio_continuous.py'
+proc_pisces_car = '/process/model/process_PISCES_Car_continuous.py'
+proc_pisces_optics = '/process/model/process_PISCES_Optics_continuous.py'
+proc_pisces_pft = '/process/model/process_PISCES_Pft_continuous.py'
+proc_pisces_co2 = '/process/model/process_PISCES_Co2_continuous.py'
 proc_wind = '/process/sat/CMEMS/process_CMEMS_Wind_NRT_Hourly_continuous.py'
 proc_sst = '/process/sat/GHRSST/process_GHRSST_continuous.py'
 proc_sss = '/process/sat/JPL/process_REMSS_SSS_cl1_continuous.py'
@@ -74,7 +86,7 @@ def updateCIStats(tbl):
 if run_script:
     if datetime.date.today().weekday() == 2:
         print("It's Wednesday!")
-        wlist = [get_pisces, get_wind, get_sst, get_sss, get_par_nrt, get_par,get_alt_nrt,get_alt_rep]
+        wlist = [get_pisces_nut, get_pisces_bio, get_pisces_car, get_pisces_optics, get_pisces_pft, get_pisces_co2, get_wind, get_sst, get_sss, get_par_nrt, get_par,get_alt_nrt,get_alt_rep]                         
         with Pool(processes=8) as pool:
             pool.map(runScript,  wlist)
             pool.close() 
@@ -94,11 +106,14 @@ if run_script:
             pool.join()
     dl_count = DB.dbRead("SELECT table_name, count(*) cnt from tblProcess_Queue where Processed is null and error_str is null group by table_name order by table_name","Rainier")
     print(dl_count)
+    
     Yn = input("Continue with data processing? [y/n] ")
+    Yn= 'y'
+    
     if Yn == 'y':
         if datetime.date.today().weekday() == 2:
             print("It's Wednesday!")
-            plist = [proc_pisces, proc_wind, proc_sst, proc_sss, proc_par_nrt, proc_par, proc_alt_nrt, proc_alt_rep]
+            plist = [proc_pisces_nut, proc_pisces_bio, proc_pisces_car, proc_pisces_optics, proc_pisces_pft, proc_pisces_co2, proc_wind, proc_sst, proc_sss, proc_par_nrt, proc_par, proc_alt_nrt, proc_alt_rep]                                                             
             with Pool(processes=20) as pool:
                 pool.map(runScript,  plist)
                 pool.close() 
@@ -126,7 +141,7 @@ if run_script:
         print(f"## Rechecking tblProcess_Queue {time_count}")
         dl_count = DB.dbRead("SELECT table_name, count(*) cnt from tblProcess_Queue where Processed is null and error_str is null group by table_name order by table_name","Rainier")
     if len(dl_count)==0:
-        print("### Starting S3 ###")
+        print("#########   Starting the Spark Cluster for Ingestion   #########")
         requests.get(cr.S3_ingest)
     else:
         rerun = input("Enter shortname to rerun (ex proc_wind, proc_sst, proc_sss, proc_par_nrt, proc_par, proc_alt_nrt) ")
@@ -134,7 +149,7 @@ if run_script:
         ### Add recheck after rerun      
     pr_count = DB.dbRead("SELECT * from tblIngestion_Queue where Ingested is null","Rainier")
     time_count = 0
-    while len(pr_count)>0 and time_count <10:
+    while len(pr_count)>0 and time_count <30:
         time.sleep(300)
         time_count += 1
         print(f"## Rechecking tblIngestion_Queue {time_count}")        
@@ -146,12 +161,15 @@ if run_script:
         max_hour = api.query(qry)
         mx_hr = max_hour['hr'][0]
         print(max_time+f'T{mx_hr}:00:00.000Z')
-        Yn = input("Update wind stats? [y/n] ")
+        
+        # Yn = input("Update wind stats? [y/n] ")
+        Yn = 'y'
+        
         if Yn == 'y':  
             for server in cr.server_alias_list:
                 stats.updateStats_Manual(min_time+'T00:00:00.000Z', max_time+f'T{mx_hr}:00:00.000Z', -89.9375, 89.9375, -179.9375, 179.9375, None, None,None, 'tblWind_NRT_hourly', 'Opedia', server)
         if datetime.date.today().weekday() == 2:
-            tlist = ['tblsss_nrt_cl1','tblSST_AVHRR_OI_NRT','tblModis_par_cl1','tblModis_par_nrt','tblPisces_Forecast_cl1','tblAltimetry_NRT_Signal']
+            tlist = ['tblsss_nrt_cl1', 'tblSST_AVHRR_OI_NRT', 'tblModis_par_cl1', 'tblModis_par_nrt', 'tblAltimetry_NRT_Signal', 'tblPisces_Forecast_Nutrients', 'tblPisces_Forecast_Bio', 'tblPisces_Forecast_Car', 'tblPisces_Forecast_Optics', 'tblPisces_Forecast_Pft', 'tblPisces_Forecast_Co2']
         elif datetime.date.today().weekday() == 1:  
             tlist = ['tblsss_nrt_cl1','tblSST_AVHRR_OI_NRT','tblModis_chl_cl1','tblModis_chl_nrt','tblModis_par_cl1','tblModis_par_nrt','tblModis_poc_cl1','tblModis_poc_nrt','tblAltimetry_NRT_Signal']
         else:

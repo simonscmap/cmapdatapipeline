@@ -10,16 +10,21 @@ import glob
 sys.path.append("ingest")
 # sys.path.append("../../../ingest")
 sys.path.append("../../../")
+sys.path.append("../../../ingest")
 
 import vault_structure as vs
 import DB
 import metadata
 import credentials as cr
+import copernicusmarine
+
+
 
 tbl = 'tblWind_NRT_hourly'
 
 base_folder = f'{vs.satellite}{tbl}/raw/'
-output_dir = base_folder.replace(" ", "\\ ")
+# output_dir = base_folder.replace(" ", "\\ ")
+output_dir = os.path.normpath(base_folder)
 
 usr = cr.usr_cmem
 psw = cr.psw_cmem
@@ -83,10 +88,23 @@ def getMaxDate(tbl):
 ## Run time for one day: 10:09:48 - 10:13:28  3 min 40sec
 
 def wget_file(yr, mnth, day, retry=False):
-    fpath = f"ftp://nrt.cmems-du.eu/Core/WIND_GLO_PHY_L4_NRT_012_004/cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H/{yr}/{mnth}/cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H_{yr}{mnth}{day}*"    
-    os.system(
-        f"""wget --no-parent -nd -r -m --ftp-user={usr} --ftp-password={psw} {fpath} -P {output_dir}"""
-    )
+    # fpath = f"ftp://nrt.cmems-du.eu/Core/WIND_GLO_PHY_L4_NRT_012_004/cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H/{yr}/{mnth}/cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H_{yr}{mnth}{day}*"    
+    # os.system(
+    #     f"""wget --no-parent -nd -r -m --ftp-user={usr} --ftp-password={psw} {fpath} -P {output_dir}"""
+    # )
+
+    copernicusmarine.get( 
+                        dataset_id="cmems_obs-wind_glo_phy_nrt_l4_0.125deg_PT1H",
+                        output_directory=output_dir,
+                        username=cr.usr_cmem,
+                        password=cr.psw_cmem,
+                        no_directories=True,
+                        show_outputnames=True,
+                        overwrite_output_data=True,
+                        force_download=True,
+                        filter=f"*{datetime.date(int(yr), int(mnth), int(day)).strftime("%Y%m%d")}*_R*.nc"
+                        )
+
     hr_list = np.arange(0, 24, 1, int)
     for hr_int in hr_list:
         hr = str(hr_int).zfill(2)
@@ -94,6 +112,7 @@ def wget_file(yr, mnth, day, retry=False):
         if len(pname) == 0:
             print(f'### No file found for {yr}{mnth}{day}{hr} ')
             if not retry:
+                pass
                 metadata.tblProcess_Queue_Download_Insert(f"{yr}_{mnth}_{day}_{hr}", tbl, 'Opedia', 'Rainier','Download Error')
             continue
         elif len(pname) > 1:
@@ -106,6 +125,7 @@ def wget_file(yr, mnth, day, retry=False):
                 metadata.tblProcess_Queue_Download_Error_Update(Error_Date, fname, tbl, 'Opedia', 'Rainier')
                 print(f"Successful retry for {Error_Date}")                
             try:
+                pass
                 metadata.tblProcess_Queue_Download_Insert(fname, tbl, 'Opedia', 'Rainier')
             except:
                 print(f"File already downloaded: {fname}")
@@ -135,6 +155,8 @@ def retryError(tbl):
 #         f"""wget --no-parent -nd -r -m --ftp-user={user} --ftp-password={pw} {fpath} -O {output_dir}datacheck_{yr}{mnth}{day}{hr}.nc"""
 #     )
 
+
+
 retryError(tbl)
 
 max_date = getMaxDate(tbl)
@@ -147,6 +169,9 @@ max_date += delta
 end_date -= delta
 ## ran thru 2/13
 ## Oct 2022 start 2023-02-14 12:07:31, FINISHED --2023-02-14 14:10:33. 2hr download time
+
+
+
 while max_date <= end_date:
     yr = max_date.year
     mnth = f"{max_date:%m}"

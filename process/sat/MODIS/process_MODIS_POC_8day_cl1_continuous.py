@@ -58,8 +58,20 @@ for fil in tqdm(flist):
     df["dayofyear"] = pd.to_datetime(df["time"]).dt.dayofyear
     df = df[["time", "lat", "lon", "poc", "year", "month", "week", "dayofyear"]]
     df = data.sort_values(df, data.ST_columns(df))
+    
+
+    ####### This block of code needs to be checked!!
+    df['time'] = df['time'].astype('<M8[us]')
+    for col in ['lat', 'lon']:
+        df[col] = df[col].astype('float64')
+    for col in ['year', 'month', 'dayofyear']:
+        df[col] = df[col].astype('int64')
+    ################################################    
+
     if df.dtypes.to_dict() != test_dtype:
         print(f"Check data types in {fil}. New: {df.columns.to_list()}")
+        print(df.dtypes.to_dict())
+        print(test_dtype) 
         sys.exit()      
     df.to_parquet(f"{rep_folder}{tbl}_{fil_date}.parquet", index=False)      
     metadata.tblProcess_Queue_Process_Update(fil_name, path, tbl, 'Opedia', 'Rainier')
