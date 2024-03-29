@@ -81,7 +81,7 @@ def retryError(tbl):
             get_SSS(date, True)
 
 
-retryError(tbl)
+# retryError(tbl)
 max_date = getMaxDate(tbl)
 end_date = dt.date.today()
 delta = dt.timedelta(days=1)
@@ -89,10 +89,12 @@ max_date += delta
 ## New data on ~ two week delay
 end_date -= dt.timedelta(days=11)
 
-while max_date <= end_date:
-    get_SSS(max_date)
-    sleep(1)    
-    max_date += delta
+print(max_date, end_date)
+
+# while max_date <= end_date:
+#     get_SSS(max_date)
+#     sleep(1)    
+#     max_date += delta
 
 
 
